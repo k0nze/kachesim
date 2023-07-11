@@ -1,5 +1,7 @@
-# Build
+# Build & Run
 ```bash
 cd build
-cmake ..
+cmake -GNinja ..
+ninja
+./main
 ```

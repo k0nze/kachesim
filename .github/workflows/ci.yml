@@ -18,7 +18,7 @@ jobs:
     - name: install build tools
       run: |
         sudo apt -y update
-        sudo apt -y install ninja
+        sudo apt -y install ninja-build
     - name: build
       run: |
         cd build

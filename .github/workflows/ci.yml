@@ -18,8 +18,8 @@ jobs:
     - name: build
       run: |
         cd build
-        cmake ..
-        make
+        cmake -GNinja ..
+        ninja
     - name: test
       run: |
         cd build

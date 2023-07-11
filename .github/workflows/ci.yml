@@ -15,6 +15,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: install build tools
+      run: |
+        apt -y update
+        apt -y install ninja
     - name: build
       run: |
         cd build

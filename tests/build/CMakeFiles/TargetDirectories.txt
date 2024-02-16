@@ -1,4 +1,0 @@
-/Users/konze/Programming/mesi_cachesim/tests/build/CMakeFiles/test_cache_entry.dir
-/Users/konze/Programming/mesi_cachesim/tests/build/CMakeFiles/test.dir
-/Users/konze/Programming/mesi_cachesim/tests/build/CMakeFiles/edit_cache.dir
-/Users/konze/Programming/mesi_cachesim/tests/build/CMakeFiles/rebuild_cache.dir

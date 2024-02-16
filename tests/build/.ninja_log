@@ -1,5 +1,0 @@
-# ninja log v5
-1	46	1708102033562234541	build.ninja	cd045ffca20439c8
-0	555	1708102034131102751	CMakeFiles/test_cache_entry.dir/test_cache_entry.cc.o	f2ceb3a33f01220e
-556	670	1708102034245482875	test_cache_entry	1646ad8e38fd1a69
-0	923	0	CMakeFiles/test.util	97af63cf0897c971

@@ -14,21 +14,21 @@ set(CMAKE_CONFIGURATION_TYPES
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 # test_cache_entry
-add_executable(test_cache_entry test_cache_entry.cc)
+add_executable(test_cache_line test_cache_line.cc)
 
-target_include_directories(test_cache_entry
+target_include_directories(test_cache_line
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 add_test(
-    test_cache_entry_build
+    test_cache_line_build
     "${CMAKE_COMMAND}"
     --build
     "${CMAKE_BINARY_DIR}"
     --config
     "$<CONFIG>"
     --target
-    test_cache_entry)
+    test_cache_line)
 
-add_test(NAME test_cache_entry COMMAND ./test_cache_entry)
-set_tests_properties(test_cache_entry PROPERTIES FIXTURES_SETUP test_fixture)
-set_tests_properties(test_cache_entry PROPERTIES FIXTURES_SETUP test_fixture)
+add_test(NAME test_cache_line COMMAND ./test_cache_entry)
+set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
+set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)

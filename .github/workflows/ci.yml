@@ -22,9 +22,12 @@ jobs:
     - name: build
       run: |
         cd build
-        cmake -GNinja ..
+        cmake -GNinja ../src
         ninja
     - name: test
       run: |
+        cd tests
+        mkdir build
         cd build
-        ./main
+        cmake -GNinja ..
+        ninja test

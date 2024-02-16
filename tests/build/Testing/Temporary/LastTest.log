@@ -1,0 +1,36 @@
+Start testing: Feb 16 17:47 CET
+----------------------------------------------------------
+1/2 Testing: test_cache_entry_build
+1/2 Test: test_cache_entry_build
+Command: "/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake" "--build" "/Users/konze/Programming/mesi_cachesim/tests/build" "--config" "$<CONFIG>" "--target" "test_cache_entry"
+Directory: /Users/konze/Programming/mesi_cachesim/tests/build
+"test_cache_entry_build" start time: Feb 16 17:47 CET
+Output:
+----------------------------------------------------------
+[1/2] Building CXX object CMakeFiles/test_cache_entry.dir/test_cache_entry.cc.o
+[2/2] Linking CXX executable test_cache_entry
+<end of output>
+Test time =   0.68 sec
+----------------------------------------------------------
+Test Passed.
+"test_cache_entry_build" end time: Feb 16 17:47 CET
+"test_cache_entry_build" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: test_cache_entry
+2/2 Test: test_cache_entry
+Command: "/Users/konze/Programming/mesi_cachesim/tests/build/test_cache_entry"
+Directory: /Users/konze/Programming/mesi_cachesim/tests/build
+"test_cache_entry" start time: Feb 16 17:47 CET
+Output:
+----------------------------------------------------------
+Hello World!
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"test_cache_entry" end time: Feb 16 17:47 CET
+"test_cache_entry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Feb 16 17:47 CET

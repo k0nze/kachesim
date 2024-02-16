@@ -1,4 +1,5 @@
 #include <cassert>
+#include <memory>
 
 #include "cache_line.h"
 

@@ -28,9 +28,10 @@ add_test(
     "$<CONFIG>"
     --target
     test_cache_line)
+set_tests_properties(test_cache_line_build PROPERTIES FIXTURES_SETUP
+                                                      test_fixture)
 
 add_test(NAME test_cache_line COMMAND ./test_cache_line)
-set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 
 # test_cache_set
@@ -49,9 +50,10 @@ add_test(
     "$<CONFIG>"
     --target
     test_cache_set)
+set_tests_properties(test_cache_set_build PROPERTIES FIXTURES_SETUP
+                                                     test_fixture)
 
 add_test(NAME test_cache_set COMMAND ./test_cache_set)
-set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 
 # test_set_associative_cache
@@ -71,8 +73,11 @@ add_test(
     --target
     test_set_associative_cache)
 
-add_test(NAME test_set_associative_cache COMMAND ./test_set_associative_cache)
-set_tests_properties(test_set_associative_cache PROPERTIES FIXTURES_SETUP
-                                                           test_fixture)
+set_tests_properties(test_set_associative_cache_build PROPERTIES FIXTURES_SETUP
+                                                                 test_fixture)
+
+add_test(NAME test_set_associative_cache COMMAND ./test_set_associative_cache
+                                                 test_fixture)
+
 set_tests_properties(test_set_associative_cache PROPERTIES FIXTURES_SETUP
                                                            test_fixture)

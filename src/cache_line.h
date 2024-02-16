@@ -1,3 +1,6 @@
+#ifndef CACHE_LINE_H
+#define CACHE_LINE_H
+
 #include <array>
 #include <cstdint>
 
@@ -13,3 +16,5 @@ struct CacheLine {
     bool dirty = false;
     std::array<uint8_t, N> data;
 };
+
+#endif

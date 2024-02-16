@@ -21,6 +21,7 @@ jobs:
         sudo apt -y install ninja-build
     - name: build
       run: |
+        mkdir build
         cd build
         cmake -GNinja ../src
         ninja

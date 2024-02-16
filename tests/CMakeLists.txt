@@ -14,7 +14,7 @@ set(CMAKE_CONFIGURATION_TYPES
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 # test_cache_line
-add_executable(test_cache_line test_cache_line.cc)
+add_executable(test_cache_line test_cache_line.cc ../src/cache_line.cc)
 
 target_include_directories(test_cache_line
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)

@@ -73,6 +73,8 @@ public:
     uint32_t ways_;
 
     uint64_t size();
+
+private:
 };
 
 #endif

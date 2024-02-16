@@ -33,6 +33,27 @@ add_test(NAME test_cache_line COMMAND ./test_cache_entry)
 set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 
+# test_cache_set
+add_executable(test_cache_set test_cache_set.cc ../src/cache_line.cc
+                              ../src/cache_set.cc)
+
+target_include_directories(test_cache_set
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+
+add_test(
+    test_cache_set_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_cache_set)
+
+add_test(NAME test_cache_set COMMAND ./test_cache_entry)
+set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
+set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
+
 # test_set_associative_cache
 add_executable(test_set_associative_cache test_set_associative_cache.cc
                                           ../src/set_associative_cache.cc)

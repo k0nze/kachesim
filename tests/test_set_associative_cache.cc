@@ -15,4 +15,6 @@ int main() {
     assert(sac->sets_ == 2);
 
     assert(sac->size() == 8 * 4 * 2);
+
+    return 0;
 }

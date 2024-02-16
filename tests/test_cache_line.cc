@@ -16,4 +16,6 @@ int main() {
     for (int i = 0; i < cl->size(); i++) {
         assert(cl->operator[](i) == 255 - i);
     }
+
+    return 0;
 }

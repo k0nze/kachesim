@@ -27,8 +27,8 @@
 *.lib
 
 # Executables
-build/*
-test/build/*
+build
+test/build
 *.exe
 *.out
 *.app
@@ -38,3 +38,6 @@ test/build/*
 
 # Python
 *.venv
+
+# Clang
+.clangd

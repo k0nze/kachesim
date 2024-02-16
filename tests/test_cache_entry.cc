@@ -1,6 +1,11 @@
+#include <cassert>
 #include <iostream>
 
+#include "cache_entry.h"
+
 int main() {
-    std::cout << "Hello World!" << std::endl;
-    return 0;
+    auto ce = std::make_unique<CacheEntry>();
+
+    assert(ce->tag == 0);
+    assert(ce->dirty == false);
 }

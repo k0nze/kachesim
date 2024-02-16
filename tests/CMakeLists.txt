@@ -29,7 +29,7 @@ add_test(
     --target
     test_cache_line)
 
-add_test(NAME test_cache_line COMMAND ./test_cache_entry)
+add_test(NAME test_cache_line COMMAND ./test_cache_line)
 set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 
@@ -50,7 +50,7 @@ add_test(
     --target
     test_cache_set)
 
-add_test(NAME test_cache_set COMMAND ./test_cache_entry)
+add_test(NAME test_cache_set COMMAND ./test_cache_set)
 set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 
@@ -71,7 +71,7 @@ add_test(
     --target
     test_set_associative_cache)
 
-add_test(NAME test_set_associative_cache COMMAND ./test_cache_entry)
+add_test(NAME test_set_associative_cache COMMAND ./test_set_associative_cache)
 set_tests_properties(test_set_associative_cache PROPERTIES FIXTURES_SETUP
                                                            test_fixture)
 set_tests_properties(test_set_associative_cache PROPERTIES FIXTURES_SETUP

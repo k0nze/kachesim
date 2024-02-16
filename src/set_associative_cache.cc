@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include "cache_line.h"
-
 SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
                                          uint32_t miss_latency, uint32_t hit_latency,
                                          uint32_t cache_line_size, uint32_t sets,
@@ -14,9 +12,7 @@ SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
       hit_latency_(hit_latency),
       cache_line_size_(cache_line_size),
       sets_(sets),
-      ways_(ways) {
-    // auto cl = std::make_unique<CacheLine>();
-}
+      ways_(ways) {}
 
 /**
  * @brief Returns the size of the cache in bytes

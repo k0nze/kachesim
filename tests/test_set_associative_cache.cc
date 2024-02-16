@@ -11,8 +11,8 @@ int main() {
     assert(sac->miss_latency_ == 10);
     assert(sac->hit_latency_ == 5);
     assert(sac->cache_line_size_ == 8);
-    assert(sac->ways_ == 4);
-    assert(sac->sets_ == 2);
+    assert(sac->sets_ == 4);
+    assert(sac->ways_ == 2);
 
     assert(sac->size() == 8 * 4 * 2);
 

@@ -13,4 +13,6 @@ int main() {
     assert(sac->cache_line_size_ == 8);
     assert(sac->ways_ == 4);
     assert(sac->sets_ == 2);
+
+    assert(sac->size() == 8 * 4 * 2);
 }

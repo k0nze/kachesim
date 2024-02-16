@@ -11,3 +11,9 @@ SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
       cache_line_size_(cache_line_size),
       sets_(sets),
       ways_(ways) {}
+
+/**
+ * @brief Returns the size of the cache in bytes
+ * @return The size of the cache in bytes
+ */
+uint64_t SetAssociativeCache::size() { return sets_ * ways_ * cache_line_size_; }

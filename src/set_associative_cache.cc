@@ -39,7 +39,7 @@ uint64_t SetAssociativeCache::size() { return sets_ * ways_ * cache_line_size_; 
  * @param address the address to calculate the offset from
  * @return the offset of the address
  */
-uint64_t SetAssociativeCache::get_address_offset(uint64_t address) {
+inline uint64_t SetAssociativeCache::get_address_offset(uint64_t address) {
     return address & offset_mask_;
 }
 
@@ -48,7 +48,7 @@ uint64_t SetAssociativeCache::get_address_offset(uint64_t address) {
  * @param address the address to calculate the index from
  * @return the offset of the address
  */
-uint64_t SetAssociativeCache::get_address_index(uint64_t address) {
+inline uint64_t SetAssociativeCache::get_address_index(uint64_t address) {
     return (address & index_mask_) >> clog2(cache_line_size_);
 }
 
@@ -57,7 +57,7 @@ uint64_t SetAssociativeCache::get_address_index(uint64_t address) {
  * @param address the address to calculate the tag from
  * @return the tag of the address
  */
-uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
+inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
     return (address & tag_mask_) >> (clog2(cache_line_size_) + clog2(sets_));
 }
 

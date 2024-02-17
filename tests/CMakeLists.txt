@@ -13,11 +13,14 @@ set(CMAKE_CONFIGURATION_TYPES
 # generate debug symbols
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src mesi_cachesim)
+
 # test_cache_line
-add_executable(test_cache_line test_cache_line.cc ../src/cache_line.cc)
+add_executable(test_cache_line test_cache_line.cc)
 
 target_include_directories(test_cache_line
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_cache_line PRIVATE mesi_cachesim)
 
 add_test(
     test_cache_line_build
@@ -35,11 +38,11 @@ add_test(NAME test_cache_line COMMAND ./test_cache_line)
 set_tests_properties(test_cache_line PROPERTIES FIXTURES_SETUP test_fixture)
 
 # test_cache_set
-add_executable(test_cache_set test_cache_set.cc ../src/cache_line.cc
-                              ../src/cache_set.cc)
+add_executable(test_cache_set test_cache_set.cc)
 
 target_include_directories(test_cache_set
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_cache_set PRIVATE mesi_cachesim)
 
 add_test(
     test_cache_set_build
@@ -57,11 +60,11 @@ add_test(NAME test_cache_set COMMAND ./test_cache_set)
 set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 
 # test_set_associative_cache
-add_executable(test_set_associative_cache test_set_associative_cache.cc
-                                          ../src/set_associative_cache.cc)
+add_executable(test_set_associative_cache test_set_associative_cache.cc)
 
 target_include_directories(test_set_associative_cache
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_set_associative_cache PRIVATE mesi_cachesim)
 
 add_test(
     test_set_associative_cache_build

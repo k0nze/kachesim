@@ -4,6 +4,6 @@ project(mesi_cachesim CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_library(mesi_cachesim SHARED cache_line.cc cache_set.cc
+add_library(mesi_cachesim SHARED common.cc cache_line.cc cache_set.cc
                                  set_associative_cache.cc)
 target_compile_options(mesi_cachesim INTERFACE "-fsized-deallocation")

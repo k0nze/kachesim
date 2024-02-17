@@ -2,6 +2,9 @@
 #define SET_ASSOCIATIVE_CACHE_H
 
 #include <cstdint>
+#include <vector>
+
+#include "cache_set.h"
 
 /**
  * represents a set-associative cache
@@ -74,7 +77,19 @@ public:
 
     uint64_t size();
 
+    void write(uint64_t address, const std::vector<uint8_t>& data);
+    std::vector<uint8_t> read(uint64_t address, uint32_t num_bytes);
+
 private:
+    uint64_t offset_mask_;
+    uint64_t index_mask_;
+    uint64_t tag_mask_;
+
+    std::vector<CacheSet> cache_sets_;
+
+    uint64_t get_address_offset(uint64_t address);
+    uint64_t get_address_index(uint64_t address);
+    uint64_t get_address_tag(uint64_t address);
 };
 
 #endif

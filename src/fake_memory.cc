@@ -167,7 +167,7 @@ uint32_t FakeMemory::read_word(uint64_t address) {
  * @return double_word read from memory
  */
 uint64_t FakeMemory::read_double_word(uint64_t address) {
-    std::vector<uint8_t> data = read(address, 4);
+    std::vector<uint8_t> data = read(address, 8);
     uint64_t double_word = (((uint64_t)data[7]) << 56) | (((uint64_t)data[6]) << 48) |
                            (((uint64_t)data[5]) << 40) | (((uint64_t)data[4]) << 32) |
                            (((uint64_t)data[3]) << 24) | (((uint64_t)data[2]) << 16) |

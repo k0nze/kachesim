@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <string>
 
 class Data {
 public:
@@ -22,15 +23,7 @@ public:
     template <typename T>
     void set(T bytes, size_t offset = 0) {
         int max_byte = std::min({(size_t)sizeof(T), size_});
-
-        for (int i = offset; i < max_byte; i++) {
-            data_[i] = (bytes >> (8 * i)) & 0xff;
-        }
-
-        // erase remaining bytes
-        for (int i = max_byte; i < size_; i++) {
-            data_[i] = 0;
-        }
+        memcpy(data_, &bytes, max_byte);
     }
 
     /**
@@ -41,13 +34,8 @@ public:
     template <typename T>
     T get(size_t offset = 0) {
         int max_byte = std::min({(size_t)sizeof(T), size_});
-
         T bytes = 0;
-
-        for (int i = offset; i < max_byte; i++) {
-            bytes |= ((T)data_[i]) << (8 * i);
-        }
-
+        memcpy(&bytes, data_, max_byte);
         return bytes;
     }
 

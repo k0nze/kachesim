@@ -15,6 +15,27 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src mesi_cachesim)
 
+# test_data
+add_executable(test_data test_data.cc)
+
+target_include_directories(test_data PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_data PRIVATE mesi_cachesim)
+
+add_test(
+    test_data_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_data)
+
+set_tests_properties(test_data_build PROPERTIES FIXTURES_SETUP test_fixture)
+
+add_test(NAME test_data COMMAND ./test_data test_fixture)
+set_tests_properties(test_data PROPERTIES FIXTURES_SETUP test_fixture)
+
 # test_cache_line
 add_executable(test_cache_line test_cache_line.cc)
 

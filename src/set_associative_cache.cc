@@ -19,12 +19,7 @@ SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
     index_mask_ = bitmask<uint64_t>(clog2(sets_)) << clog2(cache_line_size_);
     tag_mask_ = ~offset_mask_ & ~index_mask_;
 
-    cache_sets_ = std::vector<CacheSet>();
-    cache_sets_.reserve(sets_);
-
-    for (int i = 0; i < sets_; i++) {
-        cache_sets_[i] = CacheSet(cache_line_size_, ways_);
-    }
+    reset();
 }
 
 /**
@@ -84,4 +79,16 @@ std::vector<uint8_t> SetAssociativeCache::read(uint64_t address, uint32_t num_by
     auto data = std::vector<uint8_t>(num_bytes);
 
     return data;
+}
+
+/**
+ * @brief reset the whole cache
+ */
+void SetAssociativeCache::reset() {
+    cache_sets_ = std::vector<CacheSet>();
+    cache_sets_.reserve(sets_);
+
+    for (int i = 0; i < sets_; i++) {
+        cache_sets_[i] = CacheSet(cache_line_size_, ways_);
+    }
 }

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <limits>
 #include <memory>
 
 #include "data.h"
@@ -236,6 +237,24 @@ int main() {
     d8->set<uint32_t>(0x04030201, 1);
     assert(d8->get<uint64_t>(0) == 0x0403020100);
     assert(d8->get<uint64_t>(1) == 0x04030201);
+
+    d8->set<float>(3.14);
+    assert(d8->get<float>() > 3.14 - std::numeric_limits<float>::epsilon());
+    assert(d8->get<float>() < 3.14 + std::numeric_limits<float>::epsilon());
+
+    d8->set<float>(3.14, 1);
+    assert(d8->get<float>(1) > 3.14 - std::numeric_limits<float>::epsilon());
+    assert(d8->get<float>(1) < 3.14 + std::numeric_limits<float>::epsilon());
+
+    d8->set<double>(42.23);
+    assert(d8->get<double>() > 42.23 - std::numeric_limits<float>::epsilon());
+    assert(d8->get<double>() < 42.23 + std::numeric_limits<float>::epsilon());
+
+    auto d12 = std::make_unique<Data>(12);
+
+    d12->set<double>(42.23, 3);
+    assert(d12->get<double>(3) > 42.23 - std::numeric_limits<float>::epsilon());
+    assert(d12->get<double>(3) < 42.23 + std::numeric_limits<float>::epsilon());
 
     return 0;
 }

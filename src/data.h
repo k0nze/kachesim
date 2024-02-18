@@ -18,17 +18,17 @@ public:
     void set_word(uint32_t word);
     void set_double_word(uint64_t double_word);
 
-    void set_int8_t(int8_t i);
-    void set_uint8_t(uint8_t i);
+    void set_int8_t(int8_t a);
+    void set_uint8_t(uint8_t a);
 
-    void set_int16_t(int16_t i);
-    void set_uint16_t(uint16_t i);
+    void set_int16_t(int16_t a);
+    void set_uint16_t(uint16_t a);
 
-    void set_int32_t(int32_t i);
-    void set_uint32_t(uint32_t i);
+    void set_int32_t(int32_t a);
+    void set_uint32_t(uint32_t a);
 
-    void set_int64_t(int64_t i);
-    void set_uint64_t(uint64_t i);
+    void set_int64_t(int64_t a);
+    void set_uint64_t(uint64_t a);
 
     void set_float(float f);
     void set_double(double d);

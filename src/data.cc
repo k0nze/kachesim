@@ -6,7 +6,14 @@ Data::Data(uint32_t size) : size_(size) { data_ = std::vector<uint8_t>(size_); }
 
 uint32_t Data::size() { return size_; }
 
-void Data::set_byte(uint8_t byte) { data_[0] = byte; }
+void Data::set_byte(uint8_t byte) {
+    data_[0] = byte;
+
+    // erase remaining bytes
+    for (int i = 1; i < size_; i++) {
+        data_[i] = 0;
+    }
+}
 
 void Data::set_half_word(uint16_t half_word) {
     int max_byte = std::min({(uint32_t)2, size_});
@@ -46,6 +53,22 @@ void Data::set_double_word(uint64_t double_word) {
         data_[i] = 0;
     }
 }
+
+void Data::set_int8_t(int8_t a) { set_byte((uint8_t)a); }
+
+void Data::set_uint8_t(uint8_t a) { set_byte(a); }
+
+void Data::set_int16_t(int16_t a) { set_half_word((uint16_t)a); }
+
+void Data::set_uint16_t(uint16_t a) { set_half_word(a); }
+
+void Data::set_int32_t(int32_t a) { set_word((uint32_t)a); }
+
+void Data::set_uint32_t(uint32_t a) { set_word(a); }
+
+void Data::set_int64_t(int64_t a) { set_double_word((uint64_t)a); }
+
+void Data::set_uint64_t(uint64_t a) { set_double_word(a); }
 
 uint8_t Data::get_byte() {
     uint8_t byte = data_[0];
@@ -87,3 +110,19 @@ uint64_t Data::get_double_word() {
 
     return double_word;
 }
+
+int8_t Data::get_int8_t() { return (int8_t)get_byte(); }
+
+uint8_t Data::get_uint8_t() { return get_byte(); }
+
+int16_t Data::get_int16_t() { return (int16_t)get_half_word(); }
+
+uint16_t Data::get_uint16_t() { return get_half_word(); }
+
+int32_t Data::get_int32_t() { return (int32_t)get_word(); }
+
+uint32_t Data::get_uint32_t() { return get_word(); }
+
+int64_t Data::get_int64_t() { return (int64_t)get_double_word(); }
+
+uint64_t Data::get_uint64_t() { return get_double_word(); }

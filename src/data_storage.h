@@ -1,13 +1,13 @@
-#ifndef CACHE_INTERFACE_H
-#define CACHE_INTERFACE_H
+#ifndef DATA_STORAGE_H
+#define DATA_STORAGE_H
 
 #include <cstdint>
 #include <vector>
 
-class CacheInterface {
+class DataStorage {
 public:
-    CacheInterface() {}
-    virtual ~CacheInterface() {}
+    DataStorage() {}
+    virtual ~DataStorage() {}
 
     virtual void write(uint64_t address, const std::vector<uint8_t>& data) = 0;
     virtual std::vector<uint8_t> read(uint64_t address, uint32_t num_bytes) = 0;

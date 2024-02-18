@@ -1,8 +1,8 @@
 #ifndef SET_ASSOCIATIVE_CACHE_H
 #define SET_ASSOCIATIVE_CACHE_H
 
-#include "cache_interface.h"
 #include "cache_set.h"
+#include "data_storage.h"
 
 /**
  * represents a set-associative cache
@@ -59,7 +59,7 @@
  *
  *   ways: is the number of lines per set
  */
-class SetAssociativeCache : public CacheInterface {
+class SetAssociativeCache : public DataStorage {
 public:
     SetAssociativeCache(bool write_allocate, bool write_back, uint32_t miss_latency,
                         uint32_t hit_latency, uint32_t cache_line_size, uint32_t sets,

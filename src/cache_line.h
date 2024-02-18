@@ -4,8 +4,6 @@
 #include <cstdint>
 #include <vector>
 
-enum CacheLineAccessResult { hit, miss };
-
 /**
  * represents a cache line (also called block) containing N bytes with a tag and a
  * dirty bit

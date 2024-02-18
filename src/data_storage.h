@@ -4,10 +4,30 @@
 #include <cstdint>
 #include <vector>
 
+#include "data.h"
+
+typedef uint32_t latency_t;
+typedef uint64_t address_t;
+
+// enum CacheAccessResult { hit, miss };
+
+enum DataStorageTransactionType { read, write };
+enum HitMiss { hit, miss };
+
+struct DataStorageTransaction {
+    DataStorageTransactionType type;
+    latency_t latency;
+    std::vector<HitMiss> hit_miss_chain;
+    Data data;
+};
+
 class DataStorage {
 public:
     DataStorage() {}
     virtual ~DataStorage() {}
+
+    // virtual DataStorageTransaction write(address_t address, Data data) = 0;
+    // virtual DataStorageTransaction read(address_t address) = 0;
 
     virtual void write(uint64_t address, const std::vector<uint8_t>& data) = 0;
     virtual std::vector<uint8_t> read(uint64_t address, uint32_t num_bytes) = 0;

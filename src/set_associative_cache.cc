@@ -81,6 +81,34 @@ std::vector<uint8_t> SetAssociativeCache::read(uint64_t address, uint32_t num_by
     return data;
 }
 
+void SetAssociativeCache::write_byte(uint64_t address, uint8_t byte) {}
+
+void SetAssociativeCache::write_half_word(uint64_t address, uint16_t half_word) {}
+
+void SetAssociativeCache::write_word(uint64_t address, uint32_t word) {}
+
+void SetAssociativeCache::write_double_word(uint64_t address, uint64_t double_word) {}
+
+uint8_t SetAssociativeCache::read_byte(uint64_t address) {
+    uint8_t byte = 0;
+    return byte;
+}
+
+uint16_t SetAssociativeCache::read_half_word(uint64_t address) {
+    uint16_t half_word = 0;
+    return half_word;
+}
+
+uint32_t SetAssociativeCache::read_word(uint64_t address) {
+    uint32_t word = 0;
+    return word;
+}
+
+uint64_t SetAssociativeCache::read_double_word(uint64_t address) {
+    uint64_t double_word = 0;
+    return double_word;
+}
+
 /**
  * @brief reset the whole cache
  */

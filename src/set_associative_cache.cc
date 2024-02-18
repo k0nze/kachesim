@@ -66,7 +66,13 @@ inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
  * @param address the address to write to
  * @param data the data to write to the cache at the address
  */
-void SetAssociativeCache::write(uint64_t address, const std::vector<uint8_t>& data) {}
+void SetAssociativeCache::write(uint64_t address, const std::vector<uint8_t>& data) {
+    uint64_t offset = get_address_offset(address);
+    uint64_t index = get_address_index(address);
+    uint64_t tag = get_address_tag(address);
+
+    CacheSet set = cache_sets_[index];
+}
 
 /**
  * @brief reads data from the cache

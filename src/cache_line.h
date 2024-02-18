@@ -16,6 +16,7 @@ public:
 
     uint64_t tag_;
     bool dirty_ = false;
+    bool valid_ = false;
 
     std::size_t size() const { return data_.size(); }
 

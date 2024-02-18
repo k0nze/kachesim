@@ -12,6 +12,8 @@ public:
     CacheSet(uint64_t cache_line_size, uint32_t ways);
 
     std::vector<CacheLine> lines;
+
+    int32_t get_free_line_index();
 };
 
 #endif

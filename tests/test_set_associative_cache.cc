@@ -1,5 +1,6 @@
 #include <cassert>
 #include <memory>
+#include <vector>
 
 #include "set_associative_cache.h"
 
@@ -15,6 +16,14 @@ int main() {
     assert(sac->ways_ == 2);
 
     assert(sac->size() == 8 * 4 * 2);
+
+    std::vector<uint8_t> data;
+    data.push_back(1);
+    data.push_back(2);
+    data.push_back(3);
+    data.push_back(4);
+
+    sac->write(0xdeadbeef, data);
 
     return 0;
 }

@@ -23,8 +23,11 @@ public:
      */
     template <typename T>
     void set(T bytes, size_t offset = 0) {
-        int max_byte = std::min({(size_t)sizeof(T), size_});
-        memcpy(data_, &bytes, max_byte);
+        int max_byte = std::min({(size_t)sizeof(T), size_ - offset});
+        // clear data_
+        memset(data_, 0, size_);
+        // copy bytes in to data_
+        memcpy(data_ + offset, &bytes, max_byte);
     }
 
     /**
@@ -34,9 +37,9 @@ public:
      */
     template <typename T>
     T get(size_t offset = 0) {
-        int max_byte = std::min({(size_t)sizeof(T), size_});
+        int max_byte = std::min({(size_t)sizeof(T), size_ - offset});
         T bytes = 0;
-        memcpy(&bytes, data_, max_byte);
+        memcpy(&bytes, data_ + offset, max_byte);
         return bytes;
     }
 

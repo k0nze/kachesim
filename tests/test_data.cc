@@ -233,5 +233,9 @@ int main() {
     d8->set<uint64_t>(4723642012);
     assert(d8->get<uint64_t>() == 4723642012);
 
+    d8->set<uint32_t>(0x04030201, 1);
+    assert(d8->get<uint64_t>(0) == 0x0403020100);
+    assert(d8->get<uint64_t>(1) == 0x04030201);
+
     return 0;
 }

@@ -1,6 +1,8 @@
 #ifndef DATA_STORAGE_TRANSACTION_H
 #define DATA_STORAGE_TRANSACTION_H
 
+#include <memory>
+
 #include "data.h"
 
 typedef uint32_t latency_t;

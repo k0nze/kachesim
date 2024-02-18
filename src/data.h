@@ -1,9 +1,10 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <string.h>
+
 #include <algorithm>
 #include <cstdint>
-#include <string>
 
 class Data {
 public:

@@ -59,7 +59,7 @@
  *
  *   ways: is the number of lines per set
  */
-class SetAssociativeCache : public DataStorage {
+class SetAssociativeCache /*: public DataStorage*/ {
 public:
     SetAssociativeCache(bool write_allocate, bool write_back, uint32_t miss_latency,
                         uint32_t hit_latency, uint32_t cache_line_size, uint32_t sets,

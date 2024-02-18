@@ -144,7 +144,8 @@ uint8_t FakeMemory::read_byte(uint64_t address) { return read(address, 1)[0]; }
  * @return half_word read from memory
  */
 uint16_t FakeMemory::read_half_word(uint64_t address) {
-    uint16_t half_word = 0;
+    std::vector<uint8_t> data = read(address, 2);
+    uint16_t half_word = (data[1] << 8) | data[0];
     return half_word;
 }
 
@@ -154,7 +155,8 @@ uint16_t FakeMemory::read_half_word(uint64_t address) {
  * @return word read from memory
  */
 uint32_t FakeMemory::read_word(uint64_t address) {
-    uint32_t word = 0;
+    std::vector<uint8_t> data = read(address, 4);
+    uint32_t word = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
     return word;
 }
 
@@ -164,7 +166,10 @@ uint32_t FakeMemory::read_word(uint64_t address) {
  * @return double_word read from memory
  */
 uint64_t FakeMemory::read_double_word(uint64_t address) {
-    uint32_t double_word = 0;
+    std::vector<uint8_t> data = read(address, 4);
+    uint64_t double_word = (data[7] << 56) | (data[6] << 48) | (data[5] << 40) |
+                           (data[4] << 32) | (data[3] << 24) | (data[2] << 16) |
+                           (data[1] << 8) | data[0];
     return double_word;
 }
 

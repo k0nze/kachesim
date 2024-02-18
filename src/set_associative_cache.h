@@ -1,9 +1,7 @@
 #ifndef SET_ASSOCIATIVE_CACHE_H
 #define SET_ASSOCIATIVE_CACHE_H
 
-#include <cstdint>
-#include <vector>
-
+#include "cache_interface.h"
 #include "cache_set.h"
 
 /**
@@ -61,7 +59,7 @@
  *
  *   ways: is the number of lines per set
  */
-class SetAssociativeCache {
+class SetAssociativeCache : public CacheInterface {
 public:
     SetAssociativeCache(bool write_allocate, bool write_back, uint32_t miss_latency,
                         uint32_t hit_latency, uint32_t cache_line_size, uint32_t sets,

@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <cmath>
+#include <string>
 
 /**
  * @author Siu Ching Pong -Asuka Kenji- https://stackoverflow.com/a/28703383
@@ -14,5 +15,9 @@ static constexpr R bitmask(unsigned int const onecount) {
 }
 
 uint32_t clog2(uint64_t x);
+
+#define THROW_OUT_OF_RANGE(msg)                                                   \
+    throw std::out_of_range((std::string(msg)) + " at " + std::string(__FILE__) + \
+                            ":" + std::to_string(__LINE__));
 
 #endif

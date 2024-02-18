@@ -84,3 +84,27 @@ add_test(NAME test_set_associative_cache COMMAND ./test_set_associative_cache
 
 set_tests_properties(test_set_associative_cache PROPERTIES FIXTURES_SETUP
                                                            test_fixture)
+
+# test_fake_memory
+add_executable(test_fake_memory test_fake_memory.cc)
+
+target_include_directories(test_fake_memory
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_fake_memory PRIVATE mesi_cachesim)
+
+add_test(
+    test_fake_memory_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_fake_memory)
+
+set_tests_properties(test_fake_memory_build PROPERTIES FIXTURES_SETUP
+                                                       test_fixture)
+
+add_test(NAME test_fake_memory COMMAND ./test_fake_memory test_fixture)
+
+set_tests_properties(test_fake_memory PROPERTIES FIXTURES_SETUP test_fixture)

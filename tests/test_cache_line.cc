@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 #include "cache_line.h"
@@ -6,17 +7,28 @@
 int main() {
     auto cl = std::make_unique<CacheLine>(8);
 
-    assert(cl->tag_ == 0);
-    assert(cl->dirty_ == false);
     assert(cl->size() == 8);
+    assert(cl->valid() == false);
+    assert(cl->dirty() == false);
+    assert(cl->get_tag() == 0);
 
-    for (int i = 0; i < cl->size(); i++) {
-        cl->operator[](i) = 255 - i;
-    }
+    auto d = cl->get_data();
+    assert(d.size() == 8);
 
-    for (int i = 0; i < cl->size(); i++) {
-        assert(cl->operator[](i) == 255 - i);
-    }
+    d[1] = 0x01;
+    uint64_t tag = 42;
+
+    cl->update(tag, d);
+
+    auto e = cl->get_data();
+
+    std::cout << std::hex << d.get<uint64_t>() << std::endl;
+    std::cout << std::hex << e.get<uint64_t>() << std::endl;
+    assert(d == e);
+
+    assert(cl->get_tag() == tag);
+    assert(cl->valid() == true);
+    assert(cl->dirty() == true);
 
     return 0;
 }

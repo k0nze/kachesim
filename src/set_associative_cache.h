@@ -1,6 +1,8 @@
 #ifndef SET_ASSOCIATIVE_CACHE_H
 #define SET_ASSOCIATIVE_CACHE_H
 
+#include <map>
+
 #include "cache_interface.h"
 #include "cache_set.h"
 
@@ -94,6 +96,7 @@ private:
     uint64_t get_address_index(uint64_t address);
     uint64_t get_address_tag(uint64_t address);
 
+    std::map<address_t, Data> align_transaction(address_t address, Data& data);
     DataStorageTransaction aligned_write(address_t address, Data& data);
 };
 

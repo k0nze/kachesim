@@ -61,8 +61,58 @@ inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
     return (address & tag_mask_) >> (clog2(cache_line_size_) + clog2(sets_));
 }
 
+std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t address,
+                                                                 Data& data) {
+    std::map<address_t, Data> address_data_map;
+
+    // check if data effects multiple sets and lines
+    uint64_t offset = get_address_offset(address);
+    uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
+
+    // split data into cache line size chunks
+    // if offset != 0 first piece of data is a partial update
+    uint32_t bytes_allocated = cache_line_size_ - offset;
+
+    auto d0 = Data(bytes_allocated);
+
+    for (int i = 0; i < bytes_allocated; i++) {
+        d0[i] = data[i];
+    }
+
+    address_data_map.insert({address, d0});
+
+    while (bytes_allocated < data.size()) {
+        // check if there is data for a whole line
+        if (data.size() - bytes_allocated > cache_line_size_) {
+            // full update
+            Data d = Data(cache_line_size_);
+            for (int i = 0; i < cache_line_size_; i++) {
+                d[i] = data[i + bytes_allocated];
+            }
+            address_data_map.insert({address + bytes_allocated, d});
+            bytes_allocated += cache_line_size_;
+        }
+
+        else {
+            // partial update
+            Data d = Data(data.size() - bytes_allocated);
+            for (int i = 0; i < data.size() - bytes_allocated; i++) {
+                d[i] = data[i + bytes_allocated];
+            }
+            address_data_map.insert({address + bytes_allocated, d});
+            bytes_allocated += cache_line_size_;
+        }
+    }
+
+    return address_data_map;
+}
+
 DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                                                           Data& data) {
+    std::cout << "a: " << std::hex << address << ", d: " << data.get<uint64_t>()
+              << std::endl;
+
     uint32_t hit_level = 0;
     latency_t latency = 0;
 
@@ -78,59 +128,13 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
  * @param data the data to write
  */
 DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data) {
-    // check if data effects multiple sets and lines
-    uint64_t offset = get_address_offset(address);
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    std::map<address_t, Data> address_data_map = align_transaction(address, data);
 
-    // check if data spans over multiple cache sets
-    // first cache set
-
-    std::vector<uint64_t> addresses;
-    std::vector<Data> datas;
-
-    // split data into cache line size chunks
-    // if offset != 0 first piece of data is a partial update
-    uint32_t bytes_allocated = cache_line_size_ - offset;
-
-    auto d0 = Data(bytes_allocated);
-
-    for (int i = 0; i < bytes_allocated; i++) {
-        d0[i] = data[i];
+    // itreate over address_data_map and execute and aligned_write
+    for (auto& [addr, d] : address_data_map) {
+        auto dst = aligned_write(addr, d);
     }
-
-    datas.push_back(d0);
-    addresses.push_back(address);
-
-    while (bytes_allocated < data.size()) {
-        // check if there is data for a whole line
-        if (data.size() - bytes_allocated > cache_line_size_) {
-            // full update
-            Data d = Data(cache_line_size_);
-            for (int i = 0; i < cache_line_size_; i++) {
-                d[i] = data[i + bytes_allocated];
-            }
-            datas.push_back(d);
-            addresses.push_back(address + bytes_allocated);
-            bytes_allocated += cache_line_size_;
-        }
-
-        else {
-            // partial update
-            Data d = Data(data.size() - bytes_allocated);
-            for (int i = 0; i < data.size() - bytes_allocated; i++) {
-                d[i] = data[i + bytes_allocated];
-            }
-            datas.push_back(d);
-            addresses.push_back(address + bytes_allocated);
-            bytes_allocated += cache_line_size_;
-        }
-    }
-
-    // iterate over all addresses and data and perform an aligned write
-    for (int i = 0; i < addresses.size(); i++) {
-        aligned_write(addresses[i], datas[i]);
-    }
+    std::cout << std::endl;
 
     uint32_t hit_level = 0;
     latency_t latency = 0;

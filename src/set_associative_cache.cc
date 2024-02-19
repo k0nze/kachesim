@@ -1,21 +1,25 @@
 #include "set_associative_cache.h"
 
+#include <cmath>
 #include <iostream>
+#include <map>
 #include <memory>
+#include <vector>
 
 #include "common.h"
 
 SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
                                          latency_t miss_latency, latency_t hit_latency,
                                          size_t cache_line_size, size_t sets,
-                                         size_t ways)
+                                         size_t ways, size_t multi_line_access)
     : write_allocate_(write_allocate),
       write_back_(write_back),
       miss_latency_(miss_latency),
       hit_latency_(hit_latency),
       cache_line_size_(cache_line_size),
       sets_(sets),
-      ways_(ways) {
+      ways_(ways),
+      multi_line_access_(multi_line_access) {
     offset_mask_ = bitmask<uint64_t>(clog2(cache_line_size_));
     index_mask_ = bitmask<uint64_t>(clog2(sets_)) << clog2(cache_line_size_);
     tag_mask_ = ~offset_mask_ & ~index_mask_;
@@ -57,31 +61,75 @@ inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
     return (address & tag_mask_) >> (clog2(cache_line_size_) + clog2(sets_));
 }
 
+DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
+                                                          Data& data) {
+    uint32_t hit_level = 0;
+    latency_t latency = 0;
+
+    DataStorageTransaction dst = {WRITE, address, latency, hit_level,
+                                  std::unique_ptr<Data>(new Data(data))};
+
+    return dst;
+}
+
 /**
- * @brief write data to cache
+ * @brief write data to cache and allows for unaligned access and variable length
  * @param address the address to write to
  * @param data the data to write
  */
 DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data) {
+    // check if data effects multiple sets and lines
     uint64_t offset = get_address_offset(address);
-    uint64_t index = get_address_index(address);
     uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
 
-    // select target cache set
-    CacheSet target_cache_set = cache_sets_[index];
+    // check if data spans over multiple cache sets
+    // first cache set
 
-    // check if cache set has a free line (way)
-    int32_t target_line_index = target_cache_set.get_free_line_index();
+    std::vector<uint64_t> addresses;
+    std::vector<Data> datas;
 
-    // free line was found
-    if (target_line_index != -1) {
-        // allocate line
+    // split data into cache line size chunks
+    // if offset != 0 first piece of data is a partial update
+    uint32_t bytes_allocated = cache_line_size_ - offset;
+
+    auto d0 = Data(bytes_allocated);
+
+    for (int i = 0; i < bytes_allocated; i++) {
+        d0[i] = data[i];
     }
 
-    // no free line was found, evict line
-    else {
-        // evict line
-        // allocate line
+    datas.push_back(d0);
+    addresses.push_back(address);
+
+    while (bytes_allocated < data.size()) {
+        // check if there is data for a whole line
+        if (data.size() - bytes_allocated > cache_line_size_) {
+            // full update
+            Data d = Data(cache_line_size_);
+            for (int i = 0; i < cache_line_size_; i++) {
+                d[i] = data[i + bytes_allocated];
+            }
+            datas.push_back(d);
+            addresses.push_back(address + bytes_allocated);
+            bytes_allocated += cache_line_size_;
+        }
+
+        else {
+            // partial update
+            Data d = Data(data.size() - bytes_allocated);
+            for (int i = 0; i < data.size() - bytes_allocated; i++) {
+                d[i] = data[i + bytes_allocated];
+            }
+            datas.push_back(d);
+            addresses.push_back(address + bytes_allocated);
+            bytes_allocated += cache_line_size_;
+        }
+    }
+
+    // iterate over all addresses and data and perform an aligned write
+    for (int i = 0; i < addresses.size(); i++) {
+        aligned_write(addresses[i], datas[i]);
     }
 
     uint32_t hit_level = 0;

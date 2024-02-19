@@ -63,7 +63,7 @@ class SetAssociativeCache : public CacheInterface {
 public:
     SetAssociativeCache(bool write_allocate, bool write_back, latency_t miss_latency,
                         latency_t hit_latency, size_t cache_line_size, size_t sets,
-                        size_t ways);
+                        size_t ways, size_t multi_line_access = 1);
 
     bool write_allocate_;
     bool write_back_;
@@ -74,6 +74,7 @@ public:
     size_t cache_line_size_;
     size_t sets_;
     size_t ways_;
+    size_t multi_line_access_;
 
     size_t size();
 
@@ -92,6 +93,8 @@ private:
     uint64_t get_address_offset(uint64_t address);
     uint64_t get_address_index(uint64_t address);
     uint64_t get_address_tag(uint64_t address);
+
+    DataStorageTransaction aligned_write(address_t address, Data& data);
 };
 
 #endif

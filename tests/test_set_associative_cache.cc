@@ -16,10 +16,21 @@ int main() {
     auto sac = std::make_unique<SetAssociativeCache>(
         false, true, miss_latency, hit_latency, cache_line_size, sets, ways);
 
-    Data d1 = Data(1);
+    Data d = Data(14);
+    d.set<uint64_t>(0x87654321deadbeef, 0);
+    d.set<uint64_t>(0xaabbccddeeff, 8, false);
 
-    sac->write(0x1000, d1);
-    sac->write(0x1001, d1);
+    sac->write(0x1000, d);
+    sac->write(0x1001, d);
+    sac->write(0x1002, d);
+    sac->write(0x1003, d);
+    sac->write(0x1004, d);
+    sac->write(0x1005, d);
+    sac->write(0x1006, d);
+    sac->write(0x1007, d);
+
+    sac->write(0x1008, d);
+    sac->write(0x1009, d);
 
     return 0;
 }

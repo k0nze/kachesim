@@ -10,6 +10,7 @@ class Data {
 public:
     Data(uint32_t size);
     Data(const std::vector<uint8_t>& data);
+    Data(const uint8_t* data, size_t size);
     Data(const Data& data);
     ~Data();
 

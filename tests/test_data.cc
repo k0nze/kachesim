@@ -264,5 +264,15 @@ int main() {
 
     assert(*a == *b);
 
+    uint8_t* ds = new uint8_t[8];
+
+    for (int i = 0; i < 8; i++) {
+        ds[i] = i + 1;
+    }
+
+    auto c = std::make_unique<Data>(ds, 8);
+
+    assert(c->get<uint64_t>() == 0x0807060504030201);
+
     return 0;
 }

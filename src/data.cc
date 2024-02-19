@@ -11,6 +11,15 @@ Data::Data(const std::vector<uint8_t>& data) {
     }
 }
 
+Data::Data(const uint8_t* data, size_t size) {
+    size_ = size;
+    data_ = new uint8_t[size_];
+
+    for (int i = 0; i < size_; i++) {
+        data_[i] = data[i];
+    }
+}
+
 Data::Data(const Data& data) {
     size_ = data.size_;
     data_ = new uint8_t[size_];

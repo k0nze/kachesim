@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "data_storage.h"
+#include "memory_interface.h"
 
-class FakeMemory : public DataStorage {
+class FakeMemory : public MemoryInterface {
 public:
     FakeMemory(uint64_t size);
 

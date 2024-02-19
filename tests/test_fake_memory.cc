@@ -8,19 +8,24 @@
 #include "fake_memory.h"
 
 int main() {
-    auto fm = std::make_unique<FakeMemory>(65536);
+    latency_t read_latency = 3;
+    latency_t write_latency = 3;
+
+    auto fm = std::make_unique<FakeMemory>(65536, read_latency, write_latency);
 
     // write one byte to each memory address
     for (uint64_t i = 0; i < fm->size(); i++) {
         Data d = Data(1);
         d.set<uint8_t>(i);
-        fm->write(i, d);
+        auto dst = fm->write(i, d);
+        assert(dst.latency == write_latency);
     }
 
     // read bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i++) {
         auto dst = fm->read(i, 1);
         assert(dst.data->get<uint8_t>() == (i % (UCHAR_MAX + 1)));
+        assert(dst.latency == read_latency);
     }
 
     // write 2 bytes to each 2ne memory address

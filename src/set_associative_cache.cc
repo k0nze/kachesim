@@ -127,23 +127,57 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     uint64_t index = get_address_index(address);
 
     // check if target cache set already contains tag
-    int32_t line_index = cache_sets_[index].get_line_index_with_tag(tag);
+    int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
 
+    std::cout << line_index << std::endl;
+
+    // TODO: may be move to CacheSet in the future
     if (line_index != -1) {
         // line with tag found -> update line
+        // TODO
     } else {
         // check if there is a free line
-        line_index = cache_sets_[index].get_free_line_index();
+        line_index = cache_sets_[index]->get_free_line_index();
+        std::cout << line_index << std::endl;
 
         if (line_index != -1) {
-            // free line found -> write to line
+            // free line found -> miss -> write to line
+
+            // check if its a partial write
+            if (data.size() != cache_line_size_) {
+                Data d = Data(cache_line_size_);
+
+                if (offset != 0) {
+                    // load lower bytes from memory
+                    // TODO
+                    for (int i = 0; i < offset; i++) {
+                        d[i] = 0xef;
+                    }
+                    for (int i = offset; i < cache_line_size_; i++) {
+                        d[i] = data[i - offset];
+                    }
+                } else {
+                    for (int i = 0; i < data.size(); i++) {
+                        d[i] = data[i];
+                    }
+                    // load upper bytes from memory
+                    // TODO
+                    for (int i = data.size(); i < cache_line_size_; i++) {
+                        d[i] = 0xef;
+                    }
+                }
+
+                cache_sets_[index]->update_line(line_index, tag, d);
+                std::cout << "Partial write to index: " << index
+                          << ", d: " << d.get<uint64_t>() << std::endl;
+            }
         } else {
             // no free line found -> evict line
+            // TODO
             // write to line
+            // TODO
         }
     }
-
-    // cache_sets_[index].update_line(0, tag, data);
 
     uint32_t hit_level = 0;
     latency_t latency = 0;
@@ -195,10 +229,10 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
  * @brief reset the whole cache
  */
 void SetAssociativeCache::reset() {
-    cache_sets_ = std::vector<CacheSet>();
     cache_sets_.reserve(sets_);
 
     for (int i = 0; i < sets_; i++) {
-        cache_sets_[i] = CacheSet(cache_line_size_, ways_);
+        cache_sets_.push_back(
+            std::unique_ptr<CacheSet>(new CacheSet(cache_line_size_, ways_)));
     }
 }

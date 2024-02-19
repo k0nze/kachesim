@@ -1,13 +1,13 @@
 #include "cache_set.h"
 
+#include <iostream>
 #include <memory>
 
 CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways) {
-    lines_ = std::vector<CacheLine>();
     lines_.reserve(ways);
 
     for (int i = 0; i < ways; i++) {
-        lines_[i] = CacheLine(cache_line_size);
+        lines_.push_back(std::unique_ptr<CacheLine>(new CacheLine(cache_line_size)));
     }
 }
 
@@ -17,8 +17,7 @@ CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways) {
  */
 int32_t CacheSet::get_line_index_with_tag(uint64_t tag) {
     for (int i = 0; i < lines_.size(); i++) {
-        CacheLine line = lines_[i];
-        if (line.get_tag() == tag) {
+        if (lines_[i]->get_tag() == tag) {
             return i;
         }
     }
@@ -32,8 +31,7 @@ int32_t CacheSet::get_line_index_with_tag(uint64_t tag) {
  */
 int32_t CacheSet::get_free_line_index() {
     for (int i = 0; i < lines_.size(); i++) {
-        CacheLine line = lines_[i];
-        if (line.valid() == false) {
+        if (!lines_[i]->valid()) {
             return i;
         }
     }
@@ -42,9 +40,9 @@ int32_t CacheSet::get_free_line_index() {
 }
 
 Data CacheSet::get_line_data(uint32_t line_index) {
-    return lines_[line_index].get_data();
+    return lines_[line_index]->get_data();
 }
 
 void CacheSet::update_line(uint32_t line_index, uint64_t tag, Data& data) {
-    lines_[line_index].update(tag, data);
+    lines_[line_index]->update(tag, data);
 }

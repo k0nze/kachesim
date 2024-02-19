@@ -90,7 +90,7 @@ private:
     uint64_t index_mask_;
     uint64_t tag_mask_;
 
-    std::vector<CacheSet> cache_sets_;
+    std::vector<std::unique_ptr<CacheSet>> cache_sets_;
 
     uint64_t get_address_offset(uint64_t address);
     uint64_t get_address_index(uint64_t address);

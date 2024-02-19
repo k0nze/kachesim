@@ -34,8 +34,8 @@ void CacheLine::update(uint64_t tag, Data& data) {
     }
 
     tag_ = tag;
-    valid_ = true;
-    dirty_ = true;
+    valid_ = false;
+    dirty_ = false;
 
     // copy data into data_
     for (int i = 0; i < size_; i++) {

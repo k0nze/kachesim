@@ -18,7 +18,7 @@ public:
     void update_line(uint32_t line_index, uint64_t tag, Data& data);
 
 private:
-    std::vector<CacheLine> lines_;
+    std::vector<std::unique_ptr<CacheLine>> lines_;
 };
 
 #endif

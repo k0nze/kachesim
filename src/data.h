@@ -26,10 +26,12 @@ public:
      * @param offset default 0
      */
     template <typename T>
-    void set(T bytes, size_t offset = 0) {
+    void set(T bytes, size_t offset = 0, bool clear = true) {
         int max_byte = std::min({(size_t)sizeof(T), size_ - offset});
         // clear data_
-        memset(data_, 0, size_);
+        if (clear) {
+            memset(data_, 0, size_);
+        }
         // copy bytes in to data_
         memcpy(data_ + offset, &bytes, max_byte);
     }

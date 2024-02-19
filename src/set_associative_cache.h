@@ -59,7 +59,7 @@
  *
  *   ways: is the number of lines per set
  */
-class SetAssociativeCache /*: public DataStorage*/ {
+class SetAssociativeCache : public DataStorage {
 public:
     SetAssociativeCache(bool write_allocate, bool write_back, uint32_t miss_latency,
                         uint32_t hit_latency, uint32_t cache_line_size, uint32_t sets,
@@ -67,26 +67,18 @@ public:
 
     bool write_allocate_;
     bool write_back_;
+
     uint32_t miss_latency_;
     uint32_t hit_latency_;
-    uint32_t cache_line_size_;
-    uint32_t sets_;
-    uint32_t ways_;
 
-    uint64_t size();
+    size_t cache_line_size_;
+    size_t sets_;
+    size_t ways_;
 
-    void write(uint64_t address, const std::vector<uint8_t>& data);
-    std::vector<uint8_t> read(uint64_t address, uint32_t num_bytes);
+    size_t size();
 
-    void write_byte(uint64_t address, uint8_t byte);
-    void write_half_word(uint64_t address, uint16_t half_word);
-    void write_word(uint64_t address, uint32_t word);
-    void write_double_word(uint64_t address, uint64_t double_word);
-
-    uint8_t read_byte(uint64_t address);
-    uint16_t read_half_word(uint64_t address);
-    uint32_t read_word(uint64_t address);
-    uint64_t read_double_word(uint64_t address);
+    DataStorageTransaction write(address_t address, Data& data);
+    DataStorageTransaction read(address_t address, size_t num_bytes);
 
     void reset();
 

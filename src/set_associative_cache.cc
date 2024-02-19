@@ -26,7 +26,7 @@ SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
  * @brief Returns the size of the cache in bytes
  * @return The size of the cache in bytes
  */
-uint64_t SetAssociativeCache::size() { return sets_ * ways_ * cache_line_size_; }
+size_t SetAssociativeCache::size() { return sets_ * ways_ * cache_line_size_; }
 
 /**
  * @brief calculates the offset of the address (n LSBs, while 2^n is the cache line
@@ -57,56 +57,39 @@ inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
 }
 
 /**
- * @brief writes data to the cache
+ * @brief write data to cache
  * @param address the address to write to
- * @param data the data to write to the cache at the address
+ * @param data the data to write
  */
-void SetAssociativeCache::write(uint64_t address, const std::vector<uint8_t>& data) {
+DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data) {
     uint64_t offset = get_address_offset(address);
     uint64_t index = get_address_index(address);
     uint64_t tag = get_address_tag(address);
 
     CacheSet set = cache_sets_[index];
+
+    uint32_t hit_level = 0;
+    latency_t latency = 0;
+
+    DataStorageTransaction dst = {WRITE, address, latency, hit_level,
+                                  std::unique_ptr<Data>(new Data(data))};
+
+    return dst;
 }
 
 /**
- * @brief reads data from the cache
+ * @brief read data from cache
  * @param address the address to read from
- * @param num_bytes the number of bytes to read, starting from the address
- * @return the data read from the cache
+ * @param num_bytes the number of bytes to read
+ * @return bytes read from cache
  */
-std::vector<uint8_t> SetAssociativeCache::read(uint64_t address, uint32_t num_bytes) {
-    auto data = std::vector<uint8_t>(num_bytes);
+DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_bytes) {
+    auto data = std::unique_ptr<Data>(new Data(num_bytes));
 
-    return data;
-}
-
-void SetAssociativeCache::write_byte(uint64_t address, uint8_t byte) {}
-
-void SetAssociativeCache::write_half_word(uint64_t address, uint16_t half_word) {}
-
-void SetAssociativeCache::write_word(uint64_t address, uint32_t word) {}
-
-void SetAssociativeCache::write_double_word(uint64_t address, uint64_t double_word) {}
-
-uint8_t SetAssociativeCache::read_byte(uint64_t address) {
-    uint8_t byte = 0;
-    return byte;
-}
-
-uint16_t SetAssociativeCache::read_half_word(uint64_t address) {
-    uint16_t half_word = 0;
-    return half_word;
-}
-
-uint32_t SetAssociativeCache::read_word(uint64_t address) {
-    uint32_t word = 0;
-    return word;
-}
-
-uint64_t SetAssociativeCache::read_double_word(uint64_t address) {
-    uint64_t double_word = 0;
-    return double_word;
+    uint32_t hit_level = 0;
+    latency_t latency = 0;
+    DataStorageTransaction dst = {READ, address, latency, hit_level, std::move(data)};
+    return dst;
 }
 
 /**

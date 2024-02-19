@@ -16,5 +16,10 @@ int main() {
     auto sac = std::make_unique<SetAssociativeCache>(
         false, true, miss_latency, hit_latency, cache_line_size, sets, ways);
 
+    Data d1 = Data(1);
+
+    sac->write(0x1000, d1);
+    sac->write(0x1001, d1);
+
     return 0;
 }

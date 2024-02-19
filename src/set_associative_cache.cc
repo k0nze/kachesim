@@ -1,5 +1,6 @@
 #include "set_associative_cache.h"
 
+#include <iostream>
 #include <memory>
 
 #include "common.h"
@@ -66,9 +67,22 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     uint64_t index = get_address_index(address);
     uint64_t tag = get_address_tag(address);
 
-    CacheSet set = cache_sets_[index];
+    // select target cache set
+    CacheSet target_cache_set = cache_sets_[index];
 
-    // TODO
+    // check if cache set has a free line (way)
+    int32_t target_line_index = target_cache_set.get_free_line_index();
+
+    // free line was found
+    if (target_line_index != -1) {
+        // allocate line
+    }
+
+    // no free line was found, evict line
+    else {
+        // evict line
+        // allocate line
+    }
 
     uint32_t hit_level = 0;
     latency_t latency = 0;

@@ -18,7 +18,7 @@ CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways) {
 int32_t CacheSet::get_free_line_index() {
     for (int i = 0; i < lines.size(); i++) {
         CacheLine line = lines[i];
-        if (line.valid_ == false) {
+        if (line.valid() == false) {
             return i;
         }
     }

@@ -122,8 +122,28 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
  */
 DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                                                           Data& data) {
-    std::cout << "a: " << std::hex << address << ", d: " << data.get<uint64_t>()
-              << std::endl;
+    uint64_t offset = get_address_offset(address);
+    uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
+
+    // check if target cache set already contains tag
+    int32_t line_index = cache_sets_[index].get_line_index_with_tag(tag);
+
+    if (line_index != -1) {
+        // line with tag found -> update line
+    } else {
+        // check if there is a free line
+        line_index = cache_sets_[index].get_free_line_index();
+
+        if (line_index != -1) {
+            // free line found -> write to line
+        } else {
+            // no free line found -> evict line
+            // write to line
+        }
+    }
+
+    // cache_sets_[index].update_line(0, tag, data);
 
     uint32_t hit_level = 0;
     latency_t latency = 0;
@@ -146,7 +166,6 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     for (auto& [addr, d] : address_data_map) {
         auto dst = aligned_write(addr, d);
     }
-    std::cout << std::endl;
 
     uint32_t hit_level = 0;
     latency_t latency = 0;

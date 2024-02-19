@@ -61,15 +61,15 @@
  */
 class SetAssociativeCache : public CacheInterface {
 public:
-    SetAssociativeCache(bool write_allocate, bool write_back, uint32_t miss_latency,
-                        uint32_t hit_latency, uint32_t cache_line_size, uint32_t sets,
-                        uint32_t ways);
+    SetAssociativeCache(bool write_allocate, bool write_back, latency_t miss_latency,
+                        latency_t hit_latency, size_t cache_line_size, size_t sets,
+                        size_t ways);
 
     bool write_allocate_;
     bool write_back_;
 
-    uint32_t miss_latency_;
-    uint32_t hit_latency_;
+    latency_t miss_latency_;
+    latency_t hit_latency_;
 
     size_t cache_line_size_;
     size_t sets_;

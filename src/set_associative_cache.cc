@@ -5,9 +5,9 @@
 #include "common.h"
 
 SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
-                                         uint32_t miss_latency, uint32_t hit_latency,
-                                         uint32_t cache_line_size, uint32_t sets,
-                                         uint32_t ways)
+                                         latency_t miss_latency, latency_t hit_latency,
+                                         size_t cache_line_size, size_t sets,
+                                         size_t ways)
     : write_allocate_(write_allocate),
       write_back_(write_back),
       miss_latency_(miss_latency),
@@ -67,6 +67,8 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     uint64_t tag = get_address_tag(address);
 
     CacheSet set = cache_sets_[index];
+
+    // TODO
 
     uint32_t hit_level = 0;
     latency_t latency = 0;

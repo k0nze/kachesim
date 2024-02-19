@@ -61,6 +61,12 @@ inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
     return (address & tag_mask_) >> (clog2(cache_line_size_) + clog2(sets_));
 }
 
+/**
+ * @brief aligns a transaction to the cache line size
+ * @param address the address to align
+ * @param data the data to align
+ * @return a map of aligned addresses and data
+ */
 std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t address,
                                                                  Data& data) {
     std::map<address_t, Data> address_data_map;
@@ -108,6 +114,12 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
     return address_data_map;
 }
 
+/**
+ * @brief write data to single cache line
+ * @param address the address to write to
+ * @param data the data to write
+ * @return the transaction result
+ */
 DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                                                           Data& data) {
     std::cout << "a: " << std::hex << address << ", d: " << data.get<uint64_t>()

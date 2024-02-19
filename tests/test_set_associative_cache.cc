@@ -32,5 +32,9 @@ int main() {
     sac->write(0x1008, d);
     sac->write(0x1009, d);
 
+    Data e = Data(4);
+    e.set<uint32_t>(0xdeadbeef, 0);
+    sac->write(0x2000, e);
+
     return 0;
 }

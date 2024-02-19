@@ -46,7 +46,7 @@ int main() {
     // read 4 bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i += 4) {
         auto dst = fm->read(i, 4);
-        assert(dst.data->get<uint32_t>() == (i % (UINT_MAX + 1)));
+        assert(dst.data->get<uint32_t>() == (i % 4294967295));
     }
 
     // write 8 bytes to each 8th memory address
@@ -59,7 +59,7 @@ int main() {
     // read 8 bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i += 8) {
         auto dst = fm->read(i, 8);
-        assert(dst.data->get<uint64_t>() == (i % (ULONG_MAX + 1)));
+        assert(dst.data->get<uint64_t>() == (i % 18446744073709551615ul));
     }
 
     // check if reset is correct

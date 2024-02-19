@@ -6,6 +6,12 @@
 #include "common.h"
 
 FakeMemory::FakeMemory(uint64_t size) : size_(size) { reset(); }
+FakeMemory::FakeMemory(uint64_t size, latency_t read_latency, latency_t write_latency)
+    : size_(size) {
+    read_latency_ = read_latency;
+    write_latency_ = write_latency;
+    reset();
+}
 
 size_t FakeMemory::size() { return size_; }
 

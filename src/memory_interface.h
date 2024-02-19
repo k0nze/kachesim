@@ -7,10 +7,16 @@ class MemoryInterface : DataStorage {
 public:
     MemoryInterface() {}
     virtual ~MemoryInterface() {}
+
     virtual size_t size() = 0;
+
     virtual DataStorageTransaction write(address_t address, Data& data) = 0;
     virtual DataStorageTransaction read(address_t address, size_t num_bytes) = 0;
+
     virtual void reset() = 0;
+
+    latency_t read_latency_ = 0;
+    latency_t write_latency_ = 0;
 };
 
 #endif

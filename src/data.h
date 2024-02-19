@@ -15,8 +15,9 @@ public:
 
     size_t size();
 
-    uint8_t operator[](uint64_t index) const { return data_[index]; }
-    uint8_t& operator[](uint64_t index) { return data_[index]; }
+    uint8_t operator[](uint64_t index) const;
+    uint8_t& operator[](uint64_t index);
+    bool operator==(Data& d) const;
 
     /**
      * @brief set value to bytes starting from offset

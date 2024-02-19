@@ -256,5 +256,13 @@ int main() {
     assert(d12->get<double>(3) > 42.23 - std::numeric_limits<float>::epsilon());
     assert(d12->get<double>(3) < 42.23 + std::numeric_limits<float>::epsilon());
 
+    auto a = std::make_unique<Data>(8);
+    auto b = std::make_unique<Data>(8);
+
+    a->set<uint64_t>(2342);
+    b->set<uint64_t>(2342);
+
+    assert(*a == *b);
+
     return 0;
 }

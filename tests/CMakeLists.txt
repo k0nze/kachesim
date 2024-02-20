@@ -80,6 +80,29 @@ set_tests_properties(test_cache_set_build PROPERTIES FIXTURES_SETUP
 add_test(NAME test_cache_set COMMAND ./test_cache_set)
 set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 
+# test_least_recently_used
+add_executable(test_least_recently_used test_least_recently_used.cc)
+
+target_include_directories(test_least_recently_used
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_least_recently_used PRIVATE mesi_cachesim)
+
+add_test(
+    test_least_recently_used_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_least_recently_used)
+set_tests_properties(test_least_recently_used_build PROPERTIES FIXTURES_SETUP
+                                                               test_fixture)
+
+add_test(NAME test_least_recently_used COMMAND ./test_least_recently_used)
+set_tests_properties(test_least_recently_used PROPERTIES FIXTURES_SETUP
+                                                         test_fixture)
+
 # test_set_associative_cache
 add_executable(test_set_associative_cache test_set_associative_cache.cc)
 

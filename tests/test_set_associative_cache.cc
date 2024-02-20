@@ -25,14 +25,27 @@ int main() {
     std::cout << std::endl;
 
     sac->write(0x1001, d);
-    /*
-    sac->write(0x1002, d);
-    sac->write(0x1003, d);
-    sac->write(0x1004, d);
-    sac->write(0x1005, d);
-    sac->write(0x1006, d);
-    sac->write(0x1007, d);
+    std::cout << std::endl;
 
+    sac->write(0x1002, d);
+    std::cout << std::endl;
+
+    sac->write(0x1003, d);
+    std::cout << std::endl;
+
+    sac->write(0x1004, d);
+    std::cout << std::endl;
+
+    sac->write(0x1005, d);
+    std::cout << std::endl;
+
+    sac->write(0x1006, d);
+    std::cout << std::endl;
+
+    sac->write(0x1007, d);
+    std::cout << std::endl;
+
+    /*
     sac->write(0x1008, d);
     sac->write(0x1009, d);
 

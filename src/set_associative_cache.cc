@@ -129,47 +129,90 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     // check if target cache set already contains tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
 
-    std::cout << line_index << std::endl;
-
     // TODO: may be move to CacheSet in the future
     if (line_index != -1) {
         // line with tag found -> update line
-        // TODO
+
+        // check if its a partial write
+        if (data.size() != cache_line_size_) {
+            // partial write
+            Data update_data = Data(cache_line_size_);
+            Data cache_line_data = cache_sets_[index]->get_line_data(line_index);
+
+            if (offset != 0) {
+                // load lower bytes from cache line
+                for (int i = 0; i < offset; i++) {
+                    // fake data not from memory
+                    update_data[i] = cache_line_data[i];
+                }
+                for (int i = offset; i < cache_line_size_; i++) {
+                    update_data[i] = data[i - offset];
+                }
+
+            } else {
+                for (int i = 0; i < data.size(); i++) {
+                    update_data[i] = data[i];
+                }
+                // load upper bytes from cache line
+                for (int i = data.size(); i < cache_line_size_; i++) {
+                    // fake data not from memory
+                    update_data[i] = cache_line_data[i + offset];
+                }
+            }
+            cache_sets_[index]->update_line(line_index, tag, update_data);
+            std::cout << "Partial update @ address/index: " << std::hex << address
+                      << "/" << index << ", d: " << update_data.get<uint64_t>()
+                      << std::endl;
+        } else {
+            // full write
+            cache_sets_[index]->update_line(line_index, tag, data);
+            std::cout << "Full update @ address/index:    " << std::hex << address
+                      << "/" << index << ", d: " << data.get<uint64_t>() << std::endl;
+        }
     } else {
         // check if there is a free line
         line_index = cache_sets_[index]->get_free_line_index();
-        std::cout << line_index << std::endl;
 
         if (line_index != -1) {
             // free line found -> miss -> write to line
 
             // check if its a partial write
             if (data.size() != cache_line_size_) {
-                Data d = Data(cache_line_size_);
+                // partial write
+                Data update_data = Data(cache_line_size_);
 
                 if (offset != 0) {
                     // load lower bytes from memory
                     // TODO
                     for (int i = 0; i < offset; i++) {
-                        d[i] = 0xef;
+                        // fake data not from memory
+                        update_data[i] = 0x11;
                     }
                     for (int i = offset; i < cache_line_size_; i++) {
-                        d[i] = data[i - offset];
+                        update_data[i] = data[i - offset];
                     }
                 } else {
                     for (int i = 0; i < data.size(); i++) {
-                        d[i] = data[i];
+                        update_data[i] = data[i];
                     }
                     // load upper bytes from memory
                     // TODO
                     for (int i = data.size(); i < cache_line_size_; i++) {
-                        d[i] = 0xef;
+                        // fake data not from memory
+                        update_data[i] = 0x11;
                     }
                 }
 
-                cache_sets_[index]->update_line(line_index, tag, d);
-                std::cout << "Partial write to index: " << index
-                          << ", d: " << d.get<uint64_t>() << std::endl;
+                cache_sets_[index]->update_line(line_index, tag, update_data);
+                std::cout << "Partial write to empty line @ address/index: " << std::hex
+                          << address << "/" << index
+                          << ", d: " << update_data.get<uint64_t>() << std::endl;
+            } else {
+                // full write
+                cache_sets_[index]->update_line(line_index, tag, data);
+                std::cout << "Full write to empty line @ address/index:    " << std::hex
+                          << address << "/" << index << ", d: " << data.get<uint64_t>()
+                          << std::endl;
             }
         } else {
             // no free line found -> evict line

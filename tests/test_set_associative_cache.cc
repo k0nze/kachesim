@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -21,7 +22,10 @@ int main() {
     d.set<uint64_t>(0xaabbccddeeff, 8, false);
 
     sac->write(0x1000, d);
+    std::cout << std::endl;
+
     sac->write(0x1001, d);
+    /*
     sac->write(0x1002, d);
     sac->write(0x1003, d);
     sac->write(0x1004, d);
@@ -35,6 +39,7 @@ int main() {
     Data e = Data(4);
     e.set<uint32_t>(0xdeadbeef, 0);
     sac->write(0x2000, e);
+    */
 
     return 0;
 }

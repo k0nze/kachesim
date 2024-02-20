@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "cache_line.h"
+#include "replacement_policy.h"
 
 class CacheSet {
 public:
@@ -19,6 +20,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<CacheLine>> lines_;
+    std::unique_ptr<ReplacementPolicy> replacement_policy_;
 };
 
 #endif

@@ -59,3 +59,11 @@ Data CacheSet::get_line_data(uint32_t line_index) {
 void CacheSet::update_line(uint32_t line_index, uint64_t tag, Data& data) {
     lines_[line_index]->update(tag, data);
 }
+
+void CacheSet::update_replacement_policy(uint32_t line_index) {
+    replacement_policy_->update(line_index);
+}
+
+uint32_t CacheSet::get_replacement_index() {
+    return replacement_policy_->get_replacement_index();
+}

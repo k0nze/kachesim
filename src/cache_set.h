@@ -19,6 +19,9 @@ public:
     Data get_line_data(uint32_t line_index);
     void update_line(uint32_t line_index, uint64_t tag, Data& data);
 
+    void update_replacement_policy(uint32_t line_index);
+    uint32_t get_replacement_index();
+
 private:
     std::vector<std::unique_ptr<CacheLine>> lines_;
     std::unique_ptr<ReplacementPolicy> replacement_policy_;

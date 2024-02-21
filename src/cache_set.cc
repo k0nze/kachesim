@@ -3,11 +3,24 @@
 #include <iostream>
 #include <memory>
 
-CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways) {
+#include "common.h"
+#include "least_recently_used.h"
+
+CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways,
+                   ReplacementPolicyType replacement_policy_type) {
     lines_.reserve(ways);
 
     for (int i = 0; i < ways; i++) {
         lines_.push_back(std::unique_ptr<CacheLine>(new CacheLine(cache_line_size)));
+    }
+
+    switch (replacement_policy_type) {
+        case ReplacementPolicyType::LRU:
+            replacement_policy_ = std::make_unique<LeastRecentlyUsed>(ways);
+            break;
+        default:
+            THROW_INVALID_ARGUMENT("invalid ReplacementPolicyType");
+            break;
     }
 }
 

@@ -278,7 +278,7 @@ void SetAssociativeCache::reset() {
     cache_sets_.reserve(sets_);
 
     for (int i = 0; i < sets_; i++) {
-        cache_sets_.push_back(
-            std::unique_ptr<CacheSet>(new CacheSet(cache_line_size_, ways_)));
+        cache_sets_.push_back(std::unique_ptr<CacheSet>(
+            new CacheSet(cache_line_size_, ways_, replacement_policy_type_)));
     }
 }

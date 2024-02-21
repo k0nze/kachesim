@@ -10,7 +10,8 @@
 
 class CacheSet {
 public:
-    CacheSet(uint64_t cache_line_size, uint32_t ways);
+    CacheSet(uint64_t cache_line_size, uint32_t ways,
+             ReplacementPolicyType replacement_policy_type);
 
     int32_t get_line_index_with_tag(uint64_t tag);
     int32_t get_free_line_index();

@@ -32,4 +32,8 @@ uint32_t clog2(uint64_t x);
     throw std::out_of_range((std::string(msg)) + " at " + std::string(__FILE__) + \
                             ":" + std::to_string(__LINE__));
 
+#define THROW_INVALID_ARGUMENT(msg)                                                   \
+    throw std::invalid_argument((std::string(msg)) + " at " + std::string(__FILE__) + \
+                                ":" + std::to_string(__LINE__));
+
 #endif

@@ -65,7 +65,8 @@ class SetAssociativeCache : public CacheInterface {
 public:
     SetAssociativeCache(bool write_allocate, bool write_back, latency_t miss_latency,
                         latency_t hit_latency, size_t cache_line_size, size_t sets,
-                        size_t ways, size_t multi_line_access = 1);
+                        size_t ways, ReplacementPolicyType replacement_policy_type,
+                        size_t multi_line_access = 1);
 
     bool write_allocate_;
     bool write_back_;
@@ -89,6 +90,7 @@ private:
     uint64_t offset_mask_;
     uint64_t index_mask_;
     uint64_t tag_mask_;
+    ReplacementPolicyType replacement_policy_type_;
 
     std::vector<std::unique_ptr<CacheSet>> cache_sets_;
 

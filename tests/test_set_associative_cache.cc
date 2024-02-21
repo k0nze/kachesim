@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "data.h"
+#include "replacement_policy.h"
 #include "set_associative_cache.h"
 
 int main() {
@@ -14,8 +15,9 @@ int main() {
     size_t sets = 4;
     size_t ways = 2;
 
-    auto sac = std::make_unique<SetAssociativeCache>(
-        false, true, miss_latency, hit_latency, cache_line_size, sets, ways);
+    auto sac = std::make_unique<SetAssociativeCache>(false, true, miss_latency,
+                                                     hit_latency, cache_line_size, sets,
+                                                     ways, ReplacementPolicyType::LRU);
 
     Data d = Data(14);
     d.set<uint64_t>(0x87654321deadbeef, 0);

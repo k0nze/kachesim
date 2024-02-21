@@ -11,7 +11,9 @@
 SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
                                          latency_t miss_latency, latency_t hit_latency,
                                          size_t cache_line_size, size_t sets,
-                                         size_t ways, size_t multi_line_access)
+                                         size_t ways,
+                                         ReplacementPolicyType replacement_policy_type,
+                                         size_t multi_line_access)
     : write_allocate_(write_allocate),
       write_back_(write_back),
       miss_latency_(miss_latency),
@@ -19,6 +21,7 @@ SetAssociativeCache::SetAssociativeCache(bool write_allocate, bool write_back,
       cache_line_size_(cache_line_size),
       sets_(sets),
       ways_(ways),
+      replacement_policy_type_(replacement_policy_type),
       multi_line_access_(multi_line_access) {
     offset_mask_ = bitmask<uint64_t>(clog2(cache_line_size_));
     index_mask_ = bitmask<uint64_t>(clog2(sets_)) << clog2(cache_line_size_);

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-enum ReplacementPolicyType { LRU };
+typedef enum ReplacementPolicyType { LRU } ReplacementPolicyType;
 
 class ReplacementPolicy {
 public:

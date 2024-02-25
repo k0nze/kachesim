@@ -2,7 +2,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "least_recently_used.h"
+#include "replacement_policy/least_recently_used.h"
 
 int main() {
     auto lru = std::make_unique<LeastRecentlyUsed>();

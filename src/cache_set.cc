@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "common.h"
-#include "least_recently_used.h"
+#include "replacement_policy/least_recently_used.h"
 
 CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways,
                    ReplacementPolicyType replacement_policy_type) {

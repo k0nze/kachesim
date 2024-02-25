@@ -1,10 +1,8 @@
 #include "least_recently_used.h"
 
-#include "replacement_policy.h"
-
 LeastRecentlyUsed::LeastRecentlyUsed() {}
 
-void LeastRecentlyUsed::update(uint64_t index) {
+void LeastRecentlyUsed::update(uint32_t index) {
     // check if index is in the map_
     if (map_.find(index) == map_.end()) {
         // index is not in map
@@ -18,12 +16,12 @@ void LeastRecentlyUsed::update(uint64_t index) {
     }
 }
 
-uint64_t LeastRecentlyUsed::get_replacement_index() {
+uint32_t LeastRecentlyUsed::get_replacement_index() {
     // if the hashmap in not full return 0 as default replacement index
     return dll_.get_tail();
 }
 
-void LeastRecentlyUsed::remove(uint64_t index) {
+void LeastRecentlyUsed::remove(uint32_t index) {
     auto node = map_[index];
     dll_.remove(node);
     map_.erase(index);

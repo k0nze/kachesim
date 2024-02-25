@@ -166,11 +166,13 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             std::cout << "Partial update @ address/index: " << std::hex << address
                       << "/" << index << ", d: " << update_data.get<uint64_t>()
                       << std::endl;
+            cache_sets_[index]->update_replacement_policy(line_index);
         } else {
             // full write
             cache_sets_[index]->update_line(line_index, tag, data);
             std::cout << "Full update @ address/index:    " << std::hex << address
                       << "/" << index << ", d: " << data.get<uint64_t>() << std::endl;
+            cache_sets_[index]->update_replacement_policy(line_index);
         }
     } else {
         // check if there is a free line
@@ -210,16 +212,19 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 std::cout << "Partial write to empty line @ address/index: " << std::hex
                           << address << "/" << index
                           << ", d: " << update_data.get<uint64_t>() << std::endl;
+                cache_sets_[index]->update_replacement_policy(line_index);
             } else {
                 // full write
                 cache_sets_[index]->update_line(line_index, tag, data);
                 std::cout << "Full write to empty line @ address/index:    " << std::hex
                           << address << "/" << index << ", d: " << data.get<uint64_t>()
                           << std::endl;
+                cache_sets_[index]->update_replacement_policy(line_index);
             }
         } else {
             // no free line found -> evict line
-            // TODO
+            uint32_t replacement_index = cache_sets_[index]->get_replacement_index();
+
             // write to line
             // TODO
         }

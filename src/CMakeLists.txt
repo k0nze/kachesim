@@ -10,8 +10,8 @@ add_library(
     data.cc
     cache_line.cc
     cache_set.cc
-    replacement_policy.cc
-    least_recently_used.cc
+    replacement_policy/replacement_policy.cc
+    replacement_policy/least_recently_used.cc
     set_associative_cache.cc
     fake_memory.cc)
 target_compile_options(mesi_cachesim INTERFACE "-fsized-deallocation")

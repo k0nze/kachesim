@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "cache_line.h"
-#include "replacement_policy.h"
+#include "replacement_policy/replacement_policy.h"
 
 class CacheSet {
 public:

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "data.h"
-#include "replacement_policy.h"
+#include "replacement_policy/replacement_policy.h"
 #include "set_associative_cache.h"
 
 int main() {

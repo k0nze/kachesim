@@ -1,6 +1,6 @@
 #include "replacement_policy.h"
 
-ReplacementPolicy::ReplacementPolicy(uint64_t indeces) : indeces_(indeces) {}
+ReplacementPolicy::ReplacementPolicy() {}
 
 void ReplacementPolicy::update(uint64_t index) {}
 

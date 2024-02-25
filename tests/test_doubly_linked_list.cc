@@ -5,7 +5,7 @@
 #include "doubly_linked_list/doubly_linked_list.h"
 
 int main() {
-    auto dll = std::make_unique<DoublyLinkedList>();
+    auto dll = std::make_unique<DoublyLinkedList<uint64_t>>();
 
     auto node_1 = dll->insert_head(1);
     auto node_2 = dll->insert_head(2);

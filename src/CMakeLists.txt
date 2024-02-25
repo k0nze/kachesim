@@ -13,6 +13,5 @@ add_library(
     replacement_policy.cc
     least_recently_used.cc
     set_associative_cache.cc
-    fake_memory.cc
-    doubly_linked_list/doubly_linked_list.cc)
+    fake_memory.cc)
 target_compile_options(mesi_cachesim INTERFACE "-fsized-deallocation")

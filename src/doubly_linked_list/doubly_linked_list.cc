@@ -10,8 +10,9 @@ uint64_t DoublyLinkedList::get_tail() const { return tail_->value; }
 
 uint64_t DoublyLinkedList::size() const { return size_; }
 
-std::shared_ptr<DoublyLinkedListNode> DoublyLinkedList::insert_head(uint64_t value) {
-    auto new_node = std::make_shared<DoublyLinkedListNode>();
+std::shared_ptr<DoublyLinkedListNode<uint64_t>> DoublyLinkedList::insert_head(
+    uint64_t value) {
+    auto new_node = std::make_shared<DoublyLinkedListNode<uint64_t>>();
     new_node->value = value;
 
     // check if list is empty
@@ -31,8 +32,9 @@ std::shared_ptr<DoublyLinkedListNode> DoublyLinkedList::insert_head(uint64_t val
     return new_node;
 }
 
-std::shared_ptr<DoublyLinkedListNode> DoublyLinkedList::insert_tail(uint64_t value) {
-    auto new_node = std::make_shared<DoublyLinkedListNode>();
+std::shared_ptr<DoublyLinkedListNode<uint64_t>> DoublyLinkedList::insert_tail(
+    uint64_t value) {
+    auto new_node = std::make_shared<DoublyLinkedListNode<uint64_t>>();
     new_node->value = value;
 
     // check if list is empty
@@ -52,7 +54,7 @@ std::shared_ptr<DoublyLinkedListNode> DoublyLinkedList::insert_tail(uint64_t val
     return new_node;
 }
 
-void DoublyLinkedList::remove(std::shared_ptr<DoublyLinkedListNode> node) {
+void DoublyLinkedList::remove(std::shared_ptr<DoublyLinkedListNode<uint64_t>> node) {
     // check if node is head
     if (head_ == node && tail_ == node) {
         // node is last node in list
@@ -75,7 +77,8 @@ void DoublyLinkedList::remove(std::shared_ptr<DoublyLinkedListNode> node) {
     size_--;
 }
 
-void DoublyLinkedList::move_to_head(std::shared_ptr<DoublyLinkedListNode> node) {
+void DoublyLinkedList::move_to_head(
+    std::shared_ptr<DoublyLinkedListNode<uint64_t>> node) {
     // check if node is not head
     if (head_ != node) {
         // remove node from list
@@ -88,7 +91,8 @@ void DoublyLinkedList::move_to_head(std::shared_ptr<DoublyLinkedListNode> node) 
     }
 }
 
-void DoublyLinkedList::move_to_tail(std::shared_ptr<DoublyLinkedListNode> node) {
+void DoublyLinkedList::move_to_tail(
+    std::shared_ptr<DoublyLinkedListNode<uint64_t>> node) {
     // check if node is not tail
     if (tail_ != node) {
         // remove node from list

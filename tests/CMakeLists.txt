@@ -80,6 +80,29 @@ set_tests_properties(test_cache_set_build PROPERTIES FIXTURES_SETUP
 add_test(NAME test_cache_set COMMAND ./test_cache_set)
 set_tests_properties(test_cache_set PROPERTIES FIXTURES_SETUP test_fixture)
 
+# test_doubly_linked_list
+add_executable(test_doubly_linked_list test_doubly_linked_list.cc)
+
+target_include_directories(test_doubly_linked_list
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_doubly_linked_list PRIVATE mesi_cachesim)
+
+add_test(
+    test_doubly_linked_list_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_doubly_linked_list)
+set_tests_properties(test_doubly_linked_list_build PROPERTIES FIXTURES_SETUP
+                                                              test_fixture)
+
+add_test(NAME test_doubly_linked_list COMMAND ./test_doubly_linked_list)
+set_tests_properties(test_doubly_linked_list PROPERTIES FIXTURES_SETUP
+                                                        test_fixture)
+
 # test_least_recently_used
 add_executable(test_least_recently_used test_least_recently_used.cc)
 

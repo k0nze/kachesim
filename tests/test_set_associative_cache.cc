@@ -98,7 +98,6 @@ int main() {
     sac->write(0x0038, d_line);
 
     sac->write(0x0000, d_line);
-    // sac->write(0x0008, d_line);
 
     // evict line
     sac->write(0x0040, d_line);

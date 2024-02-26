@@ -66,6 +66,5 @@ void CacheSet::update_replacement_policy(uint32_t line_index) {
 }
 
 uint32_t CacheSet::get_replacement_index() {
-    std::cout << replacement_policy_->to_string() << std::endl;
     return replacement_policy_->get_replacement_index();
 }

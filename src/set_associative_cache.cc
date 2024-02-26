@@ -225,11 +225,16 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
         } else {
             // no free line found -> evict line
             std::cout << "No free line found" << std::endl;
-            uint32_t replacement_index = cache_sets_[index]->get_replacement_index();
+            uint32_t line_index = cache_sets_[index]->get_replacement_index();
 
-            std::cout << "evict line: " << replacement_index << std::endl;
-            // write to line
-            // TODO
+            std::cout << "evict line: " << line_index << std::endl;
+
+            cache_sets_[index]->update_line(line_index, tag, data, true, true);
+            std::cout << "Full write to evicted line @ address/index:  " << std::hex
+                      << address << "/" << index << ", d: " << data.get<uint64_t>()
+                      << std::endl;
+
+            cache_sets_[index]->update_replacement_policy(line_index);
         }
     }
 

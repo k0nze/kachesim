@@ -10,6 +10,7 @@
 class LeastRecentlyUsed : public ReplacementPolicy {
 public:
     LeastRecentlyUsed();
+    ~LeastRecentlyUsed();
 
     void update(uint32_t index);
     uint32_t get_replacement_index();

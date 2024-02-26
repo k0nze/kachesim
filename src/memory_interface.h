@@ -5,8 +5,7 @@
 
 class MemoryInterface : DataStorage {
 public:
-    MemoryInterface() {}
-    virtual ~MemoryInterface() {}
+    virtual ~MemoryInterface() = 0;
 
     virtual size_t size() = 0;
 

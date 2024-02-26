@@ -8,12 +8,11 @@ typedef enum ReplacementPolicyType { LRU } ReplacementPolicyType;
 
 class ReplacementPolicy {
 public:
-    ReplacementPolicy();
+    virtual ~ReplacementPolicy() = 0;
+    virtual void update(uint32_t index) = 0;
+    virtual uint32_t get_replacement_index() = 0;
 
-    void update(uint64_t index);
-    uint64_t get_replacement_index();
-
-    std::string to_string();
+    virtual std::string to_string() = 0;
 };
 
 #endif

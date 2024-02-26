@@ -8,8 +8,7 @@
 
 class DataStorage {
 public:
-    DataStorage() {}
-    virtual ~DataStorage() {}
+    virtual ~DataStorage() = 0;
 
     virtual size_t size() = 0;
 

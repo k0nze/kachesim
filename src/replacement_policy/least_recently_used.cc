@@ -3,6 +3,7 @@
 #include <sstream>
 
 LeastRecentlyUsed::LeastRecentlyUsed() {}
+LeastRecentlyUsed::~LeastRecentlyUsed() {}
 
 void LeastRecentlyUsed::update(uint32_t index) {
     // check if index is in the map_
@@ -18,10 +19,7 @@ void LeastRecentlyUsed::update(uint32_t index) {
     }
 }
 
-uint32_t LeastRecentlyUsed::get_replacement_index() {
-    // if the hashmap in not full return 0 as default replacement index
-    return dll_.get_tail();
-}
+uint32_t LeastRecentlyUsed::get_replacement_index() { return dll_.get_tail(); }
 
 void LeastRecentlyUsed::remove(uint32_t index) {
     auto node = map_[index];

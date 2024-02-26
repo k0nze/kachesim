@@ -5,8 +5,7 @@
 
 class CacheInterface : DataStorage {
 public:
-    CacheInterface() {}
-    virtual ~CacheInterface() {}
+    virtual ~CacheInterface() = 0;
 
     virtual size_t size() = 0;
 

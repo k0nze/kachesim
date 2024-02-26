@@ -1,5 +1,7 @@
 #include "least_recently_used.h"
 
+#include <sstream>
+
 LeastRecentlyUsed::LeastRecentlyUsed() {}
 
 void LeastRecentlyUsed::update(uint32_t index) {
@@ -26,4 +28,16 @@ void LeastRecentlyUsed::remove(uint32_t index) {
     dll_.remove(node);
     map_.erase(index);
     size_--;
+}
+
+std::string LeastRecentlyUsed::to_string() {
+    std::stringstream ss;
+
+    auto dll_nodes = dll_.get_nodes();
+
+    for (auto const& dll_node : dll_nodes) {
+        ss << dll_node->value << " ";
+    }
+
+    return ss.str();
 }

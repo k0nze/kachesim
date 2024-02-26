@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 template <typename T>
 struct DoublyLinkedListNode {
@@ -109,6 +110,21 @@ public:
 
     T get_head() const { return head_->value; };
     T get_tail() const { return tail_->value; };
+
+    std::vector<std::shared_ptr<DoublyLinkedListNode<T>>> get_nodes() {
+        std::vector<std::shared_ptr<DoublyLinkedListNode<T>>> nodes;
+
+        auto current_node = head_;
+
+        if (current_node != nullptr) {
+            while (current_node->next != nullptr) {
+                nodes.push_back(current_node);
+                current_node = current_node->next;
+            }
+        }
+
+        return nodes;
+    }
 
     uint64_t size() const { return size_; };
 

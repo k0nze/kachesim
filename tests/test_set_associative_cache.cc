@@ -19,6 +19,8 @@ int main() {
                                                      hit_latency, cache_line_size, sets,
                                                      ways, ReplacementPolicyType::LRU);
 
+    std::cout << "Cache size: " << sac->size() << std::endl;
+
     // trigger overlaping writes to cache lines and sets
     /*
     Data d = Data(14);
@@ -61,39 +63,45 @@ int main() {
 
     // partial write to empty line
     sac->write(0x0000, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0001, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0002, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0003, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0004, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0005, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0006, d_byte);
-    std::cout << std::endl;
 
     // partial line update
     sac->write(0x0007, d_byte);
-    std::cout << std::endl;
 
-    // partial write to empty line
-    sac->write(0x0008, d_byte);
-    std::cout << std::endl;
+    Data d_line = Data(8);
+    d_line.set<uint64_t>(0xcdcdcdcdcdcdcdcd, 0);
+
+    // full write to empty line
+    sac->write(0x0008, d_line);
+    sac->write(0x0010, d_line);
+    sac->write(0x0018, d_line);
+    sac->write(0x0020, d_line);
+    sac->write(0x0028, d_line);
+    sac->write(0x0030, d_line);
+    sac->write(0x0038, d_line);
+
+    sac->write(0x0000, d_line);
+    // sac->write(0x0008, d_line);
+
+    // evict line
+    sac->write(0x0040, d_line);
 
     return 0;
 }

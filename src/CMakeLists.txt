@@ -9,8 +9,13 @@ add_library(
     common.cc
     data.cc
     cache_line.cc
+    cache_set.cc
     replacement_policy/replacement_policy.cc
     replacement_policy/least_recently_used.cc
-    set_associative_cache.cc
-    fake_memory.cc)
+    data_storage.cc
+    memory_interface.cc
+    fake_memory.cc
+    cache_interface.cc
+    set_associative_cache.cc)
+
 target_compile_options(mesi_cachesim INTERFACE "-fsized-deallocation")

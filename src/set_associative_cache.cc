@@ -79,6 +79,12 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
     uint64_t tag = get_address_tag(address);
     uint64_t index = get_address_index(address);
 
+    // check if only one cache line is affected
+    if (offset + data.size() <= cache_line_size_) {
+        address_data_map.insert({address, data});
+        return address_data_map;
+    }
+
     // split data into cache line size chunks
     // if offset != 0 first piece of data is a partial update
     uint32_t bytes_allocated = cache_line_size_ - offset;
@@ -142,34 +148,31 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             Data update_data = Data(cache_line_size_);
             Data cache_line_data = cache_sets_[index]->get_line_data(line_index);
 
-            if (offset != 0) {
-                // load lower bytes from cache line
-                for (int i = 0; i < offset; i++) {
-                    // fake data not from memory
-                    update_data[i] = cache_line_data[i];
-                }
-                for (int i = offset; i < cache_line_size_; i++) {
-                    update_data[i] = data[i - offset];
-                }
-
-            } else {
-                for (int i = 0; i < data.size(); i++) {
-                    update_data[i] = data[i];
-                }
-                // load upper bytes from cache line
-                for (int i = data.size(); i < cache_line_size_; i++) {
-                    // fake data not from memory
-                    update_data[i] = cache_line_data[i + offset];
-                }
+            // copy data from cache line
+            // from 0 to offset
+            for (int i = 0; i < offset; i++) {
+                update_data[i] = cache_line_data[i];
             }
-            cache_sets_[index]->update_line(line_index, tag, update_data);
+            // from offset to offset+data.size()
+            for (int i = offset; i < offset + data.size(); i++) {
+                update_data[i] = data[i - offset];
+            }
+            // from offset+data.size() to cache_line_size_
+            for (int i = offset + data.size(); i < cache_line_size_; i++) {
+                update_data[i] = cache_line_data[i];
+            }
+
+            std::cout << "update data:     " << update_data.get<uint64_t>()
+                      << std::endl;
+
+            cache_sets_[index]->update_line(line_index, tag, update_data, true, true);
             std::cout << "Partial update @ address/index: " << std::hex << address
                       << "/" << index << ", d: " << update_data.get<uint64_t>()
                       << std::endl;
             cache_sets_[index]->update_replacement_policy(line_index);
         } else {
             // full write
-            cache_sets_[index]->update_line(line_index, tag, data);
+            cache_sets_[index]->update_line(line_index, tag, data, true, true);
             std::cout << "Full update @ address/index:    " << std::hex << address
                       << "/" << index << ", d: " << data.get<uint64_t>() << std::endl;
             cache_sets_[index]->update_replacement_policy(line_index);
@@ -191,7 +194,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                     // TODO
                     for (int i = 0; i < offset; i++) {
                         // fake data not from memory
-                        update_data[i] = 0x11;
+                        update_data[i] = 0xff;
                     }
                     for (int i = offset; i < cache_line_size_; i++) {
                         update_data[i] = data[i - offset];
@@ -204,18 +207,19 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                     // TODO
                     for (int i = data.size(); i < cache_line_size_; i++) {
                         // fake data not from memory
-                        update_data[i] = 0x11;
+                        update_data[i] = 0xff;
                     }
                 }
 
-                cache_sets_[index]->update_line(line_index, tag, update_data);
+                cache_sets_[index]->update_line(line_index, tag, update_data, true,
+                                                true);
                 std::cout << "Partial write to empty line @ address/index: " << std::hex
                           << address << "/" << index
                           << ", d: " << update_data.get<uint64_t>() << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
             } else {
                 // full write
-                cache_sets_[index]->update_line(line_index, tag, data);
+                cache_sets_[index]->update_line(line_index, tag, data, true, true);
                 std::cout << "Full write to empty line @ address/index:    " << std::hex
                           << address << "/" << index << ", d: " << data.get<uint64_t>()
                           << std::endl;
@@ -223,6 +227,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             }
         } else {
             // no free line found -> evict line
+            std::cout << "No free line found" << std::endl;
             uint32_t replacement_index = cache_sets_[index]->get_replacement_index();
 
             // write to line

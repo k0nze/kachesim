@@ -17,7 +17,6 @@ public:
 private:
     DoublyLinkedList<uint32_t> dll_;
     std::unordered_map<uint32_t, std::shared_ptr<DoublyLinkedListNode<uint32_t>>> map_;
-    std::unordered_map<int, int> map2_;
 
     uint64_t size_;
 };

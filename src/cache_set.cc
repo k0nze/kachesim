@@ -30,7 +30,7 @@ CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways,
  */
 int32_t CacheSet::get_line_index_with_tag(uint64_t tag) {
     for (int i = 0; i < lines_.size(); i++) {
-        if (lines_[i]->get_tag() == tag) {
+        if (lines_[i]->get_tag() == tag && lines_[i]->valid()) {
             return i;
         }
     }
@@ -56,8 +56,9 @@ Data CacheSet::get_line_data(uint32_t line_index) {
     return lines_[line_index]->get_data();
 }
 
-void CacheSet::update_line(uint32_t line_index, uint64_t tag, Data& data) {
-    lines_[line_index]->update(tag, data);
+void CacheSet::update_line(uint32_t line_index, uint64_t tag, Data& data, bool valid,
+                           bool dirty) {
+    lines_[line_index]->update(tag, data, valid, dirty);
 }
 
 void CacheSet::update_replacement_policy(uint32_t line_index) {

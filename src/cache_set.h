@@ -17,7 +17,8 @@ public:
     int32_t get_free_line_index();
 
     Data get_line_data(uint32_t line_index);
-    void update_line(uint32_t line_index, uint64_t tag, Data& data);
+    void update_line(uint32_t line_index, uint64_t tag, Data& data, bool valid = true,
+                     bool dirty = true);
 
     void update_replacement_policy(uint32_t line_index);
     uint32_t get_replacement_index();

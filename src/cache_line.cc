@@ -25,7 +25,7 @@ void CacheLine::set_not_dirty() { dirty_ = false; }
  * @throws std::out_of_range if the size of the data does not match the size of the
  * cache line
  */
-void CacheLine::update(uint64_t tag, Data& data) {
+void CacheLine::update(uint64_t tag, Data& data, bool valid, bool dirty) {
     if (data.size() != size_) {
         std::string err_msg = std::string("data size with tag: ") +
                               int_to_hex<uint64_t>(tag) +
@@ -34,8 +34,8 @@ void CacheLine::update(uint64_t tag, Data& data) {
     }
 
     tag_ = tag;
-    valid_ = false;
-    dirty_ = false;
+    valid_ = valid;
+    dirty_ = dirty;
 
     // copy data into data_
     for (int i = 0; i < size_; i++) {

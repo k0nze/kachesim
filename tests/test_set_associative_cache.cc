@@ -19,6 +19,8 @@ int main() {
                                                      hit_latency, cache_line_size, sets,
                                                      ways, ReplacementPolicyType::LRU);
 
+    // trigger overlaping writes to cache lines and sets
+    /*
     Data d = Data(14);
     d.set<uint64_t>(0x87654321deadbeef, 0);
     d.set<uint64_t>(0xaabbccddeeff, 8, false);
@@ -47,14 +49,51 @@ int main() {
     sac->write(0x1007, d);
     std::cout << std::endl;
 
-    /*
     sac->write(0x1008, d);
-    sac->write(0x1009, d);
+    std::cout << std::endl;
 
-    Data e = Data(4);
-    e.set<uint32_t>(0xdeadbeef, 0);
-    sac->write(0x2000, e);
+    sac->write(0x1009, d);
+    std::cout << std::endl;
     */
+
+    Data d_byte = Data(1);
+    d_byte.set<uint8_t>(0xab, 0);
+
+    // partial write to empty line
+    sac->write(0x0000, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0001, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0002, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0003, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0004, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0005, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0006, d_byte);
+    std::cout << std::endl;
+
+    // partial line update
+    sac->write(0x0007, d_byte);
+    std::cout << std::endl;
+
+    // partial write to empty line
+    sac->write(0x0008, d_byte);
+    std::cout << std::endl;
 
     return 0;
 }

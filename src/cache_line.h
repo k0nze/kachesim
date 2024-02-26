@@ -25,7 +25,7 @@ public:
     void set_not_dirty();
     uint64_t dirty();
 
-    void update(uint64_t tag, Data& data);
+    void update(uint64_t tag, Data& data, bool valid = true, bool dirty = true);
     uint64_t get_tag();
     Data get_data();
 

@@ -25,7 +25,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<CacheLine>> lines_;
-    std::unique_ptr<ReplacementPolicy> replacement_policy_;
+    std::shared_ptr<ReplacementPolicy> replacement_policy_;
 };
 
 #endif

@@ -16,7 +16,7 @@ CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways,
 
     switch (replacement_policy_type) {
         case ReplacementPolicyType::LRU:
-            replacement_policy_ = std::make_unique<LeastRecentlyUsed>();
+            replacement_policy_ = std::make_shared<LeastRecentlyUsed>();
             break;
         default:
             THROW_INVALID_ARGUMENT("invalid ReplacementPolicyType");

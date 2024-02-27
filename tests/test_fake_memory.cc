@@ -80,7 +80,7 @@ int main() {
     fm = std::make_unique<FakeMemory>(32, read_latency, write_latency);
 
     // read whole hex file to memory starting from address 0
-    fm->read_hex_memory_file("../data/data0.mem", 0);
+    fm->read_hex_memory_file("../data/hex_data0.mem", 0);
 
     assert(fm->read(0, 1).data->get<uint8_t>() == 0xad);
     assert(fm->read(1, 1).data->get<uint8_t>() == 0xde);
@@ -102,12 +102,13 @@ int main() {
     assert(fm->read(0, 8).data->get<uint64_t>() == 0x12340a0abeefdead);
     assert(fm->read(8, 8).data->get<uint64_t>() == 0x010000eeff012345);
 
-    fm->write_hex_memory_file("../data/data1.mem", 0);
+    fm->write_hex_memory_file("../data/hex_data1.mem", 0);
+    fm->write_bin_memory_file("../data/bin_data1.mem", 0);
 
     fm->reset();
 
     // read 4 bytes from hex to memory starting from address 0
-    fm->read_hex_memory_file("../data/data0.mem", 0, 3);
+    fm->read_hex_memory_file("../data/hex_data0.mem", 0, 3);
 
     assert(fm->read(0, 1).data->get<uint8_t>() == 0xad);
     assert(fm->read(1, 1).data->get<uint8_t>() == 0xde);
@@ -120,7 +121,7 @@ int main() {
     fm->reset();
 
     // read whole hex file to memory starting from address 16
-    fm->read_hex_memory_file("../data/data0.mem", 16);
+    fm->read_hex_memory_file("../data/hex_data0.mem", 16);
 
     assert(fm->read(16, 1).data->get<uint8_t>() == 0xad);
     assert(fm->read(17, 1).data->get<uint8_t>() == 0xde);
@@ -146,7 +147,7 @@ int main() {
 
     // read 5 bytes from hex to memory starting from address 16
     // however data in mem file is not aligned and there for the fifth byte is discarded
-    fm->read_hex_memory_file("../data/data0.mem", 16, 20);
+    fm->read_hex_memory_file("../data/hex_data0.mem", 16, 20);
 
     assert(fm->read(16, 1).data->get<uint8_t>() == 0xad);
     assert(fm->read(17, 1).data->get<uint8_t>() == 0xde);
@@ -156,7 +157,7 @@ int main() {
 
     assert(fm->read(16, 8).data->get<uint64_t>() == 0xbeefdead);
 
-    fm->write_hex_memory_file("../data/data2.mem", 16, 19);
+    fm->write_hex_memory_file("../data/hex_data2.mem", 16, 19);
 
     return 0;
 }

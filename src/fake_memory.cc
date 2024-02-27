@@ -192,6 +192,23 @@ void FakeMemory::write_hex_memory_file(const std::string& memory_file_path,
 void FakeMemory::read_bin_memory_file(const std::string& memory_file_path,
                                       uint64_t start_address, uint64_t end_address) {}
 
+void FakeMemory::write_bin_memory_file(const std::string& memory_file_path,
+                                       uint64_t start_address, uint64_t end_address) {
+    if (end_address == 0) {
+        end_address = size_ - 1;
+    }
+
+    std::ofstream memory_file;
+
+    memory_file.open(memory_file_path, std::ios::binary);
+
+    for (uint64_t i = start_address; i <= end_address; i++) {
+        memory_file << data_[i];
+    }
+
+    memory_file.close();
+}
+
 /**
  * @brief reset whole memory
  */

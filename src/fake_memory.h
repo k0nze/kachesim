@@ -23,6 +23,8 @@ public:
 
     void read_bin_memory_file(const std::string& memory_file_path,
                               uint64_t start_address = 0, uint64_t end_address = 0);
+    void write_bin_memory_file(const std::string& memory_file_path,
+                               uint64_t start_address = 0, uint64_t end_address = 0);
 
     void reset();
 

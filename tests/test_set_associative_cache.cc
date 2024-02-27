@@ -10,8 +10,6 @@
 #include "set_associative_cache.h"
 
 int main() {
-    std::shared_ptr<DataStorage> ds = std::make_shared<FakeMemory>(1024, 10, 5);
-
     auto fm = std::make_shared<FakeMemory>(1024, 10, 5);
 
     // write 0xff to each byte in memory

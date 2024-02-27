@@ -187,26 +187,26 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 // partial write
                 Data update_data = Data(cache_line_size_);
 
-                if (offset != 0) {
-                    // load lower bytes from memory
-                    // TODO
-                    for (int i = 0; i < offset; i++) {
-                        // fake data not from memory
-                        update_data[i] = 0xff;
-                    }
-                    for (int i = offset; i < cache_line_size_; i++) {
-                        update_data[i] = data[i - offset];
-                    }
-                } else {
-                    for (int i = 0; i < data.size(); i++) {
-                        update_data[i] = data[i];
-                    }
-                    // load upper bytes from memory
-                    // TODO
-                    for (int i = data.size(); i < cache_line_size_; i++) {
-                        // fake data not from memory
-                        update_data[i] = 0xff;
-                    }
+                // load data from next level data storage
+                // auto next_level_dst = next_level_data_storage_->read(address-offset,
+                // cache_line_size_); auto next_level_data = next_level_dst.data;
+
+                auto next_level_data =
+                    next_level_data_storage_->read(address - offset, cache_line_size_)
+                        .data;
+
+                // copy data from memory
+                // from 0 to offset
+                for (int i = 0; i < offset; i++) {
+                    update_data[i] = (*next_level_data)[i];
+                }
+                // from offset to offset+data.size()
+                for (int i = offset; i < offset + data.size(); i++) {
+                    update_data[i] = data[i - offset];
+                }
+                // form offset+data.size() to cache_line_size_
+                for (int i = offset + data.size(); i < cache_line_size_; i++) {
+                    update_data[i] = (*next_level_data)[i];
                 }
 
                 cache_sets_[index]->update_line(line_index, tag, update_data, true,

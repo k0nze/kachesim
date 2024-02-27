@@ -1,5 +1,6 @@
 #include "least_recently_used.h"
 
+#include <iostream>
 #include <sstream>
 
 LeastRecentlyUsed::LeastRecentlyUsed() {}

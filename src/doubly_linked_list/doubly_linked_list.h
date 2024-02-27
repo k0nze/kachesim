@@ -117,9 +117,10 @@ public:
         auto current_node = head_;
 
         if (current_node != nullptr) {
+            nodes.push_back(current_node);
             while (current_node->next != nullptr) {
-                nodes.push_back(current_node);
                 current_node = current_node->next;
+                nodes.push_back(current_node);
             }
         }
 

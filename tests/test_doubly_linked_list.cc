@@ -12,6 +12,9 @@ int main() {
     auto node_3 = dll->insert_head(3);
     auto node_4 = dll->insert_head(4);
 
+    auto nodes = dll->get_nodes();
+    assert(nodes.size() == 4);
+
     assert(dll->size() == 4);
     assert(dll->get_head() == 4);
     assert(dll->get_tail() == 1);

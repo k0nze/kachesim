@@ -8,6 +8,7 @@
 
 class FakeMemory : public MemoryInterface {
 public:
+    FakeMemory();
     FakeMemory(uint64_t size, latency_t read_latency, latency_t write_latency);
 
     size_t size();

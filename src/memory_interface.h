@@ -3,7 +3,7 @@
 
 #include "data_storage.h"
 
-class MemoryInterface : DataStorage {
+class MemoryInterface : public DataStorage {
 public:
     virtual ~MemoryInterface() = 0;
 

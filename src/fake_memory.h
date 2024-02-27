@@ -1,19 +1,24 @@
 #ifndef FAKE_MEMORY_H
 #define FAKE_MEMORY_H
 
+#include <string>
 #include <vector>
 
 #include "memory_interface.h"
 
 class FakeMemory : public MemoryInterface {
 public:
-    FakeMemory(uint64_t size);
     FakeMemory(uint64_t size, latency_t read_latency, latency_t write_latency);
 
     size_t size();
 
     DataStorageTransaction write(address_t address, Data& data);
     DataStorageTransaction read(address_t address, size_t num_bytes);
+
+    void read_hex_memory_file(const std::string& memory_file_path,
+                              uint64_t start_address = 0, uint64_t end_address = 0);
+    void read_bin_memory_file(const std::string& memory_file_path,
+                              uint64_t start_address = 0, uint64_t end_address = 0);
 
     void reset();
 

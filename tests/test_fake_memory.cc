@@ -76,5 +76,83 @@ int main() {
         assert(dst.data->get<uint8_t>() == 0);
     }
 
+    // test reading from files
+    fm = std::make_unique<FakeMemory>(32, read_latency, write_latency);
+
+    // read whole hex file to memory starting from address 0
+    fm->read_hex_memory_file("../data/data0.mem", 0);
+
+    assert(fm->read(0, 1).data->get<uint8_t>() == 0xad);
+    assert(fm->read(1, 1).data->get<uint8_t>() == 0xde);
+    assert(fm->read(2, 1).data->get<uint8_t>() == 0xef);
+    assert(fm->read(3, 1).data->get<uint8_t>() == 0xbe);
+    assert(fm->read(4, 1).data->get<uint8_t>() == 0x0a);
+    assert(fm->read(5, 1).data->get<uint8_t>() == 0x0a);
+    assert(fm->read(6, 1).data->get<uint8_t>() == 0x34);
+    assert(fm->read(7, 1).data->get<uint8_t>() == 0x12);
+    assert(fm->read(8, 1).data->get<uint8_t>() == 0x45);
+    assert(fm->read(9, 1).data->get<uint8_t>() == 0x23);
+    assert(fm->read(10, 1).data->get<uint8_t>() == 0x01);
+    assert(fm->read(11, 1).data->get<uint8_t>() == 0xff);
+    assert(fm->read(12, 1).data->get<uint8_t>() == 0xee);
+    assert(fm->read(13, 1).data->get<uint8_t>() == 0x00);
+    assert(fm->read(14, 1).data->get<uint8_t>() == 0x00);
+    assert(fm->read(15, 1).data->get<uint8_t>() == 0x01);
+
+    assert(fm->read(0, 8).data->get<uint64_t>() == 0x12340a0abeefdead);
+    assert(fm->read(8, 8).data->get<uint64_t>() == 0x010000eeff012345);
+
+    fm->reset();
+
+    // read 4 bytes from hex to memory starting from address 0
+    fm->read_hex_memory_file("../data/data0.mem", 0, 3);
+
+    assert(fm->read(0, 1).data->get<uint8_t>() == 0xad);
+    assert(fm->read(1, 1).data->get<uint8_t>() == 0xde);
+    assert(fm->read(2, 1).data->get<uint8_t>() == 0xef);
+    assert(fm->read(3, 1).data->get<uint8_t>() == 0xbe);
+    assert(fm->read(4, 1).data->get<uint8_t>() == 0x00);
+
+    assert(fm->read(0, 8).data->get<uint64_t>() == 0xbeefdead);
+
+    fm->reset();
+
+    // read whole hex file to memory starting from address 16
+    fm->read_hex_memory_file("../data/data0.mem", 16);
+
+    assert(fm->read(16, 1).data->get<uint8_t>() == 0xad);
+    assert(fm->read(17, 1).data->get<uint8_t>() == 0xde);
+    assert(fm->read(18, 1).data->get<uint8_t>() == 0xef);
+    assert(fm->read(19, 1).data->get<uint8_t>() == 0xbe);
+    assert(fm->read(20, 1).data->get<uint8_t>() == 0x0a);
+    assert(fm->read(21, 1).data->get<uint8_t>() == 0x0a);
+    assert(fm->read(22, 1).data->get<uint8_t>() == 0x34);
+    assert(fm->read(23, 1).data->get<uint8_t>() == 0x12);
+    assert(fm->read(24, 1).data->get<uint8_t>() == 0x45);
+    assert(fm->read(25, 1).data->get<uint8_t>() == 0x23);
+    assert(fm->read(26, 1).data->get<uint8_t>() == 0x01);
+    assert(fm->read(27, 1).data->get<uint8_t>() == 0xff);
+    assert(fm->read(28, 1).data->get<uint8_t>() == 0xee);
+    assert(fm->read(29, 1).data->get<uint8_t>() == 0x00);
+    assert(fm->read(30, 1).data->get<uint8_t>() == 0x00);
+    assert(fm->read(31, 1).data->get<uint8_t>() == 0x01);
+
+    assert(fm->read(16, 8).data->get<uint64_t>() == 0x12340a0abeefdead);
+    assert(fm->read(24, 8).data->get<uint64_t>() == 0x010000eeff012345);
+
+    fm->reset();
+
+    // read 5 bytes from hex to memory starting from address 16
+    // however data in mem file is not aligned and there for the fifth byte is discarded
+    fm->read_hex_memory_file("../data/data0.mem", 16, 20);
+
+    assert(fm->read(16, 1).data->get<uint8_t>() == 0xad);
+    assert(fm->read(17, 1).data->get<uint8_t>() == 0xde);
+    assert(fm->read(18, 1).data->get<uint8_t>() == 0xef);
+    assert(fm->read(19, 1).data->get<uint8_t>() == 0xbe);
+    assert(fm->read(20, 1).data->get<uint8_t>() == 0x00);
+
+    assert(fm->read(16, 8).data->get<uint64_t>() == 0xbeefdead);
+
     return 0;
 }

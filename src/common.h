@@ -36,4 +36,8 @@ uint32_t clog2(uint64_t x);
     throw std::invalid_argument((std::string(msg)) + " at " + std::string(__FILE__) + \
                                 ":" + std::to_string(__LINE__));
 
+#define THROW_RUNTIME_ERROR(msg)                                                   \
+    throw std::runtime_error((std::string(msg)) + " at " + std::string(__FILE__) + \
+                             ":" + std::to_string(__LINE__));
+
 #endif

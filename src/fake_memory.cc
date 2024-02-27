@@ -1,11 +1,15 @@
 #include "fake_memory.h"
 
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 
 #include "common.h"
 
-FakeMemory::FakeMemory(uint64_t size) : size_(size) { reset(); }
 FakeMemory::FakeMemory(uint64_t size, latency_t read_latency, latency_t write_latency)
     : size_(size) {
     read_latency_ = read_latency;
@@ -64,6 +68,102 @@ DataStorageTransaction FakeMemory::read(address_t address, size_t num_bytes) {
     DataStorageTransaction dst = {READ, address, read_latency_, 0, std::move(data)};
     return dst;
 }
+
+/**
+ * @brief read memory from hex file
+ * @param memory_file_path the path to the memory file
+ * @param start_address the start address to read to
+ * @param end_address the end address to read to (if the end_address is not set or is 0
+ * it wont be considered)
+ */
+void FakeMemory::read_hex_memory_file(const std::string& memory_file_path,
+                                      uint64_t start_address, uint64_t end_address) {
+    // check if file exists
+    std::filesystem::path p(memory_file_path);
+    if (!std::filesystem::exists(p)) {
+        std::string err_msg =
+            std::string("file ") + memory_file_path + std::string(" does not exist");
+        THROW_RUNTIME_ERROR(err_msg);
+    }
+
+    // check if start_address is in range
+    if (start_address > size_) {
+        std::string err_msg =
+            std::string("start address ") + int_to_hex<uint64_t>(start_address) +
+            std::string(" is out of range for size ") + int_to_hex<uint64_t>(size_);
+        THROW_OUT_OF_RANGE(err_msg);
+    }
+
+    std::ifstream memory_file;
+
+    memory_file.open(memory_file_path, std::ios::in);
+
+    if (memory_file.good()) {
+        char c;
+        char buffer[1024];
+        uint32_t buffer_index = 0;
+        uint64_t memory_address = start_address;
+
+        while (memory_file.get(c)) {
+            // read into buffer until newline is found
+            if (c != ' ' && c != '\n') {
+                buffer[buffer_index] = c;
+                buffer_index++;
+            }
+            // if newline is found, convert buffer to data and write to memory
+            else if (c == '\n') {
+                buffer[buffer_index] = '\0';
+
+                size_t num_bytes;
+
+                // if buffer size is odd add one to make it even (because each byte are
+                // 2 chars)
+                if (buffer_index % 2 != 0) {
+                    num_bytes = buffer_index / 2 + 1;
+                } else {
+                    num_bytes = buffer_index / 2;
+                }
+
+                Data data(num_bytes);
+                uint32_t data_byte_index = 0;
+
+                char byte_chars[3];
+                byte_chars[2] = '\0';
+
+                // read buffer from right to left
+                for (int i = buffer_index - 1; i >= 0; i -= 2) {
+                    if (i - 1 == -1) {
+                        byte_chars[1] = buffer[i];
+                        byte_chars[0] = '0';
+                    } else {
+                        byte_chars[1] = buffer[i];
+                        byte_chars[0] = buffer[i - 1];
+                    }
+                    // convert byte_chars to integer
+                    uint32_t byte;
+                    std::stringstream ss;
+                    ss << byte_chars;
+                    ss >> std::hex >> byte;
+                    data[data_byte_index] = byte;
+                    data_byte_index++;
+                }
+                buffer_index = 0;
+
+                // write data to memory
+                write(memory_address, data);
+                memory_address += data.size();
+
+                if (end_address != 0 && memory_address >= end_address) {
+                    break;
+                }
+            }
+        }
+        memory_file.close();
+    }
+}
+
+void FakeMemory::read_bin_memory_file(const std::string& memory_file_path,
+                                      uint64_t start_address, uint64_t end_address) {}
 
 /**
  * @brief reset whole memory

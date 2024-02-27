@@ -162,6 +162,33 @@ void FakeMemory::read_hex_memory_file(const std::string& memory_file_path,
     }
 }
 
+/**
+ * @brief write hex file from memory
+ * @param memory_file_path to write to
+ * @param start_address the start address read from
+ * @param end_address the end address to read from (if the end_address is not set or is
+ * 0 it wont be considered)
+ */
+void FakeMemory::write_hex_memory_file(const std::string& memory_file_path,
+                                       uint64_t start_address, uint64_t end_address,
+                                       uint8_t bytes_per_line) {
+    if (end_address == 0) {
+        end_address = size_ - 1;
+    }
+
+    std::ofstream memory_file;
+
+    memory_file.open(memory_file_path, std::ios::out);
+
+    for (uint64_t i = start_address; i <= end_address; i++) {
+        memory_file << std::hex << std::setfill('0') << std::setw(2) << (int)data_[i];
+        if ((i + 1) % bytes_per_line == 0) {
+            memory_file << std::endl;
+        }
+    }
+    memory_file.close();
+}
+
 void FakeMemory::read_bin_memory_file(const std::string& memory_file_path,
                                       uint64_t start_address, uint64_t end_address) {}
 

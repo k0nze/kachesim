@@ -102,6 +102,8 @@ int main() {
     assert(fm->read(0, 8).data->get<uint64_t>() == 0x12340a0abeefdead);
     assert(fm->read(8, 8).data->get<uint64_t>() == 0x010000eeff012345);
 
+    fm->write_hex_memory_file("../data/data1.mem", 0);
+
     fm->reset();
 
     // read 4 bytes from hex to memory starting from address 0
@@ -153,6 +155,8 @@ int main() {
     assert(fm->read(20, 1).data->get<uint8_t>() == 0x00);
 
     assert(fm->read(16, 8).data->get<uint64_t>() == 0xbeefdead);
+
+    fm->write_hex_memory_file("../data/data2.mem", 16, 19);
 
     return 0;
 }

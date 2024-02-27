@@ -6,6 +6,7 @@
 
 #include "cache_interface.h"
 #include "cache_set.h"
+#include "data_storage.h"
 
 /**
  * represents a set-associative cache
@@ -64,7 +65,8 @@
  */
 class SetAssociativeCache : public CacheInterface {
 public:
-    SetAssociativeCache(bool write_allocate, bool write_back, latency_t miss_latency,
+    SetAssociativeCache(std::shared_ptr<DataStorage> next_level_data_storage,
+                        bool write_allocate, bool write_back, latency_t miss_latency,
                         latency_t hit_latency, size_t cache_line_size, size_t sets,
                         size_t ways, ReplacementPolicyType replacement_policy_type,
                         size_t multi_line_access = 1);
@@ -101,6 +103,8 @@ private:
 
     std::map<address_t, Data> align_transaction(address_t address, Data& data);
     DataStorageTransaction aligned_write(address_t address, Data& data);
+
+    std::shared_ptr<DataStorage> next_level_data_storage_;
 };
 
 #endif

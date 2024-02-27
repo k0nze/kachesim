@@ -3,7 +3,7 @@
 
 #include "data_storage.h"
 
-class CacheInterface : DataStorage {
+class CacheInterface : public DataStorage {
 public:
     virtual ~CacheInterface() = 0;
 

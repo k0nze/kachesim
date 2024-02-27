@@ -44,5 +44,7 @@ test/build
 
 # memory files generated from tests
 tests/data/hex_data1.mem
-tests/data/bin_data1.mem
 tests/data/hex_data2.mem
+
+tests/data/bin_data0.mem
+tests/data/bin_data1.mem

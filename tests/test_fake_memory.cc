@@ -103,7 +103,36 @@ int main() {
     assert(fm->read(8, 8).data->get<uint64_t>() == 0x010000eeff012345);
 
     fm->write_hex_memory_file("../data/hex_data1.mem", 0);
-    fm->write_bin_memory_file("../data/bin_data1.mem", 0);
+    fm->write_bin_memory_file("../data/bin_data0.mem", 0);
+
+    fm->reset();
+
+    for (int i = 0; i < 32; i++) {
+        assert(fm->read(i, 1).data->get<uint8_t>() == 0);
+    }
+
+    // read whole bin file to memory starting from address 0
+    fm->read_bin_memory_file("../data/bin_data0.mem", 0);
+
+    assert(fm->read(0, 1).data->get<uint8_t>() == 0xad);
+    assert(fm->read(1, 1).data->get<uint8_t>() == 0xde);
+    assert(fm->read(2, 1).data->get<uint8_t>() == 0xef);
+    assert(fm->read(3, 1).data->get<uint8_t>() == 0xbe);
+    assert(fm->read(4, 1).data->get<uint8_t>() == 0x0a);
+    assert(fm->read(5, 1).data->get<uint8_t>() == 0x0a);
+    assert(fm->read(6, 1).data->get<uint8_t>() == 0x34);
+    assert(fm->read(7, 1).data->get<uint8_t>() == 0x12);
+    assert(fm->read(8, 1).data->get<uint8_t>() == 0x45);
+    assert(fm->read(9, 1).data->get<uint8_t>() == 0x23);
+    assert(fm->read(10, 1).data->get<uint8_t>() == 0x01);
+    assert(fm->read(11, 1).data->get<uint8_t>() == 0xff);
+    assert(fm->read(12, 1).data->get<uint8_t>() == 0xee);
+    assert(fm->read(13, 1).data->get<uint8_t>() == 0x00);
+    assert(fm->read(14, 1).data->get<uint8_t>() == 0x00);
+    assert(fm->read(15, 1).data->get<uint8_t>() == 0x01);
+
+    assert(fm->read(0, 8).data->get<uint64_t>() == 0x12340a0abeefdead);
+    assert(fm->read(8, 8).data->get<uint64_t>() == 0x010000eeff012345);
 
     fm->reset();
 

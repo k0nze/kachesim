@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -166,12 +165,19 @@ void FakeMemory::read_hex_memory_file(const std::string& memory_file_path,
  * @brief write hex file from memory
  * @param memory_file_path to write to
  * @param start_address the start address read from
- * @param end_address the end address to read from (if the end_address is not set or is
- * 0 it wont be considered)
+ * @param end_address the end address to read from
  */
 void FakeMemory::write_hex_memory_file(const std::string& memory_file_path,
                                        uint64_t start_address, uint64_t end_address,
                                        uint8_t bytes_per_line) {
+    // check if start_address is in range
+    if (start_address > size_) {
+        std::string err_msg =
+            std::string("start address ") + int_to_hex<uint64_t>(start_address) +
+            std::string(" is out of range for size ") + int_to_hex<uint64_t>(size_);
+        THROW_OUT_OF_RANGE(err_msg);
+    }
+
     if (end_address == 0) {
         end_address = size_ - 1;
     }
@@ -189,9 +195,60 @@ void FakeMemory::write_hex_memory_file(const std::string& memory_file_path,
     memory_file.close();
 }
 
+/**
+ * @brief read memory from bin file
+ * @param memory_file_path the path to the memory file
+ * @param start_address the start address to read to
+ * @param end_address the end address to read to
+ */
 void FakeMemory::read_bin_memory_file(const std::string& memory_file_path,
-                                      uint64_t start_address, uint64_t end_address) {}
+                                      uint64_t start_address, uint64_t end_address) {
+    if (end_address == 0) {
+        end_address = size_ - 1;
+    }
 
+    // check if file exists
+    std::filesystem::path p(memory_file_path);
+    if (!std::filesystem::exists(p)) {
+        std::string err_msg =
+            std::string("file ") + memory_file_path + std::string(" does not exist");
+        THROW_RUNTIME_ERROR(err_msg);
+    }
+
+    // check if start_address is in range
+    if (start_address > size_) {
+        std::string err_msg =
+            std::string("start address ") + int_to_hex<uint64_t>(start_address) +
+            std::string(" is out of range for size ") + int_to_hex<uint64_t>(size_);
+        THROW_OUT_OF_RANGE(err_msg);
+    }
+
+    std::ifstream memory_file;
+
+    memory_file.open(memory_file_path, std::ios::binary);
+
+    uint64_t memory_address = start_address;
+
+    if (memory_file.good()) {
+        char byte;
+        while (!memory_file.eof() && memory_address <= end_address) {
+            memory_file.get(byte);
+            Data data(1);
+            data.set<uint8_t>(byte);
+            write(memory_address, data);
+            memory_address++;
+        }
+    }
+
+    memory_file.close();
+}
+
+/**
+ * @brief write bin file from memory
+ * @param memory_file_path to write to
+ * @param start_address the start address read from
+ * @param end_address the end address to read from
+ */
 void FakeMemory::write_bin_memory_file(const std::string& memory_file_path,
                                        uint64_t start_address, uint64_t end_address) {
     if (end_address == 0) {

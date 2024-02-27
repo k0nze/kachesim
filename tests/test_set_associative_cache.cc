@@ -4,10 +4,21 @@
 #include <vector>
 
 #include "data.h"
+#include "data_storage.h"
+#include "fake_memory.h"
 #include "replacement_policy/replacement_policy.h"
 #include "set_associative_cache.h"
 
 int main() {
+    auto fm = std::make_shared<FakeMemory>(1024, 10, 5);
+
+    // write 0xff to each byte in memory
+    for (int i = 0; i < 1024; i++) {
+        Data d = Data(1);
+        d.set<uint8_t>(0xff, 0);
+        fm->write(i, d);
+    }
+
     latency_t miss_latency = 10;
     latency_t hit_latency = 5;
 
@@ -15,7 +26,7 @@ int main() {
     size_t sets = 4;
     size_t ways = 2;
 
-    auto sac = std::make_unique<SetAssociativeCache>(false, true, miss_latency,
+    auto sac = std::make_shared<SetAssociativeCache>(false, true, miss_latency,
                                                      hit_latency, cache_line_size, sets,
                                                      ways, ReplacementPolicyType::LRU);
 

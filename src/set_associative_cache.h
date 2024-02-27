@@ -2,6 +2,7 @@
 #define SET_ASSOCIATIVE_CACHE_H
 
 #include <map>
+#include <memory>
 
 #include "cache_interface.h"
 #include "cache_set.h"

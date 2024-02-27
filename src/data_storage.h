@@ -1,9 +1,6 @@
 #ifndef DATA_STORAGE_H
 #define DATA_STORAGE_H
 
-#include <cstdint>
-#include <vector>
-
 #include "data_storage_transaction.h"
 
 class DataStorage {

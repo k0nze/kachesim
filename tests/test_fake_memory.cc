@@ -188,5 +188,12 @@ int main() {
 
     fm->write_hex_memory_file("../data/hex_data2.mem", 16, 19);
 
+    auto fm_static = FakeMemory(32, read_latency, write_latency);
+
+    fm_static[15] = 42;
+
+    assert(fm_static[15] == 42);
+    assert(fm_static.read(15, 1).data->get<uint8_t>() == 42);
+
     return 0;
 }

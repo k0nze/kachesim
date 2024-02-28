@@ -274,5 +274,11 @@ int main() {
 
     assert(c->get<uint64_t>() == 0x0807060504030201);
 
+    auto d = Data(8);
+    d[3] = 42;
+
+    assert(d[3] == 42);
+    assert(d.get<uint8_t>(3) == 42);
+
     return 0;
 }

@@ -269,6 +269,22 @@ void FakeMemory::write_bin_memory_file(const std::string& memory_file_path,
 }
 
 /**
+ * @brief read a byte from memory. CAUTION this method is intended for debugging
+ * purposes and should not be used in a simulation
+ * @param address the address to read from
+ * @return byte read from memory
+ */
+uint8_t FakeMemory::operator[](uint64_t address) const { return data_[address]; }
+
+/**
+ * @brief write a byte to memory. CAUTION this method is intended for debugging
+ * purposes and should not be used in a simulation
+ * @param address the address to write to
+ * @return byte written to memory
+ */
+uint8_t& FakeMemory::operator[](uint64_t address) { return data_[address]; }
+
+/**
  * @brief reset whole memory
  */
 void FakeMemory::reset() { data_ = std::vector<uint8_t>(size_); }

@@ -32,86 +32,260 @@ int main() {
 
     std::cout << "Cache size: " << sac->size() << std::endl;
 
-    // trigger overlaping writes to cache lines and sets
-    /*
-    Data d = Data(14);
-    d.set<uint64_t>(0x87654321deadbeef, 0);
-    d.set<uint64_t>(0xaabbccddeeff, 8, false);
-
-    sac->write(0x1000, d);
-    std::cout << std::endl;
-
-    sac->write(0x1001, d);
-    std::cout << std::endl;
-
-    sac->write(0x1002, d);
-    std::cout << std::endl;
-
-    sac->write(0x1003, d);
-    std::cout << std::endl;
-
-    sac->write(0x1004, d);
-    std::cout << std::endl;
-
-    sac->write(0x1005, d);
-    std::cout << std::endl;
-
-    sac->write(0x1006, d);
-    std::cout << std::endl;
-
-    sac->write(0x1007, d);
-    std::cout << std::endl;
-
-    sac->write(0x1008, d);
-    std::cout << std::endl;
-
-    sac->write(0x1009, d);
-    std::cout << std::endl;
-    */
-
     Data d_byte = Data(1);
-    d_byte.set<uint8_t>(0xab, 0);
+    d_byte.set<uint8_t>(0x11, 0);
 
     // partial write to empty line
     sac->write(0x0000, d_byte);
     assert(sac->is_address_cached(0x0000));
-    assert(sac->get(0x0000) == 0xab);
-    assert(sac->is_address_cached(0x0001));
-    assert(sac->get(0x0001) == 0xff);
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+
+    for (uint64_t i = 0x0001; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == fm->get(i));
+    }
 
     // partial line update
+    d_byte.set<uint8_t>(0x22, 0);
     sac->write(0x0001, d_byte);
 
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+
+    for (uint64_t i = 0x0002; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == fm->get(i));
+    }
+
     // partial line update
+    d_byte.set<uint8_t>(0x33, 0);
     sac->write(0x0002, d_byte);
 
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+    assert(sac->is_address_cached(0x0002));
+    assert(sac->is_address_valid(0x0002));
+    assert(sac->get(0x0002) == 0x33);
+
+    for (uint64_t i = 0x0003; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == fm->get(i));
+    }
+
     // partial line update
+    d_byte.set<uint8_t>(0x44, 0);
     sac->write(0x0003, d_byte);
 
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+    assert(sac->is_address_cached(0x0002));
+    assert(sac->is_address_valid(0x0002));
+    assert(sac->get(0x0002) == 0x33);
+    assert(sac->is_address_cached(0x0003));
+    assert(sac->is_address_valid(0x0003));
+    assert(sac->get(0x0003) == 0x44);
+
+    for (uint64_t i = 0x0004; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == fm->get(i));
+    }
+
     // partial line update
+    d_byte.set<uint8_t>(0x55, 0);
     sac->write(0x0004, d_byte);
 
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+    assert(sac->is_address_cached(0x0002));
+    assert(sac->is_address_valid(0x0002));
+    assert(sac->get(0x0002) == 0x33);
+    assert(sac->is_address_cached(0x0003));
+    assert(sac->is_address_valid(0x0003));
+    assert(sac->get(0x0003) == 0x44);
+    assert(sac->is_address_cached(0x0004));
+    assert(sac->is_address_valid(0x0004));
+    assert(sac->get(0x0004) == 0x55);
+
+    for (uint64_t i = 0x0005; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == fm->get(i));
+    }
+
     // partial line update
+    d_byte.set<uint8_t>(0x66, 0);
     sac->write(0x0005, d_byte);
 
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+    assert(sac->is_address_cached(0x0002));
+    assert(sac->is_address_valid(0x0002));
+    assert(sac->get(0x0002) == 0x33);
+    assert(sac->is_address_cached(0x0003));
+    assert(sac->is_address_valid(0x0003));
+    assert(sac->get(0x0003) == 0x44);
+    assert(sac->is_address_cached(0x0004));
+    assert(sac->is_address_valid(0x0004));
+    assert(sac->get(0x0004) == 0x55);
+    assert(sac->is_address_cached(0x0005));
+    assert(sac->is_address_valid(0x0005));
+    assert(sac->get(0x0005) == 0x66);
+
+    for (uint64_t i = 0x0006; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == fm->get(i));
+    }
+
     // partial line update
+    d_byte.set<uint8_t>(0x77, 0);
     sac->write(0x0006, d_byte);
 
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+    assert(sac->is_address_cached(0x0002));
+    assert(sac->is_address_valid(0x0002));
+    assert(sac->get(0x0002) == 0x33);
+    assert(sac->is_address_cached(0x0003));
+    assert(sac->is_address_valid(0x0003));
+    assert(sac->get(0x0003) == 0x44);
+    assert(sac->is_address_cached(0x0004));
+    assert(sac->is_address_valid(0x0004));
+    assert(sac->get(0x0004) == 0x55);
+    assert(sac->is_address_cached(0x0005));
+    assert(sac->is_address_valid(0x0005));
+    assert(sac->get(0x0005) == 0x66);
+    assert(sac->is_address_cached(0x0006));
+    assert(sac->is_address_valid(0x0006));
+    assert(sac->get(0x0006) == 0x77);
+
+    assert(sac->is_address_cached(0x0007));
+    assert(sac->get(0x0007) == fm->get(0x0007));
+
     // partial line update
+    d_byte.set<uint8_t>(0x88, 0);
     sac->write(0x0007, d_byte);
 
-    Data d_line = Data(8);
-    d_line.set<uint64_t>(0xcdcdcdcdcdcdcdcd, 0);
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_valid(0x0000));
+    assert(sac->get(0x0000) == 0x11);
+    assert(sac->is_address_cached(0x0001));
+    assert(sac->is_address_valid(0x0001));
+    assert(sac->get(0x0001) == 0x22);
+    assert(sac->is_address_cached(0x0002));
+    assert(sac->is_address_valid(0x0002));
+    assert(sac->get(0x0002) == 0x33);
+    assert(sac->is_address_cached(0x0003));
+    assert(sac->is_address_valid(0x0003));
+    assert(sac->get(0x0003) == 0x44);
+    assert(sac->is_address_cached(0x0004));
+    assert(sac->is_address_valid(0x0004));
+    assert(sac->get(0x0004) == 0x55);
+    assert(sac->is_address_cached(0x0005));
+    assert(sac->is_address_valid(0x0005));
+    assert(sac->get(0x0005) == 0x66);
+    assert(sac->is_address_cached(0x0006));
+    assert(sac->is_address_valid(0x0006));
+    assert(sac->get(0x0006) == 0x77);
+    assert(sac->is_address_cached(0x0007));
+    assert(sac->is_address_valid(0x0007));
+    assert(sac->get(0x0007) == 0x88);
 
-    // full write to empty line
+    // full write to empty lines
+    Data d_line = Data(8);
+    d_line.set<uint64_t>(0x0101010101010101, 0);
     sac->write(0x0008, d_line);
+
+    for (uint64_t i = 0x0008; i <= 0x000a; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x01);
+    }
+
+    d_line.set<uint64_t>(0x0202020202020202, 0);
     sac->write(0x0010, d_line);
+
+    for (uint64_t i = 0x0010; i <= 0x0017; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x02);
+    }
+
+    d_line.set<uint64_t>(0x0303030303030303, 0);
     sac->write(0x0018, d_line);
+
+    for (uint64_t i = 0x0018; i <= 0x001a; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x03);
+    }
+
+    d_line.set<uint64_t>(0x0404040404040404, 0);
     sac->write(0x0020, d_line);
+
+    for (uint64_t i = 0x0020; i <= 0x0027; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x04);
+    }
+
+    d_line.set<uint64_t>(0x0505050505050505, 0);
     sac->write(0x0028, d_line);
+
+    for (uint64_t i = 0x0028; i <= 0x002a; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x05);
+    }
+
+    d_line.set<uint64_t>(0x0606060606060606, 0);
     sac->write(0x0030, d_line);
+
+    for (uint64_t i = 0x0030; i <= 0x0037; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x06);
+    }
+
+    d_line.set<uint64_t>(0x0707070707070707, 0);
     sac->write(0x0038, d_line);
 
+    for (uint64_t i = 0x0038; i <= 0x003a; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x07);
+    }
+
+    d_line.set<uint64_t>(0x0808080808080808, 0);
     sac->write(0x0000, d_line);
 
     // evict line

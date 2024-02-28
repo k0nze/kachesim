@@ -316,6 +316,7 @@ int main() {
     // containing address 0x0020
     // because 0x0020 and 0x0040 have the same index (0) and there for they are in the
     // same cache set. in this cache set 0x0020 was accesses last.
+    d_line.set<uint64_t>(0x0909090909090909, 0);
     sac->write(0x0040, d_line);
 
     assert(sac->is_address_cached(0x0000));
@@ -329,7 +330,35 @@ int main() {
     assert(sac->is_address_cached(0x0028));
     assert(sac->is_address_cached(0x0030));
     assert(sac->is_address_cached(0x0038));
+
     assert(sac->is_address_cached(0x0040));
+    assert(sac->is_address_valid(0x0040));
+
+    for (uint64_t i = 0x0040; i <= 0x0047; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x09);
+    }
+
+    // issue unalinged write
+    Data d_multi_line = Data(11);
+
+    for (int i = 0; i < 11; i++) {
+        d_multi_line.set<uint8_t>(i + 1, i);
+    }
+
+    d_byte.set<uint8_t>(0xab);
+
+    // sac->write(0x0051, d_multi_line);
+    sac->write(0x0041, d_byte);
+    sac->write(0x0042, d_byte);
+    sac->write(0x0043, d_byte);
+    sac->write(0x0044, d_byte);
+    sac->write(0x0045, d_byte);
+    sac->write(0x0046, d_byte);
+    sac->write(0x0047, d_byte);
+
+    // sac->write(0x0048, d_byte);
 
     return 0;
 }

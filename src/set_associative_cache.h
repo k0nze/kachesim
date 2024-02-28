@@ -103,6 +103,8 @@ private:
 
     std::vector<std::unique_ptr<CacheSet>> cache_sets_;
 
+    std::shared_ptr<DataStorage> next_level_data_storage_;
+
     uint64_t get_address_offset(uint64_t address);
     uint64_t get_address_index(uint64_t address);
     uint64_t get_address_tag(uint64_t address);
@@ -110,7 +112,9 @@ private:
     std::map<address_t, Data> align_transaction(address_t address, Data& data);
     DataStorageTransaction aligned_write(address_t address, Data& data);
 
-    std::shared_ptr<DataStorage> next_level_data_storage_;
+    DataStorageTransaction fill_data_from_next_level_data_storage(Data& data,
+                                                                  uint64_t address,
+                                                                  size_t num_bytes);
 };
 
 #endif

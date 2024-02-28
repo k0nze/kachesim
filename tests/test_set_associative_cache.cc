@@ -358,7 +358,7 @@ int main() {
     sac->write(0x0046, d_byte);
     sac->write(0x0047, d_byte);
 
-    // sac->write(0x0048, d_byte);
+    sac->write(0x0048, d_byte);
 
     return 0;
 }

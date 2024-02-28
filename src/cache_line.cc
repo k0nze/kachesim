@@ -1,5 +1,6 @@
 #include "cache_line.h"
 
+#include <iostream>
 #include <string>
 
 #include "common.h"

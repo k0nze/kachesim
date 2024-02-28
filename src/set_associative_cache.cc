@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "common.h"
@@ -124,6 +125,40 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
     return address_data_map;
 }
 
+DataStorageTransaction SetAssociativeCache::fill_data_from_next_level_data_storage(
+    Data& data, uint64_t address, size_t num_bytes) {
+    uint64_t offset = get_address_offset(address);
+
+    // load data from next level data storage
+    auto next_level_data =
+        next_level_data_storage_->read(address - offset, num_bytes).data;
+
+    auto fill_data = std::make_unique<Data>(num_bytes);
+
+    // copy data from next level data storage
+    // from 0 to offset
+    for (int i = 0; i < offset; i++) {
+        (*fill_data)[i] = (*next_level_data)[i];
+    }
+    // from offset to offset+data.size()
+    for (int i = offset; i < offset + data.size(); i++) {
+        (*fill_data)[i] = data[i - offset];
+    }
+    // form offset+data.size() to cache_line_size_
+    for (int i = offset + data.size(); i < cache_line_size_; i++) {
+        (*fill_data)[i] = (*next_level_data)[i];
+    }
+
+    // TODO correct values for latency and hit_level
+    latency_t latency = 0;
+    uint32_t hit_level = 0;
+
+    DataStorageTransaction dst = {WRITE, address, latency, hit_level,
+                                  std::move(fill_data)};
+
+    return dst;
+}
+
 /**
  * @brief write data to single cache line
  * @param address the address to write to
@@ -187,32 +222,15 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             // check if its a partial write
             if (data.size() != cache_line_size_) {
                 // partial write
-                Data update_data = Data(cache_line_size_);
+                auto update_data = fill_data_from_next_level_data_storage(
+                                       data, address, cache_line_size_)
+                                       .data;
 
-                // load data from next level data storage
-                auto next_level_data =
-                    next_level_data_storage_->read(address - offset, cache_line_size_)
-                        .data;
-
-                // copy data from next level data storage
-                // from 0 to offset
-                for (int i = 0; i < offset; i++) {
-                    update_data[i] = (*next_level_data)[i];
-                }
-                // from offset to offset+data.size()
-                for (int i = offset; i < offset + data.size(); i++) {
-                    update_data[i] = data[i - offset];
-                }
-                // form offset+data.size() to cache_line_size_
-                for (int i = offset + data.size(); i < cache_line_size_; i++) {
-                    update_data[i] = (*next_level_data)[i];
-                }
-
-                cache_sets_[index]->update_line(line_index, tag, update_data, true,
+                cache_sets_[index]->update_line(line_index, tag, *update_data, true,
                                                 true);
                 std::cout << "Partial write to empty line @ address/index: " << std::hex
                           << address << "/" << index
-                          << ", d: " << update_data.get<uint64_t>() << std::endl;
+                          << ", d: " << update_data->get<uint64_t>() << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
             } else {
                 // full write
@@ -229,12 +247,26 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
 
             std::cout << "evict line: " << line_index << std::endl;
 
-            cache_sets_[index]->update_line(line_index, tag, data, true, true);
-            std::cout << "Full write to evicted line @ address/index:  " << std::hex
-                      << address << "/" << index << ", d: " << data.get<uint64_t>()
-                      << std::endl;
+            if (data.size() != cache_line_size_) {
+                // partial write
+                auto update_data = fill_data_from_next_level_data_storage(
+                                       data, address, cache_line_size_)
+                                       .data;
 
-            cache_sets_[index]->update_replacement_policy(line_index);
+                cache_sets_[index]->update_line(line_index, tag, *update_data, true,
+                                                true);
+                std::cout << "Partial write to empty line @ address/index: " << std::hex
+                          << address << "/" << index
+                          << ", d: " << update_data->get<uint64_t>() << std::endl;
+                cache_sets_[index]->update_replacement_policy(line_index);
+            } else {
+                cache_sets_[index]->update_line(line_index, tag, data, true, true);
+                std::cout << "Full write to evicted line @ address/index:  " << std::hex
+                          << address << "/" << index << ", d: " << data.get<uint64_t>()
+                          << std::endl;
+
+                cache_sets_[index]->update_replacement_policy(line_index);
+            }
         }
     }
 

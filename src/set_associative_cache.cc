@@ -139,6 +139,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     // check if target cache set already contains tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
 
+    // TODO add write_allocate
+    // TODO add write_back
     // TODO: may be move to CacheSet in the future
     if (line_index != -1) {
         // line with tag found -> update line
@@ -188,14 +190,11 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 Data update_data = Data(cache_line_size_);
 
                 // load data from next level data storage
-                // auto next_level_dst = next_level_data_storage_->read(address-offset,
-                // cache_line_size_); auto next_level_data = next_level_dst.data;
-
                 auto next_level_data =
                     next_level_data_storage_->read(address - offset, cache_line_size_)
                         .data;
 
-                // copy data from memory
+                // copy data from next level data storage
                 // from 0 to offset
                 for (int i = 0; i < offset; i++) {
                     update_data[i] = (*next_level_data)[i];

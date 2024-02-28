@@ -329,6 +329,27 @@ bool SetAssociativeCache::is_address_dirty(address_t address) {
 }
 
 /**
+ * @brief returns the cached byte or 0. CAUTION: this method is intended for debugging
+ * and should not be used in a simulation and check first if address is cached.
+ * @param address address of byte to read
+ * @return byte read or 0
+ */
+uint8_t SetAssociativeCache::operator[](uint64_t address) {
+    uint64_t offset = get_address_offset(address);
+    uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
+
+    // check if target cache set contains  with tag
+    int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
+
+    if (line_index != -1) {
+        Data cache_line_data = cache_sets_[index]->get_line_data(line_index);
+        return cache_line_data.get<uint8_t>(offset);
+    }
+    return 0;
+}
+
+/**
  * @brief reset the whole cache
  */
 void SetAssociativeCache::reset() {

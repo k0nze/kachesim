@@ -74,6 +74,10 @@ int main() {
 
     // partial write to empty line
     sac->write(0x0000, d_byte);
+    assert(sac->is_address_cached(0x0000));
+    assert((*sac)[0x0000] == 0xab);
+    assert(sac->is_address_cached(0x0001));
+    assert((*sac)[0x0001] == 0xff);
 
     // partial line update
     sac->write(0x0001, d_byte);

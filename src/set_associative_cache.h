@@ -91,6 +91,8 @@ public:
     bool is_address_valid(address_t address);
     bool is_address_dirty(address_t address);
 
+    uint8_t operator[](uint64_t address);
+
     void reset();
 
 private:

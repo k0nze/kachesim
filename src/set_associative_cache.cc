@@ -334,7 +334,7 @@ bool SetAssociativeCache::is_address_dirty(address_t address) {
  * @param address address of byte to read
  * @return byte read or 0
  */
-uint8_t SetAssociativeCache::operator[](uint64_t address) {
+uint8_t SetAssociativeCache::get(uint64_t address) {
     uint64_t offset = get_address_offset(address);
     uint64_t tag = get_address_tag(address);
     uint64_t index = get_address_index(address);

@@ -190,9 +190,9 @@ int main() {
 
     auto fm_static = FakeMemory(32, read_latency, write_latency);
 
-    fm_static[15] = 42;
+    fm_static.set(15, 42);
 
-    assert(fm_static[15] == 42);
+    assert(fm_static.get(15) == 42);
     assert(fm_static.read(15, 1).data->get<uint8_t>() == 42);
 
     return 0;

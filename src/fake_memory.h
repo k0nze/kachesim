@@ -27,8 +27,8 @@ public:
     void write_bin_memory_file(const std::string& memory_file_path,
                                uint64_t start_address = 0, uint64_t end_address = 0);
 
-    uint8_t operator[](uint64_t address) const;
-    uint8_t& operator[](uint64_t address);
+    void set(uint64_t address, uint8_t);
+    uint8_t get(uint64_t address);
 
     void reset();
 

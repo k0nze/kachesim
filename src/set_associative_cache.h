@@ -87,6 +87,10 @@ public:
     DataStorageTransaction write(address_t address, Data& data);
     DataStorageTransaction read(address_t address, size_t num_bytes);
 
+    bool is_address_cached(address_t address);
+    bool is_address_valid(address_t address);
+    bool is_address_dirty(address_t address);
+
     void reset();
 
 private:

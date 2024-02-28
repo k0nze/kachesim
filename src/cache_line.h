@@ -19,11 +19,11 @@ public:
 
     void set_valid();
     void set_unvalid();
-    bool valid();
+    bool is_valid();
 
     void set_dirty();
     void set_not_dirty();
-    uint64_t dirty();
+    bool is_dirty();
 
     void update(uint64_t tag, Data& data, bool valid = true, bool dirty = true);
     uint64_t get_tag();

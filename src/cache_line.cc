@@ -11,11 +11,13 @@ void CacheLine::set_valid() { valid_ = true; }
 
 void CacheLine::set_unvalid() { valid_ = false; }
 
-bool CacheLine::valid() { return valid_; }
+bool CacheLine::is_valid() { return valid_; }
 
 void CacheLine::set_dirty() { dirty_ = true; }
 
 void CacheLine::set_not_dirty() { dirty_ = false; }
+
+bool CacheLine::is_dirty() { return dirty_; }
 
 /**
  * update the cache line with the given tag and data, sets the cache line valid and
@@ -42,8 +44,6 @@ void CacheLine::update(uint64_t tag, Data& data, bool valid, bool dirty) {
         data_[i] = data[i];
     }
 }
-
-uint64_t CacheLine::dirty() { return dirty_; }
 
 uint64_t CacheLine::get_tag() { return tag_; }
 

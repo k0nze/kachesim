@@ -8,7 +8,7 @@ int main() {
     auto cl = std::make_unique<CacheLine>(8);
 
     // check that cache line is not valid by default
-    assert(!cl->valid());
+    assert(!cl->is_valid());
 
     /*
     assert(cl->size() == 8);

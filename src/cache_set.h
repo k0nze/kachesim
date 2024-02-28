@@ -20,6 +20,9 @@ public:
     void update_line(uint32_t line_index, uint64_t tag, Data& data, bool valid = true,
                      bool dirty = true);
 
+    bool is_line_valid(uint32_t line_index);
+    bool is_line_dirty(uint32_t line_index);
+
     void update_replacement_policy(uint32_t line_index);
     uint32_t get_replacement_index();
 

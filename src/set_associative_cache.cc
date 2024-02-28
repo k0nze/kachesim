@@ -285,6 +285,50 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
 }
 
 /**
+ * @brief returns if an address is cached. CAUTION: this method is inteded for debugging
+ * and should not be used for a simulation
+ * @param address address for which it should be checked if it is cached
+ * @return if address is cached
+ */
+bool SetAssociativeCache::is_address_cached(address_t address) {
+    uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
+
+    // check if target cache set contains  with tag
+    int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
+
+    return (line_index != -1);
+}
+
+bool SetAssociativeCache::is_address_valid(address_t address) {
+    uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
+
+    // check if target cache set contains  with tag
+    int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
+
+    if (line_index == -1) {
+        return false;
+    }
+
+    return cache_sets_[index]->is_line_valid(line_index);
+}
+
+bool SetAssociativeCache::is_address_dirty(address_t address) {
+    uint64_t tag = get_address_tag(address);
+    uint64_t index = get_address_index(address);
+
+    // check if target cache set contains  with tag
+    int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
+
+    if (line_index == -1) {
+        return false;
+    }
+
+    return cache_sets_[index]->is_line_dirty(line_index);
+}
+
+/**
  * @brief reset the whole cache
  */
 void SetAssociativeCache::reset() {

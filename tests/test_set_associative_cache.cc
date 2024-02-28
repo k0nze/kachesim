@@ -285,11 +285,51 @@ int main() {
         assert(sac->get(i) == 0x07);
     }
 
+    // update address 0x0000
+    // this places the cache line which contains address 0x0000 in front of all other
+    // lines in the LRU
     d_line.set<uint64_t>(0x0808080808080808, 0);
     sac->write(0x0000, d_line);
 
-    // evict line
+    for (uint64_t i = 0x0000; i <= 0x0007; i++) {
+        assert(sac->is_address_cached(i));
+        assert(sac->is_address_valid(i));
+        assert(sac->get(i) == 0x08);
+    }
+
+    // offset (length) = 3 [2:0]
+    // index (length) = 2  [4:3]
+    // cache_set 0
+    // 0x0000 = 0b00|00|000
+    // 0x0020 = 0b01|00|000 <- LRU
+    // cache_set 1
+    // 0x0008 = 0b00|01|000 <- LRU
+    // 0x0028 = 0b01|01|000
+    // cache_set 2
+    // 0x0010 = 0b00|10|000 <- LRU
+    // 0x0030 = 0b01|10|000
+    // cache_set 3
+    // 0x0018 = 0b00|11|000 <- LRU
+    // 0x0038 = 0b01|11|000
+
+    // all cache lines are now occupied -> this will trigger the eviction of the line
+    // containing address 0x0020
+    // because 0x0020 and 0x0040 have the same index (0) and there for they are in the
+    // same cache set. in this cache set 0x0020 was accesses last.
     sac->write(0x0040, d_line);
+
+    assert(sac->is_address_cached(0x0000));
+    assert(sac->is_address_cached(0x0008));
+    assert(sac->is_address_cached(0x0010));
+    assert(sac->is_address_cached(0x0018));
+
+    // was evicted
+    assert(!sac->is_address_cached(0x0020));
+
+    assert(sac->is_address_cached(0x0028));
+    assert(sac->is_address_cached(0x0030));
+    assert(sac->is_address_cached(0x0038));
+    assert(sac->is_address_cached(0x0040));
 
     return 0;
 }

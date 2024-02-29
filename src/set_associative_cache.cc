@@ -379,6 +379,54 @@ uint8_t SetAssociativeCache::get(uint64_t address) {
 }
 
 /**
+ * @brief returns the data of a cache line. CAUTION: this method is intended for
+ * debugging and should not be used in a simulation
+ * @param cache_set_index the index of the cache set
+ * @param line_index the index of the line
+ * @return the data of the cache line
+ */
+Data SetAssociativeCache::get_cache_line_data(uint64_t cache_set_index,
+                                              uint64_t line_index) {
+    return cache_sets_[cache_set_index]->get_line_data(line_index);
+}
+
+/**
+ * @brief returns the tag of a cache line. CAUTION: this method is intended for
+ * debugging and should not be used in a simulation
+ * @param cache_set_index the index of the cache set
+ * @param line_index the index of the line
+ * @return the tag of the cache line
+ */
+uint64_t SetAssociativeCache::get_cache_line_tag(uint64_t cache_set_index,
+                                                 uint64_t line_index) {
+    return cache_sets_[cache_set_index]->get_line_tag(line_index);
+}
+
+/**
+ * @brief returns if a cache line is valid. CAUTION: this method is intended for
+ * debugging and should not be used in a simulation
+ * @param cache_set_index the index of the cache set
+ * @param line_index the index of the line
+ * @return if the cache line is valid
+ */
+bool SetAssociativeCache::is_cache_line_valid(uint64_t cache_set_index,
+                                              uint64_t line_index) {
+    return cache_sets_[cache_set_index]->is_line_valid(line_index);
+}
+
+/**
+ * @brief returns if a cache line is dirty. CAUTION: this method is intended for
+ * debugging and should not be used in a simulation
+ * @param cache_set_index the index of the cache set
+ * @param line_index the index of the line
+ * @return if the cache line is dirty
+ */
+bool SetAssociativeCache::is_cache_line_dirty(uint64_t cache_set_index,
+                                              uint64_t line_index) {
+    return cache_sets_[cache_set_index]->is_line_dirty(line_index);
+}
+
+/**
  * @brief reset the whole cache
  */
 void SetAssociativeCache::reset() {

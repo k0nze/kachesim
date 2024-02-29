@@ -56,6 +56,10 @@ Data CacheSet::get_line_data(uint32_t line_index) {
     return lines_[line_index]->get_data();
 }
 
+uint64_t CacheSet::get_line_tag(uint32_t line_index) {
+    return lines_[line_index]->get_tag();
+}
+
 void CacheSet::update_line(uint32_t line_index, uint64_t tag, Data& data, bool valid,
                            bool dirty) {
     lines_[line_index]->update(tag, data, valid, dirty);

@@ -17,6 +17,7 @@ public:
     int32_t get_free_line_index();
 
     Data get_line_data(uint32_t line_index);
+    uint64_t get_line_tag(uint32_t line_index);
     void update_line(uint32_t line_index, uint64_t tag, Data& data, bool valid = true,
                      bool dirty = true);
 

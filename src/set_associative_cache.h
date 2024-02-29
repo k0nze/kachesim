@@ -93,6 +93,11 @@ public:
 
     uint8_t get(uint64_t address);
 
+    Data get_cache_line_data(uint64_t cache_set_index, uint64_t line_index);
+    uint64_t get_cache_line_tag(uint64_t cache_set_index, uint64_t line_index);
+    bool is_cache_line_valid(uint64_t cache_set_index, uint64_t line_index);
+    bool is_cache_line_dirty(uint64_t cache_set_index, uint64_t line_index);
+
     void reset();
 
 private:

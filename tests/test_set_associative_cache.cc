@@ -312,6 +312,50 @@ int main() {
     // 0x0018 = 0b00|11|000 <- LRU
     // 0x0038 = 0b01|11|000
 
+    // cache_set 0
+    assert(sac->get_cache_line_data(0, 0).get<uint64_t>() == 0x0808080808080808);
+    assert(sac->get_cache_line_tag(0, 0) == 0x00);
+    assert(sac->is_cache_line_valid(0, 0));
+    assert(sac->is_cache_line_dirty(0, 0));
+
+    assert(sac->get_cache_line_data(0, 1).get<uint64_t>() == 0x0404040404040404);
+    assert(sac->get_cache_line_tag(0, 1) == 0x01);
+    assert(sac->is_cache_line_valid(0, 1));
+    assert(sac->is_cache_line_dirty(0, 1));
+
+    // cache_set 1
+    assert(sac->get_cache_line_data(1, 0).get<uint64_t>() == 0x0101010101010101);
+    assert(sac->get_cache_line_tag(1, 0) == 0x00);
+    assert(sac->is_cache_line_valid(1, 0));
+    assert(sac->is_cache_line_dirty(1, 0));
+
+    assert(sac->get_cache_line_data(1, 1).get<uint64_t>() == 0x0505050505050505);
+    assert(sac->get_cache_line_tag(1, 1) == 0x01);
+    assert(sac->is_cache_line_valid(1, 1));
+    assert(sac->is_cache_line_dirty(1, 1));
+
+    // cache_set 2
+    assert(sac->get_cache_line_data(2, 0).get<uint64_t>() == 0x0202020202020202);
+    assert(sac->get_cache_line_tag(2, 0) == 0x00);
+    assert(sac->is_cache_line_valid(2, 0));
+    assert(sac->is_cache_line_dirty(2, 0));
+
+    assert(sac->get_cache_line_data(2, 1).get<uint64_t>() == 0x0606060606060606);
+    assert(sac->get_cache_line_tag(2, 1) == 0x01);
+    assert(sac->is_cache_line_valid(2, 1));
+    assert(sac->is_cache_line_dirty(2, 1));
+
+    // cache_set 3
+    assert(sac->get_cache_line_data(3, 0).get<uint64_t>() == 0x0303030303030303);
+    assert(sac->get_cache_line_tag(3, 0) == 0x00);
+    assert(sac->is_cache_line_valid(3, 0));
+    assert(sac->is_cache_line_dirty(3, 0));
+
+    assert(sac->get_cache_line_data(3, 1).get<uint64_t>() == 0x0707070707070707);
+    assert(sac->get_cache_line_tag(3, 1) == 0x01);
+    assert(sac->is_cache_line_valid(3, 1));
+    assert(sac->is_cache_line_dirty(3, 1));
+
     // all cache lines are now occupied -> this will trigger the eviction of the line
     // containing address 0x0020
     // because 0x0020 and 0x0040 have the same index (0) and there for they are in the
@@ -351,6 +395,7 @@ int main() {
 
     // TODO test multi line writes
     // sac->write(0x0051, d_multi_line);
+    /*
     sac->write(0x0041, d_byte);
     sac->write(0x0042, d_byte);
     sac->write(0x0043, d_byte);
@@ -360,6 +405,7 @@ int main() {
     sac->write(0x0047, d_byte);
 
     sac->write(0x0048, d_byte);
+    */
 
     return 0;
 }

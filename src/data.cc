@@ -48,4 +48,6 @@ bool Data::operator==(Data& d) const {
     return true;
 }
 
+bool Data::operator==(uint64_t i) { return get<uint64_t>() == i; }
+
 size_t Data::size() { return size_; }

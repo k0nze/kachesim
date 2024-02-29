@@ -19,6 +19,7 @@ public:
     uint8_t operator[](uint64_t index) const;
     uint8_t& operator[](uint64_t index);
     bool operator==(Data& d) const;
+    bool operator==(uint64_t i);
 
     /**
      * @brief set value to bytes starting from offset

@@ -388,24 +388,39 @@ int main() {
     Data d_multi_line = Data(11);
 
     for (int i = 0; i < 11; i++) {
-        d_multi_line.set<uint8_t>(i + 1, i);
+        d_multi_line.set<uint8_t>(i + 1, i, false);
     }
 
-    d_byte.set<uint8_t>(0xab);
+    fm->set(0x0050, 0xab);
+    fm->set(0x005f, 0xcd);
 
-    // TODO test multi line writes
-    // sac->write(0x0051, d_multi_line);
-    /*
-    sac->write(0x0041, d_byte);
-    sac->write(0x0042, d_byte);
-    sac->write(0x0043, d_byte);
-    sac->write(0x0044, d_byte);
-    sac->write(0x0045, d_byte);
-    sac->write(0x0046, d_byte);
-    sac->write(0x0047, d_byte);
+    // this will evict two lines both with line_index 0
+    // both writes are unaligned
+    sac->write(0x0051, d_multi_line);
 
-    sac->write(0x0048, d_byte);
-    */
+    // 0x0051 = 0b10|10|001
+    assert(sac->get_cache_line_data(2, 0).get<uint64_t>() == 0x7060504030201ab);
+
+    // 0x0058 = 0b10|11|000
+    assert(sac->get_cache_line_data(3, 0).get<uint64_t>() == 0xcdffffff0b0a0908);
+
+    Data d_multi_line2 = Data(26);
+
+    for (int i = 0; i < 26; i++) {
+        d_multi_line2.set<uint8_t>(i + 1, i, false);
+    }
+
+    // issue aligned for first and second line and an unaligned write for the third line
+    sac->write(0x0080, d_multi_line2);
+
+    // 0x0080 = 0b100|00|000
+    assert(sac->get_cache_line_data(0, 0) == 0x0807060504030201);
+    // 0x0088 = 0b100|01|000
+    assert(sac->get_cache_line_data(1, 0) == 0x100f0e0d0c0b0a09);
+    // 0x0090 = 0b100|10|000
+    assert(sac->get_cache_line_data(2, 1) == 0x1817161514131211);
+    // 0x0090 = 0b100|11|000
+    assert(sac->get_cache_line_data(3, 1) == 0xffffffffffff1a19);
 
     return 0;
 }

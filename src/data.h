@@ -5,6 +5,8 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
 
 class Data {
 public:
@@ -14,12 +16,25 @@ public:
     Data(const Data& data);
     ~Data();
 
-    size_t size();
+    size_t size() const;
 
     uint8_t operator[](uint64_t index) const;
     uint8_t& operator[](uint64_t index);
+
     bool operator==(Data& d) const;
     bool operator==(uint64_t i);
+
+    friend std::ostream& operator<<(std::ostream& os, const Data& d) {
+        os << "0x";
+        for (int i = 0; i < d.size(); i++) {
+            os << std::hex << std::setfill('0') << std::setw(2) << (uint32_t)d[i];
+            if (i != d.size() - 1) {
+                os << "'";
+            }
+        }
+        os << std::dec;
+        return os;
+    }
 
     /**
      * @brief set value to bytes starting from offset

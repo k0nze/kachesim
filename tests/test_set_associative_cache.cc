@@ -410,7 +410,8 @@ int main() {
         d_multi_line2.set<uint8_t>(i + 1, i, false);
     }
 
-    // issue aligned for first and second line and an unaligned write for the third line
+    // issue aligned for first second, and thrid line and an unaligned write for the
+    // fourth line
     sac->write(0x0080, d_multi_line2);
 
     // 0x0080 = 0b100|00|000
@@ -421,6 +422,21 @@ int main() {
     assert(sac->get_cache_line_data(2, 1) == 0x1817161514131211);
     // 0x0090 = 0b100|11|000
     assert(sac->get_cache_line_data(3, 1) == 0xffffffffffff1a19);
+
+    for (int i = 0x0200; i <= 0x220; i++) {
+        fm->set(i, 0xed);
+    }
+    fm->set(0x200, 0x89);
+
+    // issue aligned for the second and thrid line and an unaligned write for the first
+    // and fourth line
+    sac->write(0x0203, d_multi_line2);
+
+    // 0x0200 = 0b10000|00|000
+    std::cout << sac->get_cache_line_data(0, 0) << std::endl;
+    // 0x0208 = 0b10000|01|000
+    // 0x0210 = 0b10000|10|000
+    // 0x0218 = 0b10000|11|000
 
     return 0;
 }

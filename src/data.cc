@@ -50,4 +50,4 @@ bool Data::operator==(Data& d) const {
 
 bool Data::operator==(uint64_t i) { return get<uint64_t>() == i; }
 
-size_t Data::size() { return size_; }
+size_t Data::size() const { return size_; }

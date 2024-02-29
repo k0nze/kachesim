@@ -39,8 +39,8 @@ DataStorageTransaction FakeMemory::write(address_t address, Data& data) {
         data_[address + i] = data[i];
     }
 
-    DataStorageTransaction dst = {WRITE, address, write_latency_, 0,
-                                  std::unique_ptr<Data>(new Data(data))};
+    DataStorageTransaction dst = {WRITE, address, write_latency_, 0, data};
+
     return dst;
 }
 
@@ -60,13 +60,14 @@ DataStorageTransaction FakeMemory::read(address_t address, size_t num_bytes) {
         THROW_OUT_OF_RANGE(err_msg);
     }
 
-    auto data = std::unique_ptr<Data>(new Data(num_bytes));
+    Data data = Data(num_bytes);
 
     for (int i = 0; i < num_bytes; i++) {
-        data->operator[](i) = data_[address + i];
+        data[i] = data_[address + i];
     }
 
-    DataStorageTransaction dst = {READ, address, read_latency_, 0, std::move(data)};
+    DataStorageTransaction dst = {READ, address, read_latency_, 0, data};
+
     return dst;
 }
 

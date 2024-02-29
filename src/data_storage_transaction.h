@@ -16,7 +16,7 @@ struct DataStorageTransaction {
     address_t address;
     latency_t latency;
     uint32_t hit_level;
-    std::unique_ptr<Data> data;
+    Data data;
 };
 
 #endif

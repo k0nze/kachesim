@@ -133,28 +133,27 @@ DataStorageTransaction SetAssociativeCache::fill_data_from_next_level_data_stora
     auto next_level_data =
         next_level_data_storage_->read(address - offset, num_bytes).data;
 
-    auto fill_data = std::make_unique<Data>(num_bytes);
+    Data fill_data = Data(num_bytes);
 
     // copy data from next level data storage
     // from 0 to offset
     for (int i = 0; i < offset; i++) {
-        (*fill_data)[i] = (*next_level_data)[i];
+        fill_data[i] = next_level_data[i];
     }
     // from offset to offset+data.size()
     for (int i = offset; i < offset + data.size(); i++) {
-        (*fill_data)[i] = data[i - offset];
+        fill_data[i] = data[i - offset];
     }
     // form offset+data.size() to cache_line_size_
     for (int i = offset + data.size(); i < cache_line_size_; i++) {
-        (*fill_data)[i] = (*next_level_data)[i];
+        fill_data[i] = next_level_data[i];
     }
 
     // TODO correct values for latency and hit_level
     latency_t latency = 0;
     uint32_t hit_level = 0;
 
-    DataStorageTransaction dst = {WRITE, address, latency, hit_level,
-                                  std::move(fill_data)};
+    DataStorageTransaction dst = {WRITE, address, latency, hit_level, fill_data};
 
     return dst;
 }
@@ -222,15 +221,15 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             // check if its a partial write
             if (data.size() != cache_line_size_) {
                 // partial write
-                auto update_data = fill_data_from_next_level_data_storage(
+                Data update_data = fill_data_from_next_level_data_storage(
                                        data, address, cache_line_size_)
                                        .data;
 
-                cache_sets_[index]->update_line(line_index, tag, *update_data, true,
+                cache_sets_[index]->update_line(line_index, tag, update_data, true,
                                                 true);
                 std::cout << "Partial write to empty line @ address/index: " << std::hex
                           << address << "/" << index
-                          << ", d: " << update_data->get<uint64_t>() << std::endl;
+                          << ", d: " << update_data.get<uint64_t>() << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
             } else {
                 // full write
@@ -249,15 +248,15 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
 
             if (data.size() != cache_line_size_) {
                 // partial write
-                auto update_data = fill_data_from_next_level_data_storage(
+                Data update_data = fill_data_from_next_level_data_storage(
                                        data, address, cache_line_size_)
                                        .data;
 
-                cache_sets_[index]->update_line(line_index, tag, *update_data, true,
+                cache_sets_[index]->update_line(line_index, tag, update_data, true,
                                                 true);
                 std::cout << "Partial write to empty line @ address/index: " << std::hex
                           << address << "/" << index
-                          << ", d: " << update_data->get<uint64_t>() << std::endl;
+                          << ", d: " << update_data.get<uint64_t>() << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
             } else {
                 cache_sets_[index]->update_line(line_index, tag, data, true, true);
@@ -273,8 +272,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     uint32_t hit_level = 0;
     latency_t latency = 0;
 
-    DataStorageTransaction dst = {WRITE, address, latency, hit_level,
-                                  std::unique_ptr<Data>(new Data(data))};
+    DataStorageTransaction dst = {WRITE, address, latency, hit_level, data};
 
     return dst;
 }
@@ -295,8 +293,7 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     uint32_t hit_level = 0;
     latency_t latency = 0;
 
-    DataStorageTransaction dst = {WRITE, address, latency, hit_level,
-                                  std::unique_ptr<Data>(new Data(data))};
+    DataStorageTransaction dst = {WRITE, address, latency, hit_level, data};
 
     return dst;
 }
@@ -308,11 +305,11 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
  * @return bytes read from cache
  */
 DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_bytes) {
-    auto data = std::unique_ptr<Data>(new Data(num_bytes));
+    Data data = Data(num_bytes);
 
     uint32_t hit_level = 0;
     latency_t latency = 0;
-    DataStorageTransaction dst = {READ, address, latency, hit_level, std::move(data)};
+    DataStorageTransaction dst = {READ, address, latency, hit_level, data};
     return dst;
 }
 

@@ -349,6 +349,7 @@ int main() {
 
     d_byte.set<uint8_t>(0xab);
 
+    // TODO test multi line writes
     // sac->write(0x0051, d_multi_line);
     sac->write(0x0041, d_byte);
     sac->write(0x0042, d_byte);

@@ -66,6 +66,12 @@ inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
     return (address & tag_mask_) >> (clog2(cache_line_size_) + clog2(sets_));
 }
 
+inline uint64_t SetAssociativeCache::get_address_from_index_and_tag(uint64_t index,
+                                                                    uint64_t tag) {
+    return (tag << (clog2(sets_) + clog2(cache_line_size_))) |
+           (index << clog2(cache_line_size_));
+}
+
 /**
  * @brief aligns a transaction to the cache line size
  * @param address the address to align
@@ -245,6 +251,14 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             uint32_t line_index = cache_sets_[index]->get_replacement_index();
 
             std::cout << "evict line: " << line_index << std::endl;
+
+            // if line is valid and dirty write back to next level data storage
+            Data write_back_data = cache_sets_[index]->get_line_data(line_index);
+            uint64_t write_back_tag = cache_sets_[index]->get_line_tag(line_index);
+            uint64_t write_back_address =
+                get_address_from_index_and_tag(index, write_back_tag);
+
+            // TODO write back to next level data storage
 
             if (data.size() != cache_line_size_) {
                 // partial write

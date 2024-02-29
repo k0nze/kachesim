@@ -113,6 +113,7 @@ private:
     uint64_t get_address_offset(uint64_t address);
     uint64_t get_address_index(uint64_t address);
     uint64_t get_address_tag(uint64_t address);
+    uint64_t get_address_from_index_and_tag(uint64_t index, uint64_t tag);
 
     std::map<address_t, Data> align_transaction(address_t address, Data& data);
     DataStorageTransaction aligned_write(address_t address, Data& data);

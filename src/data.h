@@ -26,9 +26,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Data& d) {
         os << "0x";
-        for (int i = 0; i < d.size(); i++) {
+        for (int i = d.size() - 1; i >= 0; i--) {
             os << std::hex << std::setfill('0') << std::setw(2) << (uint32_t)d[i];
-            if (i != d.size() - 1) {
+            if (i != 0) {
                 os << "'";
             }
         }

@@ -363,6 +363,11 @@ int main() {
     d_line.set<uint64_t>(0x0909090909090909, 0);
     sac->write(0x0040, d_line);
 
+    // check if data has been written
+    for (int i = 0; i < 8; i++) {
+        assert(fm->get(0x0020 + i) == 0x04);
+    }
+
     assert(sac->is_address_cached(0x0000));
     assert(sac->is_address_cached(0x0008));
     assert(sac->is_address_cached(0x0010));
@@ -441,9 +446,22 @@ int main() {
     // 0x0218 = 0b10000|11|000
     assert(sac->get_cache_line_data(3, 0) == 0xededed1a19181716);
 
+    fm->set(0x0001, 0xef);
+
     // issue unaligned for the first line and an aligned write for the second, thrid,
     // and fourth line
     sac->write(0x0006, d_multi_line2);
+
+    // 0x0000 = 0b00000|00|000
+    // data from memory is not 0xff because there was a write back with
+    // 0x0808080808080808
+    assert(sac->get_cache_line_data(0, 0) == 0x020108080808ef08);
+    // 0x0008 = 0b00000|01|000
+    assert(sac->get_cache_line_data(1, 0) == 0x0a09080706050403);
+    // 0x0010 = 0b00000|10|000
+    assert(sac->get_cache_line_data(2, 1) == 0x1211100f0e0d0c0b);
+    // 0x0018 = 0b00000|11|000
+    assert(sac->get_cache_line_data(3, 1) == 0x1a19181716151413);
 
     return 0;
 }

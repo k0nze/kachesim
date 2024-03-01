@@ -1,6 +1,7 @@
 #include "set_associative_cache.h"
 
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -253,12 +254,18 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             std::cout << "evict line: " << line_index << std::endl;
 
             // if line is valid and dirty write back to next level data storage
-            Data write_back_data = cache_sets_[index]->get_line_data(line_index);
-            uint64_t write_back_tag = cache_sets_[index]->get_line_tag(line_index);
-            uint64_t write_back_address =
-                get_address_from_index_and_tag(index, write_back_tag);
+            if (cache_sets_[index]->is_line_valid(line_index) &&
+                cache_sets_[index]->is_line_dirty(line_index)) {
+                Data write_back_data = cache_sets_[index]->get_line_data(line_index);
+                uint64_t write_back_tag = cache_sets_[index]->get_line_tag(line_index);
+                uint64_t write_back_address =
+                    get_address_from_index_and_tag(index, write_back_tag);
 
-            // TODO write back to next level data storage
+                std::cout << "write back: " << std::hex << write_back_address << ":"
+                          << write_back_data << std::endl;
+
+                next_level_data_storage_->write(write_back_address, write_back_data);
+            }
 
             if (data.size() != cache_line_size_) {
                 // partial write

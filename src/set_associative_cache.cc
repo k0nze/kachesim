@@ -207,10 +207,11 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             }
 
             cache_sets_[index]->update_line(line_index, tag, update_data, true, true);
-            std::cout << "Partial update @ address/index: " << std::hex << address
-                      << "/" << index << ", d: " << update_data.get<uint64_t>()
-                      << std::endl;
             cache_sets_[index]->update_replacement_policy(line_index);
+
+            DEBUG_PRINT("partial update write @ 0x%016llx / %02lld / %04d: 0x%llx\n",
+                        address, index, line_index, update_data.get<uint64_t>());
+
         } else {
             // full write
             cache_sets_[index]->update_line(line_index, tag, data, true, true);

@@ -83,6 +83,7 @@ public:
     size_t ways_;
     size_t multi_line_access_;
 
+    std::string get_name();
     size_t size();
 
     DataStorageTransaction write(address_t address, Data& data);

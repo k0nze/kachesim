@@ -11,6 +11,7 @@ public:
     FakeMemory(const std::string& name, uint64_t size, latency_t read_latency,
                latency_t write_latency);
 
+    std::string get_name();
     size_t size();
 
     DataStorageTransaction write(address_t address, Data& data);

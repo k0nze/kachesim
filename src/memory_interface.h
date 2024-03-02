@@ -10,6 +10,7 @@ public:
 
     virtual ~MemoryInterface() = 0;
 
+    virtual std::string get_name() = 0;
     virtual size_t size() = 0;
 
     virtual DataStorageTransaction write(address_t address, Data& data) = 0;

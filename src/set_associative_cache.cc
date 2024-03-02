@@ -34,6 +34,8 @@ SetAssociativeCache::SetAssociativeCache(
     reset();
 }
 
+std::string SetAssociativeCache::get_name() { return name_; }
+
 /**
  * @brief Returns the size of the cache in bytes
  * @return The size of the cache in bytes

@@ -17,6 +17,8 @@ FakeMemory::FakeMemory(const std::string& name, uint64_t size, latency_t read_la
     reset();
 }
 
+std::string FakeMemory::get_name() { return name_; }
+
 size_t FakeMemory::size() { return size_; }
 
 /**

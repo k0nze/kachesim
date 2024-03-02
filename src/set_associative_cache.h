@@ -72,17 +72,6 @@ public:
                         size_t ways, ReplacementPolicyType replacement_policy_type,
                         size_t multi_line_access = 1);
 
-    bool write_allocate_;
-    bool write_back_;
-
-    latency_t miss_latency_;
-    latency_t hit_latency_;
-
-    size_t cache_line_size_;
-    size_t sets_;
-    size_t ways_;
-    size_t multi_line_access_;
-
     std::string get_name();
     size_t size();
 
@@ -104,6 +93,17 @@ public:
 
 private:
     std::string name_;
+
+    bool write_allocate_;
+    bool write_back_;
+
+    latency_t miss_latency_;
+    latency_t hit_latency_;
+
+    size_t cache_line_size_;
+    size_t sets_;
+    size_t ways_;
+    size_t multi_line_access_;
 
     uint64_t offset_mask_;
     uint64_t index_mask_;

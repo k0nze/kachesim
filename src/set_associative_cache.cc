@@ -212,15 +212,20 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_line(line_index, tag, update_data, true, true);
             cache_sets_[index]->update_replacement_policy(line_index);
 
-            DEBUG_PRINT("partial update write @ 0x%016llx / %02lld / %04d: 0x%llx\n",
-                        address, index, line_index, update_data.get<uint64_t>());
+            DEBUG_PRINT(
+                "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - partial update "
+                "write\n",
+                name_.c_str(), address, index, line_index, update_data.get<uint64_t>());
 
         } else {
             // full write
             cache_sets_[index]->update_line(line_index, tag, data, true, true);
-            std::cout << "Full update @ address/index:    " << std::hex << address
-                      << "/" << index << ", d: " << data.get<uint64_t>() << std::endl;
             cache_sets_[index]->update_replacement_policy(line_index);
+
+            DEBUG_PRINT(
+                "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - full update "
+                "write\n",
+                name_.c_str(), address, index, line_index, data.get<uint64_t>());
         }
     } else {
         // check if there is a free line
@@ -238,24 +243,27 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
 
                 cache_sets_[index]->update_line(line_index, tag, update_data, true,
                                                 true);
-                std::cout << "Partial write to empty line @ address/index: " << std::hex
-                          << address << "/" << index
-                          << ", d: " << update_data.get<uint64_t>() << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
+
+                DEBUG_PRINT(
+                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - partial write "
+                    "to empty line\n",
+                    name_.c_str(), address, index, line_index,
+                    update_data.get<uint64_t>());
+
             } else {
                 // full write
                 cache_sets_[index]->update_line(line_index, tag, data, true, true);
-                std::cout << "Full write to empty line @ address/index:    " << std::hex
-                          << address << "/" << index << ", d: " << data.get<uint64_t>()
-                          << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
+
+                DEBUG_PRINT(
+                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - full write to "
+                    "empty line\n",
+                    name_.c_str(), address, index, line_index, data.get<uint64_t>());
             }
         } else {
             // no free line found -> evict line
-            std::cout << "No free line found" << std::endl;
             uint32_t line_index = cache_sets_[index]->get_replacement_index();
-
-            std::cout << "evict line: " << line_index << std::endl;
 
             // if line is valid and dirty write back to next level data storage
             if (cache_sets_[index]->is_line_valid(line_index) &&
@@ -264,10 +272,6 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 uint64_t write_back_tag = cache_sets_[index]->get_line_tag(line_index);
                 uint64_t write_back_address =
                     get_address_from_index_and_tag(index, write_back_tag);
-
-                std::cout << "write back: " << std::hex << write_back_address << ":"
-                          << write_back_data << std::endl;
-
                 next_level_data_storage_->write(write_back_address, write_back_data);
             }
 
@@ -279,19 +283,21 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
 
                 cache_sets_[index]->update_line(line_index, tag, update_data, true,
                                                 true);
-                std::cout << "Partial write to empty line @ address/index: " << std::hex
-                          << address << "/" << index
-                          << ", d: " << update_data.get<uint64_t>() << std::endl;
                 cache_sets_[index]->update_replacement_policy(line_index);
+
+                DEBUG_PRINT(
+                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - partial write "
+                    "to evicted line\n",
+                    name_.c_str(), address, index, line_index, data.get<uint64_t>());
+
             } else {
                 cache_sets_[index]->update_line(line_index, tag, data, true, true);
-                std::cout << "Full write to evicted line @ address/index:  " << std::hex
-                          << address << "/" << index << ", d: " << data.get<uint64_t>()
-                          << std::endl;
-
                 cache_sets_[index]->update_replacement_policy(line_index);
 
-                DEBUG_PRINT("test %d\n", 23);
+                DEBUG_PRINT(
+                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - full write to "
+                    "evicted line\n",
+                    name_.c_str(), address, index, line_index, data.get<uint64_t>());
             }
         }
     }

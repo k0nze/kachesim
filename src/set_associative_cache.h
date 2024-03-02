@@ -65,7 +65,8 @@
  */
 class SetAssociativeCache : public CacheInterface {
 public:
-    SetAssociativeCache(std::shared_ptr<DataStorage> next_level_data_storage,
+    SetAssociativeCache(const std::string& name,
+                        std::shared_ptr<DataStorage> next_level_data_storage,
                         bool write_allocate, bool write_back, latency_t miss_latency,
                         latency_t hit_latency, size_t cache_line_size, size_t sets,
                         size_t ways, ReplacementPolicyType replacement_policy_type,
@@ -101,6 +102,8 @@ public:
     void reset();
 
 private:
+    std::string name_;
+
     uint64_t offset_mask_;
     uint64_t index_mask_;
     uint64_t tag_mask_;

@@ -11,12 +11,13 @@
 #include "common.h"
 
 SetAssociativeCache::SetAssociativeCache(
-    std::shared_ptr<DataStorage> next_level_data_storage, bool write_allocate,
-    bool write_back, latency_t miss_latency, latency_t hit_latency,
+    const std::string& name, std::shared_ptr<DataStorage> next_level_data_storage,
+    bool write_allocate, bool write_back, latency_t miss_latency, latency_t hit_latency,
     size_t cache_line_size, size_t sets, size_t ways,
     ReplacementPolicyType replacement_policy_type, size_t multi_line_access)
 
-    : next_level_data_storage_(next_level_data_storage),
+    : name_(name),
+      next_level_data_storage_(next_level_data_storage),
       write_allocate_(write_allocate),
       write_back_(write_back),
       miss_latency_(miss_latency),

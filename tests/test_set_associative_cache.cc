@@ -26,9 +26,9 @@ int main() {
     size_t sets = 4;
     size_t ways = 2;
 
-    auto sac = std::make_shared<SetAssociativeCache>(fm, false, true, miss_latency,
-                                                     hit_latency, cache_line_size, sets,
-                                                     ways, ReplacementPolicyType::LRU);
+    auto sac = std::make_shared<SetAssociativeCache>(
+        "sac0", fm, false, true, miss_latency, hit_latency, cache_line_size, sets, ways,
+        ReplacementPolicyType::LRU);
 
     std::cout << "Cache size: " << sac->size() << std::endl;
 

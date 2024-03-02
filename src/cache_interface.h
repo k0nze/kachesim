@@ -5,6 +5,9 @@
 
 class CacheInterface : public DataStorage {
 public:
+    CacheInterface();
+    CacheInterface(const std::string& name);
+
     virtual ~CacheInterface() = 0;
 
     virtual size_t size() = 0;

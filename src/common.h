@@ -7,6 +7,10 @@
 #include <sstream>
 #include <string>
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
 /**
  * @author Siu Ching Pong -Asuka Kenji- https://stackoverflow.com/a/28703383
  */

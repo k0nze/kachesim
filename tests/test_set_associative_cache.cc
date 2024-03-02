@@ -10,7 +10,7 @@
 #include "set_associative_cache.h"
 
 int main() {
-    auto fm = std::make_shared<FakeMemory>("fm0", 1024, 10, 5);
+    auto fm = std::make_shared<FakeMemory>("mem0", 1024, 10, 5);
 
     // write 0xff to each byte in memory
     for (int i = 0; i < 1024; i++) {

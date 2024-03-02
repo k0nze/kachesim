@@ -6,11 +6,14 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+if(NOT DEFINED DEBUG)
+    set(DEBUG 0)
+endif()
+add_definitions(-DDEBUG=${DEBUG})
+
 set(CMAKE_CONFIGURATION_TYPES
     "Debug"
     CACHE STRING "" FORCE)
-
-add_compile_definitions(DEBUG=1)
 
 # generate debug symbols
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")

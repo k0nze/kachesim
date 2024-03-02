@@ -463,5 +463,7 @@ int main() {
     // 0x0018 = 0b00000|11|000
     assert(sac->get_cache_line_data(3, 1) == 0x1a19181716151413);
 
+    // TODO read data
+
     return 0;
 }

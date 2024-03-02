@@ -286,6 +286,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                           << std::endl;
 
                 cache_sets_[index]->update_replacement_policy(line_index);
+
+                DEBUG_PRINT("test %d\n", 23);
             }
         }
     }

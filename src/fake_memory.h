@@ -8,8 +8,8 @@
 
 class FakeMemory : public MemoryInterface {
 public:
-    FakeMemory();
-    FakeMemory(uint64_t size, latency_t read_latency, latency_t write_latency);
+    FakeMemory(const std::string& name, uint64_t size, latency_t read_latency,
+               latency_t write_latency);
 
     size_t size();
 
@@ -33,6 +33,7 @@ public:
     void reset();
 
 private:
+    std::string name_;
     size_t size_;
     std::vector<uint8_t> data_;
 };

@@ -9,10 +9,9 @@
 
 #include "common.h"
 
-FakeMemory::FakeMemory() {}
-
-FakeMemory::FakeMemory(uint64_t size, latency_t read_latency, latency_t write_latency)
-    : size_(size) {
+FakeMemory::FakeMemory(const std::string& name, uint64_t size, latency_t read_latency,
+                       latency_t write_latency)
+    : name_(name), size_(size) {
     read_latency_ = read_latency;
     write_latency_ = write_latency;
     reset();

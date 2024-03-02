@@ -11,7 +11,7 @@ int main() {
     latency_t read_latency = 3;
     latency_t write_latency = 3;
 
-    auto fm = std::make_unique<FakeMemory>(65536, read_latency, write_latency);
+    auto fm = std::make_unique<FakeMemory>("fm0", 65536, read_latency, write_latency);
 
     // write one byte to each memory address
     for (uint64_t i = 0; i < fm->size(); i++) {
@@ -77,7 +77,7 @@ int main() {
     }
 
     // test reading from files
-    fm = std::make_unique<FakeMemory>(32, read_latency, write_latency);
+    fm = std::make_unique<FakeMemory>("fm1", 32, read_latency, write_latency);
 
     // read whole hex file to memory starting from address 0
     fm->read_hex_memory_file("../data/hex_data0.mem", 0);
@@ -188,7 +188,7 @@ int main() {
 
     fm->write_hex_memory_file("../data/hex_data2.mem", 16, 19);
 
-    auto fm_static = FakeMemory(32, read_latency, write_latency);
+    auto fm_static = FakeMemory("fm_static0", 32, read_latency, write_latency);
 
     fm_static.set(15, 42);
 

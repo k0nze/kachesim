@@ -213,9 +213,10 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(line_index);
 
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - partial update "
+                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial update "
                 "write\n",
-                name_.c_str(), address, index, line_index, update_data.get<uint64_t>());
+                name_.c_str(), address, update_data.to_string().c_str(), index,
+                line_index);
 
         } else {
             // full write
@@ -223,9 +224,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(line_index);
 
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - full update "
-                "write\n",
-                name_.c_str(), address, index, line_index, data.get<uint64_t>());
+                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full update write\n",
+                name_.c_str(), address, data.to_string().c_str(), index, line_index);
         }
     } else {
         // check if there is a free line
@@ -246,10 +246,10 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - partial write "
-                    "to empty line\n",
-                    name_.c_str(), address, index, line_index,
-                    update_data.get<uint64_t>());
+                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                    "empty line\n",
+                    name_.c_str(), address, update_data.to_string().c_str(), index,
+                    line_index);
 
             } else {
                 // full write
@@ -257,9 +257,10 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - full write to "
+                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
                     "empty line\n",
-                    name_.c_str(), address, index, line_index, data.get<uint64_t>());
+                    name_.c_str(), address, data.to_string().c_str(), index,
+                    line_index);
             }
         } else {
             // no free line found -> evict line
@@ -286,18 +287,20 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - partial write "
-                    "to evicted line\n",
-                    name_.c_str(), address, index, line_index, data.get<uint64_t>());
+                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                    "evicted line\n",
+                    name_.c_str(), address, update_data.to_string().c_str(), index,
+                    line_index);
 
             } else {
                 cache_sets_[index]->update_line(line_index, tag, data, true, true);
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx / i=%02lld / l=%04d: 0x%016llx - full write to "
+                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
                     "evicted line\n",
-                    name_.c_str(), address, index, line_index, data.get<uint64_t>());
+                    name_.c_str(), address, data.to_string().c_str(), index,
+                    line_index);
             }
         }
     }

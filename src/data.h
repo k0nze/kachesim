@@ -24,15 +24,10 @@ public:
     bool operator==(Data& d) const;
     bool operator==(uint64_t i);
 
-    friend std::ostream& operator<<(std::ostream& os, const Data& d) {
-        os << "0x";
-        for (int i = d.size() - 1; i >= 0; i--) {
-            os << std::hex << std::setfill('0') << std::setw(2) << (uint32_t)d[i];
-            if (i != 0) {
-                os << "'";
-            }
-        }
-        os << std::dec;
+    std::string to_string();
+
+    friend std::ostream& operator<<(std::ostream& os, Data& d) {
+        os << d.to_string();
         return os;
     }
 

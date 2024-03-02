@@ -48,7 +48,7 @@ size_t SetAssociativeCache::size() { return sets_ * ways_ * cache_line_size_; }
  * @param address the address to calculate the offset from
  * @return the offset of the address
  */
-inline uint64_t SetAssociativeCache::get_address_offset(uint64_t address) {
+inline address_t SetAssociativeCache::get_address_offset(address_t address) {
     return address & offset_mask_;
 }
 
@@ -57,7 +57,7 @@ inline uint64_t SetAssociativeCache::get_address_offset(uint64_t address) {
  * @param address the address to calculate the index from
  * @return the offset of the address
  */
-inline uint64_t SetAssociativeCache::get_address_index(uint64_t address) {
+inline address_t SetAssociativeCache::get_address_index(uint64_t address) {
     return (address & index_mask_) >> clog2(cache_line_size_);
 }
 
@@ -66,12 +66,12 @@ inline uint64_t SetAssociativeCache::get_address_index(uint64_t address) {
  * @param address the address to calculate the tag from
  * @return the tag of the address
  */
-inline uint64_t SetAssociativeCache::get_address_tag(uint64_t address) {
+inline address_t SetAssociativeCache::get_address_tag(address_t address) {
     return (address & tag_mask_) >> (clog2(cache_line_size_) + clog2(sets_));
 }
 
-inline uint64_t SetAssociativeCache::get_address_from_index_and_tag(uint64_t index,
-                                                                    uint64_t tag) {
+inline address_t SetAssociativeCache::get_address_from_index_and_tag(address_t index,
+                                                                     address_t tag) {
     return (tag << (clog2(sets_) + clog2(cache_line_size_))) |
            (index << clog2(cache_line_size_));
 }
@@ -87,9 +87,9 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
     std::map<address_t, Data> address_data_map;
 
     // check if data effects multiple sets and lines
-    uint64_t offset = get_address_offset(address);
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    address_t offset = get_address_offset(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
 
     // check if only one cache line is affected
     if (offset + data.size() <= cache_line_size_) {
@@ -137,7 +137,7 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
 
 DataStorageTransaction SetAssociativeCache::fill_data_from_next_level_data_storage(
     Data& data, uint64_t address, size_t num_bytes) {
-    uint64_t offset = get_address_offset(address);
+    address_t offset = get_address_offset(address);
 
     // load data from next level data storage
     auto next_level_data =
@@ -176,9 +176,9 @@ DataStorageTransaction SetAssociativeCache::fill_data_from_next_level_data_stora
  */
 DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                                                           Data& data) {
-    uint64_t offset = get_address_offset(address);
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    address_t offset = get_address_offset(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
 
     // check if target cache set already contains tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
@@ -270,8 +270,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             if (cache_sets_[index]->is_line_valid(line_index) &&
                 cache_sets_[index]->is_line_dirty(line_index)) {
                 Data write_back_data = cache_sets_[index]->get_line_data(line_index);
-                uint64_t write_back_tag = cache_sets_[index]->get_line_tag(line_index);
-                uint64_t write_back_address =
+                address_t write_back_tag = cache_sets_[index]->get_line_tag(line_index);
+                address_t write_back_address =
                     get_address_from_index_and_tag(index, write_back_tag);
                 next_level_data_storage_->write(write_back_address, write_back_data);
             }
@@ -356,8 +356,8 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
  * @return if address is cached
  */
 bool SetAssociativeCache::is_address_cached(address_t address) {
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
 
     // check if target cache set contains  with tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
@@ -366,8 +366,8 @@ bool SetAssociativeCache::is_address_cached(address_t address) {
 }
 
 bool SetAssociativeCache::is_address_valid(address_t address) {
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
 
     // check if target cache set contains  with tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
@@ -380,8 +380,8 @@ bool SetAssociativeCache::is_address_valid(address_t address) {
 }
 
 bool SetAssociativeCache::is_address_dirty(address_t address) {
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
 
     // check if target cache set contains  with tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
@@ -400,9 +400,9 @@ bool SetAssociativeCache::is_address_dirty(address_t address) {
  * @return byte read or 0
  */
 uint8_t SetAssociativeCache::get(uint64_t address) {
-    uint64_t offset = get_address_offset(address);
-    uint64_t tag = get_address_tag(address);
-    uint64_t index = get_address_index(address);
+    address_t offset = get_address_offset(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
 
     // check if target cache set contains  with tag
     int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
@@ -421,8 +421,8 @@ uint8_t SetAssociativeCache::get(uint64_t address) {
  * @param line_index the index of the line
  * @return the data of the cache line
  */
-Data SetAssociativeCache::get_cache_line_data(uint64_t cache_set_index,
-                                              uint64_t line_index) {
+Data SetAssociativeCache::get_cache_line_data(address_t cache_set_index,
+                                              address_t line_index) {
     return cache_sets_[cache_set_index]->get_line_data(line_index);
 }
 
@@ -433,8 +433,8 @@ Data SetAssociativeCache::get_cache_line_data(uint64_t cache_set_index,
  * @param line_index the index of the line
  * @return the tag of the cache line
  */
-uint64_t SetAssociativeCache::get_cache_line_tag(uint64_t cache_set_index,
-                                                 uint64_t line_index) {
+address_t SetAssociativeCache::get_cache_line_tag(address_t cache_set_index,
+                                                  address_t line_index) {
     return cache_sets_[cache_set_index]->get_line_tag(line_index);
 }
 
@@ -445,8 +445,8 @@ uint64_t SetAssociativeCache::get_cache_line_tag(uint64_t cache_set_index,
  * @param line_index the index of the line
  * @return if the cache line is valid
  */
-bool SetAssociativeCache::is_cache_line_valid(uint64_t cache_set_index,
-                                              uint64_t line_index) {
+bool SetAssociativeCache::is_cache_line_valid(address_t cache_set_index,
+                                              address_t line_index) {
     return cache_sets_[cache_set_index]->is_line_valid(line_index);
 }
 
@@ -457,8 +457,8 @@ bool SetAssociativeCache::is_cache_line_valid(uint64_t cache_set_index,
  * @param line_index the index of the line
  * @return if the cache line is dirty
  */
-bool SetAssociativeCache::is_cache_line_dirty(uint64_t cache_set_index,
-                                              uint64_t line_index) {
+bool SetAssociativeCache::is_cache_line_dirty(address_t cache_set_index,
+                                              address_t line_index) {
     return cache_sets_[cache_set_index]->is_line_dirty(line_index);
 }
 

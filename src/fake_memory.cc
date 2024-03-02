@@ -86,7 +86,7 @@ DataStorageTransaction FakeMemory::read(address_t address, size_t num_bytes) {
  * it wont be considered)
  */
 void FakeMemory::read_hex_memory_file(const std::string& memory_file_path,
-                                      uint64_t start_address, uint64_t end_address) {
+                                      address_t start_address, address_t end_address) {
     // check if file exists
     std::filesystem::path p(memory_file_path);
     if (!std::filesystem::exists(p)) {
@@ -178,7 +178,7 @@ void FakeMemory::read_hex_memory_file(const std::string& memory_file_path,
  * @param end_address the end address to read from
  */
 void FakeMemory::write_hex_memory_file(const std::string& memory_file_path,
-                                       uint64_t start_address, uint64_t end_address,
+                                       address_t start_address, address_t end_address,
                                        uint8_t bytes_per_line) {
     // check if start_address is in range
     if (start_address > size_) {
@@ -212,7 +212,7 @@ void FakeMemory::write_hex_memory_file(const std::string& memory_file_path,
  * @param end_address the end address to read to
  */
 void FakeMemory::read_bin_memory_file(const std::string& memory_file_path,
-                                      uint64_t start_address, uint64_t end_address) {
+                                      address_t start_address, address_t end_address) {
     if (end_address == 0) {
         end_address = size_ - 1;
     }

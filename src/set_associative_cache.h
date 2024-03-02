@@ -82,12 +82,12 @@ public:
     bool is_address_valid(address_t address);
     bool is_address_dirty(address_t address);
 
-    uint8_t get(uint64_t address);
+    uint8_t get(address_t address);
 
-    Data get_cache_line_data(uint64_t cache_set_index, uint64_t line_index);
-    uint64_t get_cache_line_tag(uint64_t cache_set_index, uint64_t line_index);
-    bool is_cache_line_valid(uint64_t cache_set_index, uint64_t line_index);
-    bool is_cache_line_dirty(uint64_t cache_set_index, uint64_t line_index);
+    Data get_cache_line_data(address_t cache_set_index, address_t line_index);
+    address_t get_cache_line_tag(address_t cache_set_index, address_t line_index);
+    bool is_cache_line_valid(address_t cache_set_index, address_t line_index);
+    bool is_cache_line_dirty(address_t cache_set_index, address_t line_index);
 
     void reset();
 
@@ -105,25 +105,25 @@ private:
     size_t ways_;
     size_t multi_line_access_;
 
-    uint64_t offset_mask_;
-    uint64_t index_mask_;
-    uint64_t tag_mask_;
+    address_t offset_mask_;
+    address_t index_mask_;
+    address_t tag_mask_;
     ReplacementPolicyType replacement_policy_type_;
 
     std::vector<std::unique_ptr<CacheSet>> cache_sets_;
 
     std::shared_ptr<DataStorage> next_level_data_storage_;
 
-    uint64_t get_address_offset(uint64_t address);
-    uint64_t get_address_index(uint64_t address);
-    uint64_t get_address_tag(uint64_t address);
-    uint64_t get_address_from_index_and_tag(uint64_t index, uint64_t tag);
+    address_t get_address_offset(address_t address);
+    address_t get_address_index(address_t address);
+    address_t get_address_tag(address_t address);
+    address_t get_address_from_index_and_tag(address_t index, address_t tag);
 
     std::map<address_t, Data> align_transaction(address_t address, Data& data);
     DataStorageTransaction aligned_write(address_t address, Data& data);
 
     DataStorageTransaction fill_data_from_next_level_data_storage(Data& data,
-                                                                  uint64_t address,
+                                                                  address_t address,
                                                                   size_t num_bytes);
 };
 

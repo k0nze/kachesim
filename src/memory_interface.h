@@ -16,8 +16,8 @@ public:
     virtual DataStorageTransaction write(address_t address, Data& data) = 0;
     virtual DataStorageTransaction read(address_t address, size_t num_bytes) = 0;
 
-    virtual void set(uint64_t address, uint8_t) = 0;
-    virtual uint8_t get(uint64_t address) = 0;
+    virtual void set(address_t address, uint8_t) = 0;
+    virtual uint8_t get(address_t address) = 0;
 
     virtual void reset() = 0;
 

@@ -18,18 +18,18 @@ public:
     DataStorageTransaction read(address_t address, size_t num_bytes);
 
     void read_hex_memory_file(const std::string& memory_file_path,
-                              uint64_t start_address = 0, uint64_t end_address = 0);
+                              address_t start_address = 0, address_t end_address = 0);
     void write_hex_memory_file(const std::string& memory_file_path,
-                               uint64_t start_address = 0, uint64_t end_address = 0,
+                               address_t start_address = 0, address_t end_address = 0,
                                uint8_t bytes_per_line = 4);
 
     void read_bin_memory_file(const std::string& memory_file_path,
-                              uint64_t start_address = 0, uint64_t end_address = 0);
+                              address_t start_address = 0, address_t end_address = 0);
     void write_bin_memory_file(const std::string& memory_file_path,
-                               uint64_t start_address = 0, uint64_t end_address = 0);
+                               address_t start_address = 0, address_t end_address = 0);
 
-    void set(uint64_t address, uint8_t);
-    uint8_t get(uint64_t address);
+    void set(address_t address, uint8_t);
+    uint8_t get(address_t address);
 
     void reset();
 

@@ -119,8 +119,11 @@ private:
     address_t get_address_tag(address_t address);
     address_t get_address_from_index_and_tag(address_t index, address_t tag);
 
-    std::map<address_t, Data> align_transaction(address_t address, Data& data);
+    std::map<address_t, Data> align_write_transaction(address_t address, Data& data);
     DataStorageTransaction aligned_write(address_t address, Data& data);
+
+    std::map<address_t, size_t> align_read_transaction(address_t address,
+                                                       size_t num_bytes);
 
     DataStorageTransaction fill_data_from_next_level_data_storage(Data& data,
                                                                   address_t address,

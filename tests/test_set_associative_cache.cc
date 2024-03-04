@@ -465,5 +465,7 @@ int main() {
 
     // TODO read data
 
+    sac->read(0x0001, 25);
+
     return 0;
 }

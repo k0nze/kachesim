@@ -82,8 +82,8 @@ inline address_t SetAssociativeCache::get_address_from_index_and_tag(address_t i
  * @param data the data to align
  * @return a map of aligned addresses and data
  */
-std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t address,
-                                                                 Data& data) {
+std::map<address_t, Data> SetAssociativeCache::align_write_transaction(
+    address_t address, Data& data) {
     std::map<address_t, Data> address_data_map;
 
     // check if data effects multiple sets and lines
@@ -128,6 +128,7 @@ std::map<address_t, Data> SetAssociativeCache::align_transaction(address_t addre
                 d[i] = data[i + bytes_allocated];
             }
             address_data_map.insert({address + bytes_allocated, d});
+            // this line is needed to end the while loop
             bytes_allocated += cache_line_size_;
         }
     }
@@ -319,7 +320,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
  * @param data the data to write
  */
 DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data) {
-    std::map<address_t, Data> address_data_map = align_transaction(address, data);
+    std::map<address_t, Data> address_data_map = align_write_transaction(address, data);
 
     // itreate over address_data_map and execute and aligned_write
     for (auto& [addr, d] : address_data_map) {
@@ -334,6 +335,47 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     return dst;
 }
 
+std::map<address_t, size_t> SetAssociativeCache::align_read_transaction(
+    address_t address, size_t num_bytes) {
+    std::map<address_t, size_t> address_size_map;
+
+    // check if data effects multiple sets and lines
+    address_t offset = get_address_offset(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
+
+    // check if only one cache line is affected
+    if (offset + num_bytes <= cache_line_size_) {
+        address_size_map.insert({address, num_bytes});
+        return address_size_map;
+    }
+
+    // split num_bytes into cache line size chunks
+    // if offset != 0 first piece of data is a partial read
+    uint32_t bytes_allocated = cache_line_size_ - offset;
+
+    address_size_map.insert({address, bytes_allocated});
+
+    while (bytes_allocated < num_bytes) {
+        // check if there are bytes for a whole line
+        if (num_bytes - bytes_allocated > cache_line_size_) {
+            // full read
+            address_size_map.insert({address + bytes_allocated, cache_line_size_});
+            bytes_allocated += cache_line_size_;
+        }
+
+        else {
+            // partial read
+            address_size_map.insert(
+                {address + bytes_allocated, num_bytes - bytes_allocated});
+            // this line is needed to end the while loop
+            bytes_allocated += cache_line_size_;
+        }
+    }
+
+    return address_size_map;
+}
+
 /**
  * @brief read data from cache
  * @param address the address to read from
@@ -342,6 +384,13 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
  */
 DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_bytes) {
     Data data = Data(num_bytes);
+
+    std::map<address_t, size_t> address_size_map =
+        align_read_transaction(address, num_bytes);
+
+    for (auto& [addr, size] : address_size_map) {
+        std::cout << std::hex << "0x" << addr << ": " << size << std::endl;
+    }
 
     uint32_t hit_level = 0;
     latency_t latency = 0;

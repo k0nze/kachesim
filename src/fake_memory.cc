@@ -42,7 +42,7 @@ DataStorageTransaction FakeMemory::write(address_t address, Data& data) {
 
     DataStorageTransaction dst = {WRITE, address, write_latency_, 0, data};
 
-    DEBUG_PRINT("> %s @ a=0x%016llx : d=%s - write\n", name_.c_str(), address,
+    DEBUG_PRINT("> %s w @ 0x%016llx : d=%s - write\n", name_.c_str(), address,
                 data.to_string().c_str());
 
     return dst;
@@ -72,7 +72,7 @@ DataStorageTransaction FakeMemory::read(address_t address, size_t num_bytes) {
 
     DataStorageTransaction dst = {READ, address, read_latency_, 0, data};
 
-    DEBUG_PRINT("> %s @ a=0x%016llx : d=%s - read\n", name_.c_str(), address,
+    DEBUG_PRINT("> %s r @ 0x%016llx : d=%s - read\n", name_.c_str(), address,
                 data.to_string().c_str());
 
     return dst;

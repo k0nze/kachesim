@@ -214,7 +214,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(line_index);
 
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
                 "cached line\n",
                 name_.c_str(), address, update_data.to_string().c_str(), index,
                 line_index);
@@ -225,7 +225,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(line_index);
 
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full write to cached "
+                "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - full write to cached "
                 "line\n",
                 name_.c_str(), address, data.to_string().c_str(), index, line_index);
         }
@@ -249,7 +249,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
                     "empty line\n",
                     name_.c_str(), address, update_data.to_string().c_str(), index,
                     line_index);
@@ -260,7 +260,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
                     "empty line\n",
                     name_.c_str(), address, data.to_string().c_str(), index,
                     line_index);
@@ -290,7 +290,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
                     "evicted line\n",
                     name_.c_str(), address, update_data.to_string().c_str(), index,
                     line_index);
@@ -300,7 +300,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(line_index);
 
                 DEBUG_PRINT(
-                    "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
                     "evicted line\n",
                     name_.c_str(), address, data.to_string().c_str(), index,
                     line_index);
@@ -410,7 +410,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         if (num_bytes < cache_line_size_) {
             // partial read
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
                 "cached line\n",
                 name_.c_str(), address, read_data.to_string().c_str(), index,
                 line_index);
@@ -418,7 +418,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         } else {
             // full read
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full read of chached "
+                "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - full read of chached "
                 "line\n",
                 name_.c_str(), address, read_data.to_string().c_str(), index,
                 line_index);

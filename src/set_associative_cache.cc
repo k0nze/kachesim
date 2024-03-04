@@ -397,7 +397,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
 
     // TODO: may be move to CacheSet in the future
     if (line_index != -1) {
-        // line with tag found -> read line
+        // line with tag found -> hit -> read line
         Data line_data = cache_sets_[index]->get_line_data(line_index);
         cache_sets_[index]->update_replacement_policy(line_index);
 
@@ -426,7 +426,67 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
 #endif
 
     } else {
-        // line with tag not found
+        // line with tag not found -> miss -> read from next level storage
+        // check if there is a free line
+        line_index = cache_sets_[index]->get_free_line_index();
+
+        address_t next_level_address = address - offset;
+        Data next_level_storage_data =
+            next_level_data_storage_->read(next_level_address, cache_line_size_).data;
+
+        for (int i = 0; i < num_bytes; i++) {
+            read_data[i] = next_level_storage_data[i + offset];
+        }
+
+        if (line_index != -1) {
+            // free line found -> miss -> write to line
+            cache_sets_[index]->update_line(line_index, tag, next_level_storage_data,
+                                            true, false);
+            cache_sets_[index]->update_replacement_policy(line_index);
+
+#if DEBUG
+            if (num_bytes < cache_line_size_) {
+                // partial read
+                DEBUG_PRINT(
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                    "not cached line\n",
+                    name_.c_str(), address, read_data.to_string().c_str(), index,
+                    line_index);
+            } else {
+                // full read
+                DEBUG_PRINT(
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - full read not of "
+                    "cached line\n",
+                    name_.c_str(), address, read_data.to_string().c_str(), index,
+                    line_index);
+            }
+#endif
+
+        } else {
+            // no free line found -> evict line
+            line_index = cache_sets_[index]->get_replacement_index();
+            cache_sets_[index]->update_line(line_index, tag, next_level_storage_data,
+                                            true, false);
+            cache_sets_[index]->update_replacement_policy(line_index);
+
+#if DEBUG
+            if (num_bytes < cache_line_size_) {
+                // partial read
+                DEBUG_PRINT(
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                    "not cached line with eviction\n",
+                    name_.c_str(), address, read_data.to_string().c_str(), index,
+                    line_index);
+            } else {
+                // full read
+                DEBUG_PRINT(
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - full read of not "
+                    "cached line with eviction\n",
+                    name_.c_str(), address, read_data.to_string().c_str(), index,
+                    line_index);
+            }
+#endif
+        }
     }
 
     uint32_t hit_level = 0;

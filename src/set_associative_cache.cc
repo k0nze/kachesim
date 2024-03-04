@@ -214,8 +214,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(line_index);
 
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial update "
-                "write\n",
+                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                "cached line\n",
                 name_.c_str(), address, update_data.to_string().c_str(), index,
                 line_index);
 
@@ -225,10 +225,12 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(line_index);
 
             DEBUG_PRINT(
-                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full update write\n",
+                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full write to cached "
+                "line\n",
                 name_.c_str(), address, data.to_string().c_str(), index, line_index);
         }
     } else {
+        // line with tag not found
         // check if there is a free line
         line_index = cache_sets_[index]->get_free_line_index();
 
@@ -384,12 +386,53 @@ std::map<address_t, size_t> SetAssociativeCache::align_read_transaction(
 
 DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
                                                          size_t num_bytes) {
-    Data data = Data(num_bytes);
+    address_t offset = get_address_offset(address);
+    address_t tag = get_address_tag(address);
+    address_t index = get_address_index(address);
+
+    Data read_data = Data(num_bytes);
+
+    // check if target cache set already contains tag
+    int32_t line_index = cache_sets_[index]->get_line_index_with_tag(tag);
+
+    // TODO: may be move to CacheSet in the future
+    if (line_index != -1) {
+        // line with tag found -> read line
+        Data line_data = cache_sets_[index]->get_line_data(line_index);
+        cache_sets_[index]->update_replacement_policy(line_index);
+
+        // copy data from to read_data
+        for (int i = 0; i < num_bytes; i++) {
+            read_data[i] = line_data[i + offset];
+        }
+
+#if DEBUG
+        if (num_bytes < cache_line_size_) {
+            // partial read
+            DEBUG_PRINT(
+                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                "cached line\n",
+                name_.c_str(), address, read_data.to_string().c_str(), index,
+                line_index);
+
+        } else {
+            // full read
+            DEBUG_PRINT(
+                "> %s @ a=0x%016llx : d=%s / i=%02lld / l=%04d - full read of chached "
+                "line\n",
+                name_.c_str(), address, read_data.to_string().c_str(), index,
+                line_index);
+        }
+#endif
+
+    } else {
+        // line with tag not found
+    }
 
     uint32_t hit_level = 0;
     latency_t latency = 0;
 
-    DataStorageTransaction dst = {READ, address, latency, hit_level, data};
+    DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
 
     return dst;
 }
@@ -407,7 +450,6 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
         align_read_transaction(address, num_bytes);
 
     for (auto& [addr, size] : address_size_map) {
-        std::cout << std::hex << "0x" << addr << ": " << size << std::endl;
         auto dst = aligned_read(addr, size);
     }
 

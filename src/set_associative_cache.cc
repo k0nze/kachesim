@@ -335,6 +335,12 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     return dst;
 }
 
+/**
+ * @brief aligns a read transaction to the cache line size
+ * @param address the address to align
+ * @param num_bytes number of bytes to align
+ * @return a map of aligned addresses and size of read
+ */
 std::map<address_t, size_t> SetAssociativeCache::align_read_transaction(
     address_t address, size_t num_bytes) {
     std::map<address_t, size_t> address_size_map;
@@ -376,6 +382,18 @@ std::map<address_t, size_t> SetAssociativeCache::align_read_transaction(
     return address_size_map;
 }
 
+DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
+                                                         size_t num_bytes) {
+    Data data = Data(num_bytes);
+
+    uint32_t hit_level = 0;
+    latency_t latency = 0;
+
+    DataStorageTransaction dst = {READ, address, latency, hit_level, data};
+
+    return dst;
+}
+
 /**
  * @brief read data from cache
  * @param address the address to read from
@@ -390,6 +408,7 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
 
     for (auto& [addr, size] : address_size_map) {
         std::cout << std::hex << "0x" << addr << ": " << size << std::endl;
+        auto dst = aligned_read(addr, size);
     }
 
     uint32_t hit_level = 0;

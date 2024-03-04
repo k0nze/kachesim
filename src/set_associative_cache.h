@@ -124,6 +124,7 @@ private:
 
     std::map<address_t, size_t> align_read_transaction(address_t address,
                                                        size_t num_bytes);
+    DataStorageTransaction aligned_read(address_t address, size_t num_bytes);
 
     DataStorageTransaction fill_data_from_next_level_data_storage(Data& data,
                                                                   address_t address,

@@ -41,6 +41,31 @@ set_tests_properties(test_data_build PROPERTIES FIXTURES_SETUP test_fixture)
 add_test(NAME test_data COMMAND ./test_data test_fixture)
 set_tests_properties(test_data PROPERTIES FIXTURES_SETUP test_fixture)
 
+# test_data_storage_transaction
+add_executable(test_data_storage_transaction test_data_storage_transaction.cc)
+
+target_include_directories(test_data_storage_transaction
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_data_storage_transaction PRIVATE mesi_cachesim)
+
+add_test(
+    test_data_storage_transaction_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_data_storage_transaction)
+
+set_tests_properties(test_data_storage_transaction_build
+                     PROPERTIES FIXTURES_SETUP test_fixture)
+
+add_test(NAME test_data_storage_transaction
+         COMMAND ./test_data_storage_transaction test_fixture)
+set_tests_properties(test_data_storage_transaction PROPERTIES FIXTURES_SETUP
+                                                              test_fixture)
+
 # test_cache_line
 add_executable(test_cache_line test_cache_line.cc)
 

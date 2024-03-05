@@ -492,7 +492,11 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
     uint32_t hit_level = 0;
     latency_t latency = 0;
 
+    std::cout << "read_data: " << read_data.to_string() << std::endl;
+
     DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
+
+    std::cout << "dst.data: " << dst.data.to_string() << std::endl;
 
     return dst;
 }

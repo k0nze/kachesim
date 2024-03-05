@@ -463,11 +463,20 @@ int main() {
     // 0x0018 = 0b00000|11|000
     assert(sac->get_cache_line_data(3, 1) == 0x1a19181716151413);
 
-    // TODO read data
+    // read data
 
-    // sac->read(0x0001, 25);
+    fm->set(0x0300, 0xef);
+    fm->set(0x0301, 0xbe);
+    fm->set(0x0302, 0xad);
+    fm->set(0x0303, 0xde);
+    fm->set(0x0304, 0xab);
+    fm->set(0x0305, 0xcd);
+    fm->set(0x0306, 0xef);
+    fm->set(0x0307, 0x89);
 
-    sac->read(0x0300, 25);
+    // read full aligned line that is not cached
+    auto read_result0 = sac->read(0x0300, 8);
+    std::cout << read_result0.data << std::endl;
 
     return 0;
 }

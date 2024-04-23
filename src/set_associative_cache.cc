@@ -72,7 +72,7 @@ inline address_t SetAssociativeCache::get_address_tag(address_t address) {
 
 inline address_t SetAssociativeCache::get_address_from_index_and_tag(address_t index,
                                                                      address_t tag) {
-    return (tag << (clog2(sets_) + clog2(cache_block_size_))) |
+    return (tag << (clog2(cache_block_size_) + clog2(sets_))) |
            (index << clog2(cache_block_size_));
 }
 
@@ -214,7 +214,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(block_index);
 
             DEBUG_PRINT(
-                "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write to "
                 "cached block\n",
                 name_.c_str(), address, update_data.to_string().c_str(), index,
                 block_index);
@@ -225,7 +225,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             cache_sets_[index]->update_replacement_policy(block_index);
 
             DEBUG_PRINT(
-                "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - full write to cached "
+                "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to cached "
                 "block\n",
                 name_.c_str(), address, data.to_string().c_str(), index, block_index);
         }
@@ -249,7 +249,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(block_index);
 
                 DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write to "
                     "empty block\n",
                     name_.c_str(), address, update_data.to_string().c_str(), index,
                     block_index);
@@ -260,14 +260,14 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(block_index);
 
                 DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to "
                     "empty block\n",
                     name_.c_str(), address, data.to_string().c_str(), index,
                     block_index);
             }
         } else {
             // no free block found -> evict block
-            uint32_t block_index = cache_sets_[index]->get_replacement_index();
+            block_index = cache_sets_[index]->get_replacement_index();
 
             // if block is valid and dirty write back to next level data storage
             if (cache_sets_[index]->is_block_valid(block_index) &&
@@ -291,7 +291,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(block_index);
 
                 DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write to "
                     "evicted block\n",
                     name_.c_str(), address, update_data.to_string().c_str(), index,
                     block_index);
@@ -301,7 +301,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 cache_sets_[index]->update_replacement_policy(block_index);
 
                 DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / l=%04d - full write to "
+                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to "
                     "evicted block\n",
                     name_.c_str(), address, data.to_string().c_str(), index,
                     block_index);
@@ -411,7 +411,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         if (num_bytes < cache_block_size_) {
             // partial read
             DEBUG_PRINT(
-                "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial read of "
                 "cached block\n",
                 name_.c_str(), address, read_data.to_string().c_str(), index,
                 block_index);
@@ -419,7 +419,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         } else {
             // full read
             DEBUG_PRINT(
-                "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - full read of chached "
+                "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - full read of chached "
                 "block\n",
                 name_.c_str(), address, read_data.to_string().c_str(), index,
                 block_index);
@@ -449,14 +449,14 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
             if (num_bytes < cache_block_size_) {
                 // partial read
                 DEBUG_PRINT(
-                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial read of "
                     "not cached block\n",
                     name_.c_str(), address, read_data.to_string().c_str(), index,
                     block_index);
             } else {
                 // full read
                 DEBUG_PRINT(
-                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - full read not of "
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - full read not of "
                     "cached block\n",
                     name_.c_str(), address, read_data.to_string().c_str(), index,
                     block_index);
@@ -464,8 +464,21 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
 #endif
 
         } else {
-            // no free block found -> evict block
+            // no free block found -> evict block -> (write back) -> miss -> write to
+            // block
             block_index = cache_sets_[index]->get_replacement_index();
+
+            // if block is valid and dirty write back to next level data storage
+            if (cache_sets_[index]->is_block_valid(block_index) &&
+                cache_sets_[index]->is_block_dirty(block_index)) {
+                Data write_back_data = cache_sets_[index]->get_block_data(block_index);
+                address_t write_back_tag =
+                    cache_sets_[index]->get_block_tag(block_index);
+                address_t write_back_address =
+                    get_address_from_index_and_tag(index, write_back_tag);
+                next_level_data_storage_->write(write_back_address, write_back_data);
+            }
+
             cache_sets_[index]->update_block(block_index, tag, next_level_storage_data,
                                              true, false);
             cache_sets_[index]->update_replacement_policy(block_index);
@@ -474,14 +487,14 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
             if (num_bytes < cache_block_size_) {
                 // partial read
                 DEBUG_PRINT(
-                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - partial read of "
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial read of "
                     "not cached block with eviction\n",
                     name_.c_str(), address, read_data.to_string().c_str(), index,
                     block_index);
             } else {
                 // full read
                 DEBUG_PRINT(
-                    "> %s r @ 0x%016llx : d=%s / i=%02lld / l=%04d - full read of not "
+                    "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - full read of not "
                     "cached block with eviction\n",
                     name_.c_str(), address, read_data.to_string().c_str(), index,
                     block_index);
@@ -514,6 +527,7 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
     std::map<address_t, size_t> address_size_map =
         align_read_transaction(address, num_bytes);
 
+    // TODO: copy data from aligned_read to data
     for (auto& [addr, size] : address_size_map) {
         auto dst = aligned_read(addr, size);
     }

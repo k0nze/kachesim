@@ -13,6 +13,7 @@ add_library(
     replacement_policy/replacement_policy.cc
     replacement_policy/least_recently_used.cc
     data_storage.cc
+    data_storage_transaction.cc
     memory_interface.cc
     fake_memory.cc
     cache_interface.cc

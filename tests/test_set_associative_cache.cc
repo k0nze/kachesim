@@ -474,13 +474,26 @@ int main() {
     fm->set(0x0306, 0xef);
     fm->set(0x0307, 0x89);
 
-    // read full aligned block that is not cached
+    // read full aligned block that is not cached, since the cache is full a block needs
+    // to be evicted, the block to be evicted is in set 0, block index 1 is least
+    // recently used -> address 0x0200 is writte back
+
+    // 0x0020 = 0b0000001|00|000
+    // 0x0200 = 0b0b10000|00|000
+    Data write_back_data = sac->get_cache_block_data(0, 1);
+
     auto dst = sac->read(0x0020, 8);
-    std::cout << dst.type << std::endl;
-    std::cout << dst.data.size() << std::endl;
-    std::cout << std::hex << dst.address << std::endl;
-    std::cout << std::hex << dst.data.get<uint32_t>() << std::endl;
-    std::cout << dst.data << std::endl;
+    // assert(dst.data.get<uint64_t>() == 0x0404040404040404);
+    std::cout << std::hex << dst.data << std::endl;
+
+    assert(fm->get(0x0200) == 0x89);
+    assert(fm->get(0x0201) == 0xed);
+    assert(fm->get(0x0202) == 0xed);
+    assert(fm->get(0x0203) == 0x01);
+    assert(fm->get(0x0204) == 0x02);
+    assert(fm->get(0x0205) == 0x03);
+    assert(fm->get(0x0206) == 0x04);
+    assert(fm->get(0x0207) == 0x05);
 
     return 0;
 }

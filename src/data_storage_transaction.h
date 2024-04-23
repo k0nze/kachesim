@@ -11,12 +11,15 @@ typedef uint64_t address_t;
 typedef enum DataStorageTransactionType { READ, WRITE } DataStorageTransactionType;
 typedef enum HitMiss { HIT, MISS } HitMiss;
 
-struct DataStorageTransaction {
+class DataStorageTransaction {
+public:
+    DataStorageTransaction(DataStorageTransactionType type, address_t address,
+                           latency_t latency, uint32_t hit_level, Data data);
     DataStorageTransactionType type;
     address_t address;
     latency_t latency;
     uint32_t hit_level;
-    Data data;
+    Data data = Data(0);
 };
 
 #endif

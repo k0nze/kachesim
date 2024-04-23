@@ -7,7 +7,7 @@
 int main() {
     auto cl = std::make_unique<CacheBlock>(8);
 
-    // check that cache line is not valid by default
+    // check that cache block is not valid by default
     assert(!cl->is_valid());
 
     /*

@@ -10,25 +10,25 @@
 
 class CacheSet {
 public:
-    CacheSet(uint64_t cache_line_size, uint32_t ways,
+    CacheSet(uint64_t cache_block_size, uint32_t ways,
              ReplacementPolicyType replacement_policy_type);
 
-    int32_t get_line_index_with_tag(uint64_t tag);
-    int32_t get_free_line_index();
+    int32_t get_block_index_with_tag(uint64_t tag);
+    int32_t get_free_block_index();
 
-    Data get_line_data(uint32_t line_index);
-    uint64_t get_line_tag(uint32_t line_index);
-    void update_line(uint32_t line_index, uint64_t tag, Data& data, bool valid = true,
-                     bool dirty = true);
+    Data get_block_data(uint32_t block_index);
+    uint64_t get_block_tag(uint32_t block_index);
+    void update_block(uint32_t block_index, uint64_t tag, Data& data, bool valid = true,
+                      bool dirty = true);
 
-    bool is_line_valid(uint32_t line_index);
-    bool is_line_dirty(uint32_t line_index);
+    bool is_block_valid(uint32_t block_index);
+    bool is_block_dirty(uint32_t block_index);
 
-    void update_replacement_policy(uint32_t line_index);
+    void update_replacement_policy(uint32_t block_index);
     uint32_t get_replacement_index();
 
 private:
-    std::vector<std::unique_ptr<CacheBlock>> lines_;
+    std::vector<std::unique_ptr<CacheBlock>> blocks_;
     std::shared_ptr<ReplacementPolicy> replacement_policy_;
 };
 

@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "cache_line.h"
+#include "cache_block.h"
 #include "replacement_policy/replacement_policy.h"
 
 class CacheSet {
@@ -28,7 +28,7 @@ public:
     uint32_t get_replacement_index();
 
 private:
-    std::vector<std::unique_ptr<CacheLine>> lines_;
+    std::vector<std::unique_ptr<CacheBlock>> lines_;
     std::shared_ptr<ReplacementPolicy> replacement_policy_;
 };
 

@@ -8,7 +8,7 @@ add_library(
     mesi_cachesim SHARED
     common.cc
     data.cc
-    cache_line.cc
+    cache_block.cc
     cache_set.cc
     replacement_policy/replacement_policy.cc
     replacement_policy/least_recently_used.cc

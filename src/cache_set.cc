@@ -11,7 +11,7 @@ CacheSet::CacheSet(uint64_t cache_line_size, uint32_t ways,
     lines_.reserve(ways);
 
     for (int i = 0; i < ways; i++) {
-        lines_.push_back(std::unique_ptr<CacheLine>(new CacheLine(cache_line_size)));
+        lines_.push_back(std::unique_ptr<CacheBlock>(new CacheBlock(cache_line_size)));
     }
 
     switch (replacement_policy_type) {

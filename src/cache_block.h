@@ -1,5 +1,5 @@
-#ifndef CACHE_LINE_H
-#define CACHE_LINE_H
+#ifndef CACHE_BLOCK_H
+#define CACHE_BLOCK_H
 
 #include <cstdint>
 #include <vector>
@@ -7,13 +7,13 @@
 #include "data.h"
 
 /**
- * represents a cache line (also called block) containing N bytes with a tag and a
+ * represents a cache block (also called line) containing N bytes with a tag and a
  * dirty bit
  */
-class CacheLine {
+class CacheBlock {
 public:
-    CacheLine(uint64_t size);
-    ~CacheLine();
+    CacheBlock(uint64_t size);
+    ~CacheBlock();
 
     std::size_t size() const { return size_; }
 

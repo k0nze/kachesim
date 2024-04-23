@@ -2,10 +2,10 @@
 #include <iostream>
 #include <memory>
 
-#include "cache_line.h"
+#include "cache_block.h"
 
 int main() {
-    auto cl = std::make_unique<CacheLine>(8);
+    auto cl = std::make_unique<CacheBlock>(8);
 
     // check that cache line is not valid by default
     assert(!cl->is_valid());

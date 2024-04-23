@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(test_mesi_cachesim CXX)
+project(test_kachesim CXX)
 
 enable_testing()
 
@@ -18,13 +18,13 @@ set(CMAKE_CONFIGURATION_TYPES
 # generate debug symbols
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src mesi_cachesim)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src kachesim)
 
 # test_data
 add_executable(test_data test_data.cc)
 
 target_include_directories(test_data PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_data PRIVATE mesi_cachesim)
+target_link_libraries(test_data PRIVATE kachesim)
 
 add_test(
     test_data_build
@@ -46,7 +46,7 @@ add_executable(test_data_storage_transaction test_data_storage_transaction.cc)
 
 target_include_directories(test_data_storage_transaction
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_data_storage_transaction PRIVATE mesi_cachesim)
+target_link_libraries(test_data_storage_transaction PRIVATE kachesim)
 
 add_test(
     test_data_storage_transaction_build
@@ -71,7 +71,7 @@ add_executable(test_cache_block test_cache_block.cc)
 
 target_include_directories(test_cache_block
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_cache_block PRIVATE mesi_cachesim)
+target_link_libraries(test_cache_block PRIVATE kachesim)
 
 add_test(
     test_cache_block_build
@@ -93,7 +93,7 @@ add_executable(test_cache_set test_cache_set.cc)
 
 target_include_directories(test_cache_set
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_cache_set PRIVATE mesi_cachesim)
+target_link_libraries(test_cache_set PRIVATE kachesim)
 
 add_test(
     test_cache_set_build
@@ -115,7 +115,7 @@ add_executable(test_doubly_linked_list test_doubly_linked_list.cc)
 
 target_include_directories(test_doubly_linked_list
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_doubly_linked_list PRIVATE mesi_cachesim)
+target_link_libraries(test_doubly_linked_list PRIVATE kachesim)
 
 add_test(
     test_doubly_linked_list_build
@@ -138,7 +138,7 @@ add_executable(test_least_recently_used test_least_recently_used.cc)
 
 target_include_directories(test_least_recently_used
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_least_recently_used PRIVATE mesi_cachesim)
+target_link_libraries(test_least_recently_used PRIVATE kachesim)
 
 add_test(
     test_least_recently_used_build
@@ -161,7 +161,7 @@ add_executable(test_set_associative_cache test_set_associative_cache.cc)
 
 target_include_directories(test_set_associative_cache
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_set_associative_cache PRIVATE mesi_cachesim)
+target_link_libraries(test_set_associative_cache PRIVATE kachesim)
 
 add_test(
     test_set_associative_cache_build
@@ -187,7 +187,7 @@ add_executable(test_fake_memory test_fake_memory.cc)
 
 target_include_directories(test_fake_memory
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-target_link_libraries(test_fake_memory PRIVATE mesi_cachesim)
+target_link_libraries(test_fake_memory PRIVATE kachesim)
 
 add_test(
     test_fake_memory_build

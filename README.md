@@ -1,6 +1,6 @@
-# C++ Project Template
+# KacheSim
 
-[![CI](https://github.com/k0nze/mesi_cachesim/actions/workflows/ci.yml/badge.svg)](https://github.com/k0nze/mesi_cachesim/actions/workflows/ci.yml)
+[![CI](https://github.com/k0nze/kachesim/actions/workflows/ci.yml/badge.svg)](https://github.com/k0nze/kachesim/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Build & Run
@@ -9,5 +9,4 @@
 cd build
 cmake -GNinja ..
 ninja
-./main
 ```

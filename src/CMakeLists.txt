@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
-project(mesi_cachesim CXX)
+project(kachesim CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(
-    mesi_cachesim SHARED
+    kachesim SHARED
     common.cc
     data.cc
     cache_block.cc
@@ -18,4 +18,4 @@ add_library(
     cache_interface.cc
     set_associative_cache.cc)
 
-target_compile_options(mesi_cachesim INTERFACE "-fsized-deallocation")
+target_compile_options(kachesim INTERFACE "-fsized-deallocation")

@@ -26,7 +26,7 @@ public:
 
     std::string to_string();
 
-    friend std::ostream& operator<<(std::ostream& os, Data& d) {
+    friend std::ostream& operator<<(std::ostream& os, Data d) {
         os << d.to_string();
         return os;
     }

@@ -26,5 +26,7 @@ int main() {
         assert(dst.data[i] == i + 1);
     }
 
+    std::cout << dst.data << std::endl;
+
     return 0;
 }

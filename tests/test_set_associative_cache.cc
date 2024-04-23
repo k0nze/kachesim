@@ -475,8 +475,12 @@ int main() {
     fm->set(0x0307, 0x89);
 
     // read full aligned line that is not cached
-    auto read_result0 = sac->read(0x0300, 8);
-    std::cout << read_result0.data << std::endl;
+    auto dst = sac->read(0x0020, 8);
+    std::cout << dst.type << std::endl;
+    std::cout << dst.data.size() << std::endl;
+    std::cout << std::hex << dst.address << std::endl;
+    std::cout << std::hex << dst.data.get<uint32_t>() << std::endl;
+    std::cout << dst.data << std::endl;
 
     return 0;
 }

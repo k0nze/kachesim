@@ -522,19 +522,24 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
  * @return bytes read from cache
  */
 DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_bytes) {
-    Data data = Data(num_bytes);
+    Data read_data = Data(num_bytes);
 
     std::map<address_t, size_t> address_size_map =
         align_read_transaction(address, num_bytes);
 
-    // TODO: copy data from aligned_read to data
+    int data_index = 0;
+
     for (auto& [addr, size] : address_size_map) {
         auto dst = aligned_read(addr, size);
+        // copy data from read result into read_data
+        for (int i = 0; i < size; i++) {
+            read_data[data_index++] = dst.data[i];
+        }
     }
 
     uint32_t hit_level = 0;
     latency_t latency = 0;
-    DataStorageTransaction dst = {READ, address, latency, hit_level, data};
+    DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
     return dst;
 }
 

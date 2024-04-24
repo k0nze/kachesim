@@ -10,7 +10,7 @@
 
 #include "common.h"
 
-namespace kache_sim {
+namespace kachesim {
 SetAssociativeCache::SetAssociativeCache(
     const std::string& name, std::shared_ptr<DataStorage> next_level_data_storage,
     bool write_allocate, bool write_back, latency_t miss_latency, latency_t hit_latency,
@@ -668,4 +668,4 @@ void SetAssociativeCache::reset() {
             new CacheSet(cache_block_size_, ways_, replacement_policy_type_)));
     }
 }
-}  // namespace kache_sim
+}  // namespace kachesim

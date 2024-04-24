@@ -9,7 +9,7 @@
 #include "replacement_policy/replacement_policy.h"
 #include "set_associative_cache.h"
 
-using namespace kache_sim;
+using namespace kachesim;
 
 int main() {
     auto fm = std::make_shared<FakeMemory>("mem0", 1024, 10, 5);

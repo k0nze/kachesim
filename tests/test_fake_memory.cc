@@ -7,6 +7,8 @@
 
 #include "fake_memory.h"
 
+using namespace kachesim;
+
 int main() {
     latency_t read_latency = 3;
     latency_t write_latency = 3;

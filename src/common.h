@@ -11,6 +11,7 @@
 #define DEBUG 0
 #endif
 
+namespace kachesim {
 /**
  * @author Siu Ching Pong -Asuka Kenji- https://stackoverflow.com/a/28703383
  */
@@ -48,5 +49,5 @@ uint32_t clog2(uint64_t x);
 #define THROW_RUNTIME_ERROR(msg)                                                   \
     throw std::runtime_error((std::string(msg)) + " at " + std::string(__FILE__) + \
                              ":" + std::to_string(__LINE__));
-
+}  // namespace kachesim
 #endif

@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <iostream>
 
+namespace kachesim {
 class Data {
 public:
     Data(uint32_t size);
@@ -64,5 +65,6 @@ private:
     size_t size_;
     uint8_t* data_;
 };
+}  // namespace kachesim
 
 #endif

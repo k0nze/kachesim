@@ -5,6 +5,8 @@
 
 #include "data.h"
 
+using namespace kachesim;
+
 int main() {
     auto d1 = std::make_unique<Data>(1);
 

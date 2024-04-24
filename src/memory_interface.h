@@ -3,6 +3,7 @@
 
 #include "data_storage.h"
 
+namespace kachesim {
 class MemoryInterface : public DataStorage {
 public:
     MemoryInterface();
@@ -25,5 +26,6 @@ protected:
     latency_t read_latency_ = 0;
     latency_t write_latency_ = 0;
 };
+}  // namespace kachesim
 
 #endif

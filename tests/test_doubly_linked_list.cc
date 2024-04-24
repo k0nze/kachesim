@@ -4,6 +4,8 @@
 
 #include "doubly_linked_list/doubly_linked_list.h"
 
+using namespace kachesim;
+
 int main() {
     auto dll = std::make_unique<DoublyLinkedList<uint64_t>>();
 

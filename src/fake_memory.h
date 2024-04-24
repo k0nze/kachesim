@@ -6,6 +6,7 @@
 
 #include "memory_interface.h"
 
+namespace kachesim {
 class FakeMemory : public MemoryInterface {
 public:
     FakeMemory(const std::string& name, uint64_t size, latency_t read_latency,
@@ -38,5 +39,6 @@ private:
     size_t size_;
     std::vector<uint8_t> data_;
 };
+}  // namespace kachesim
 
 #endif

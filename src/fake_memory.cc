@@ -9,6 +9,7 @@
 
 #include "common.h"
 
+namespace kachesim {
 FakeMemory::FakeMemory(const std::string& name, uint64_t size, latency_t read_latency,
                        latency_t write_latency)
     : name_(name), size_(size) {
@@ -296,3 +297,4 @@ uint8_t FakeMemory::get(uint64_t address) { return data_[address]; }
  * @brief reset whole memory
  */
 void FakeMemory::reset() { data_ = std::vector<uint8_t>(size_); }
+}  // namespace kachesim

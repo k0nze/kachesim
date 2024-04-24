@@ -3,6 +3,7 @@
 
 #include "data_storage_transaction.h"
 
+namespace kachesim {
 class DataStorage {
 public:
     DataStorage();
@@ -20,5 +21,6 @@ public:
 
     virtual void reset() = 0;
 };
+}  // namespace kachesim
 
 #endif

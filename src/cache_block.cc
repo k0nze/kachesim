@@ -5,6 +5,7 @@
 
 #include "common.h"
 
+namespace kachesim {
 CacheBlock::CacheBlock(uint64_t size) : size_(size) { reset(); }
 CacheBlock::~CacheBlock() { delete[] data_; }
 
@@ -54,3 +55,4 @@ Data CacheBlock::get_data() {
 }
 
 void CacheBlock::reset() { data_ = new uint8_t[size_]; }
+}  // namespace kachesim

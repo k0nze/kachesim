@@ -6,6 +6,7 @@
 #include "common.h"
 #include "replacement_policy/least_recently_used.h"
 
+namespace kachesim {
 CacheSet::CacheSet(uint64_t cache_block_size, uint32_t ways,
                    ReplacementPolicyType replacement_policy_type) {
     blocks_.reserve(ways);
@@ -81,3 +82,4 @@ void CacheSet::update_replacement_policy(uint32_t block_index) {
 uint32_t CacheSet::get_replacement_index() {
     return replacement_policy_->get_replacement_index();
 }
+}  // namespace kachesim

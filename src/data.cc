@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+namespace kachesim {
 Data::Data(uint32_t size) : size_(size) { data_ = new uint8_t[size_]; }
 
 Data::Data(const std::vector<uint8_t>& data) {
@@ -67,3 +68,4 @@ std::string Data::to_string() {
 size_t Data::size() const { return size_; }
 
 Data::~Data() { delete[] data_; }
+}  // namespace kachesim

@@ -4,6 +4,8 @@
 
 #include "cache_block.h"
 
+using namespace kachesim;
+
 int main() {
     auto cl = std::make_unique<CacheBlock>(8);
 

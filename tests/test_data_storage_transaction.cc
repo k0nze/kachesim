@@ -3,6 +3,8 @@
 
 #include "data_storage_transaction.h"
 
+using namespace kachesim;
+
 DataStorageTransaction test_function() {
     Data data = Data(9);
 

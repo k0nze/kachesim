@@ -6,6 +6,7 @@
 
 #include "data.h"
 
+namespace kachesim {
 /**
  * represents a cache block (also called line) containing N bytes with a tag and a
  * dirty bit
@@ -42,5 +43,6 @@ private:
     bool dirty_ = false;
     bool valid_ = false;
 };
+}  // namespace kachesim
 
 #endif

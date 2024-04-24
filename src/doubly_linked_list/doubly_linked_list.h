@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+namespace kachesim {
 template <typename T>
 struct DoublyLinkedListNode {
     T value;
@@ -134,5 +135,6 @@ private:
     std::shared_ptr<DoublyLinkedListNode<T>> tail_ = nullptr;
     uint64_t size_ = 0;
 };
+}  // namespace kachesim
 
 #endif

@@ -8,6 +8,7 @@
 #include "cache_block.h"
 #include "replacement_policy/replacement_policy.h"
 
+namespace kachesim {
 class CacheSet {
 public:
     CacheSet(uint64_t cache_block_size, uint32_t ways,
@@ -31,5 +32,6 @@ private:
     std::vector<std::unique_ptr<CacheBlock>> blocks_;
     std::shared_ptr<ReplacementPolicy> replacement_policy_;
 };
+}  // namespace kachesim
 
 #endif

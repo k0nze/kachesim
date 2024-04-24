@@ -11,6 +11,7 @@ typedef uint64_t address_t;
 typedef enum DataStorageTransactionType { READ, WRITE } DataStorageTransactionType;
 typedef enum HitMiss { HIT, MISS } HitMiss;
 
+namespace kachesim {
 class DataStorageTransaction {
 public:
     DataStorageTransaction(DataStorageTransactionType type, address_t address,
@@ -21,5 +22,6 @@ public:
     uint32_t hit_level;
     Data data = Data(0);
 };
+}  // namespace kachesim
 
 #endif

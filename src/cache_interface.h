@@ -3,6 +3,7 @@
 
 #include "data_storage.h"
 
+namespace kachesim {
 class CacheInterface : public DataStorage {
 public:
     CacheInterface();
@@ -20,5 +21,6 @@ public:
 
     virtual void reset() = 0;
 };
+}  // namespace kachesim
 
 #endif

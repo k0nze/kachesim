@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 
+namespace kachesim {
 LeastRecentlyUsed::LeastRecentlyUsed() {}
 LeastRecentlyUsed::~LeastRecentlyUsed() {}
 
@@ -40,3 +41,4 @@ std::string LeastRecentlyUsed::to_string() {
 
     return ss.str();
 }
+}  // namespace kachesim

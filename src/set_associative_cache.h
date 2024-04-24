@@ -63,6 +63,7 @@
  *
  *   ways: is the number of blocks per set
  */
+namespace kache_sim {
 class SetAssociativeCache : public CacheInterface {
 public:
     SetAssociativeCache(const std::string& name,
@@ -130,5 +131,5 @@ private:
                                                                   address_t address,
                                                                   size_t num_bytes);
 };
-
+}  // namespace kache_sim
 #endif

@@ -18,7 +18,7 @@ set(CMAKE_CONFIGURATION_TYPES
 # generate debug symbols
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src kachesim)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. kachesim)
 
 # test_data
 add_executable(test_data test_data.cc)

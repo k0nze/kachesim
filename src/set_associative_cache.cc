@@ -13,14 +13,14 @@
 namespace kachesim {
 SetAssociativeCache::SetAssociativeCache(
     const std::string& name, std::shared_ptr<DataStorage> next_level_data_storage,
-    bool write_allocate, bool write_back, latency_t miss_latency, latency_t hit_latency,
-    size_t cache_block_size, size_t sets, size_t ways,
+    bool write_allocate, bool write_through, latency_t miss_latency,
+    latency_t hit_latency, size_t cache_block_size, size_t sets, size_t ways,
     ReplacementPolicyType replacement_policy_type, size_t multi_block_access)
 
     : name_(name),
       next_level_data_storage_(next_level_data_storage),
       write_allocate_(write_allocate),
-      write_back_(write_back),
+      write_through_(write_through),
       miss_latency_(miss_latency),
       hit_latency_(hit_latency),
       cache_block_size_(cache_block_size),

@@ -75,7 +75,7 @@ class SetAssociativeCache : public CacheInterface {
 public:
     SetAssociativeCache(const std::string& name,
                         std::shared_ptr<DataStorage> next_level_data_storage,
-                        bool write_allocate, bool write_back, latency_t miss_latency,
+                        bool write_allocate, bool write_through, latency_t miss_latency,
                         latency_t hit_latency, size_t cache_block_size, size_t sets,
                         size_t ways, ReplacementPolicyType replacement_policy_type,
                         size_t multi_block_access = 1);
@@ -104,7 +104,7 @@ private:
     std::string name_;
 
     bool write_allocate_;
-    bool write_back_;
+    bool write_through_;
 
     latency_t miss_latency_;
     latency_t hit_latency_;

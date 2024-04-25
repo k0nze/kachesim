@@ -235,91 +235,107 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
         }
     } else {
         // block with tag not found -> miss
-        // check if there is a free block
-        block_index = cache_sets_[index]->get_free_block_index();
+        if (write_allocate_) {
+            // check if there is a free block
+            block_index = cache_sets_[index]->get_free_block_index();
 
-        if (block_index != -1) {
-            // free block found -> miss -> write to block
+            if (block_index != -1) {
+                // free block found -> miss -> write to block
+                // check if its a partial write
+                if (data.size() != cache_block_size_) {
+                    // partial write
+                    auto update_dst = fill_data_from_next_level_data_storage(
+                        data, address, cache_block_size_);
+                    hit_level = update_dst.hit_level + 1;
 
-            // check if its a partial write
-            if (data.size() != cache_block_size_) {
-                // partial write
-                auto update_dst = fill_data_from_next_level_data_storage(
-                    data, address, cache_block_size_);
-                hit_level = update_dst.hit_level + 1;
+                    Data update_data = update_dst.data;
 
-                Data update_data = update_dst.data;
+                    cache_sets_[index]->update_block(block_index, tag, update_data,
+                                                     true, true);
+                    cache_sets_[index]->update_replacement_policy(block_index);
 
-                cache_sets_[index]->update_block(block_index, tag, update_data, true,
-                                                 true);
-                cache_sets_[index]->update_replacement_policy(block_index);
+                    DEBUG_PRINT(
+                        "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write "
+                        "to "
+                        "empty block\n",
+                        name_.c_str(), address, update_data.to_string().c_str(), index,
+                        block_index);
 
-                DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write to "
-                    "empty block\n",
-                    name_.c_str(), address, update_data.to_string().c_str(), index,
-                    block_index);
+                } else {
+                    // full write
+                    cache_sets_[index]->update_block(block_index, tag, data, true,
+                                                     true);
+                    cache_sets_[index]->update_replacement_policy(block_index);
 
+                    // no hit occured on any other level
+                    hit_level = -1;
+
+                    DEBUG_PRINT(
+                        "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to "
+                        "empty block\n",
+                        name_.c_str(), address, data.to_string().c_str(), index,
+                        block_index);
+                }
             } else {
-                // full write
-                cache_sets_[index]->update_block(block_index, tag, data, true, true);
-                cache_sets_[index]->update_replacement_policy(block_index);
+                // no free block found -> evict block
+                block_index = cache_sets_[index]->get_replacement_index();
 
-                // no hit occured on any other level
-                hit_level = -1;
+                // if block is valid and dirty write back to next level data storage
+                if (cache_sets_[index]->is_block_valid(block_index) &&
+                    cache_sets_[index]->is_block_dirty(block_index)) {
+                    Data write_back_data =
+                        cache_sets_[index]->get_block_data(block_index);
+                    address_t write_back_tag =
+                        cache_sets_[index]->get_block_tag(block_index);
+                    address_t write_back_address =
+                        get_address_from_index_and_tag(index, write_back_tag);
+                    next_level_data_storage_->write(write_back_address,
+                                                    write_back_data);
+                }
 
-                DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to "
-                    "empty block\n",
-                    name_.c_str(), address, data.to_string().c_str(), index,
-                    block_index);
+                if (data.size() != cache_block_size_) {
+                    // partial write
+                    auto update_dst = fill_data_from_next_level_data_storage(
+                        data, address, cache_block_size_);
+                    Data update_data = update_dst.data;
+
+                    hit_level = update_dst.hit_level + 1;
+
+                    cache_sets_[index]->update_block(block_index, tag, update_data,
+                                                     true, true);
+                    cache_sets_[index]->update_replacement_policy(block_index);
+
+                    DEBUG_PRINT(
+                        "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write "
+                        "to "
+                        "evicted block\n",
+                        name_.c_str(), address, update_data.to_string().c_str(), index,
+                        block_index);
+
+                } else {
+                    cache_sets_[index]->update_block(block_index, tag, data, true,
+                                                     true);
+                    cache_sets_[index]->update_replacement_policy(block_index);
+
+                    // no hit occured on any other level
+                    hit_level = -1;
+
+                    DEBUG_PRINT(
+                        "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to "
+                        "evicted block\n",
+                        name_.c_str(), address, data.to_string().c_str(), index,
+                        block_index);
+                }
             }
         } else {
-            // no free block found -> evict block
-            block_index = cache_sets_[index]->get_replacement_index();
+            // write_allocate_ == false
+            auto write_back_dst = next_level_data_storage_->write(address, data);
+            hit_level = write_back_dst.hit_level + 1;
 
-            // if block is valid and dirty write back to next level data storage
-            if (cache_sets_[index]->is_block_valid(block_index) &&
-                cache_sets_[index]->is_block_dirty(block_index)) {
-                Data write_back_data = cache_sets_[index]->get_block_data(block_index);
-                address_t write_back_tag =
-                    cache_sets_[index]->get_block_tag(block_index);
-                address_t write_back_address =
-                    get_address_from_index_and_tag(index, write_back_tag);
-                next_level_data_storage_->write(write_back_address, write_back_data);
-            }
-
-            if (data.size() != cache_block_size_) {
-                // partial write
-                auto update_dst = fill_data_from_next_level_data_storage(
-                    data, address, cache_block_size_);
-                Data update_data = update_dst.data;
-
-                hit_level = update_dst.hit_level + 1;
-
-                cache_sets_[index]->update_block(block_index, tag, update_data, true,
-                                                 true);
-                cache_sets_[index]->update_replacement_policy(block_index);
-
-                DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - partial write to "
-                    "evicted block\n",
-                    name_.c_str(), address, update_data.to_string().c_str(), index,
-                    block_index);
-
-            } else {
-                cache_sets_[index]->update_block(block_index, tag, data, true, true);
-                cache_sets_[index]->update_replacement_policy(block_index);
-
-                // no hit occured on any other level
-                hit_level = -1;
-
-                DEBUG_PRINT(
-                    "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - full write to "
-                    "evicted block\n",
-                    name_.c_str(), address, data.to_string().c_str(), index,
-                    block_index);
-            }
+            DEBUG_PRINT(
+                "> %s w @ 0x%016llx : d=%s / i=%02lld - block not cached, write back "
+                "only no allocation\n",
+                name_.c_str(), address, data.to_string().c_str(), index);
         }
     }
 

@@ -62,6 +62,13 @@
  *   +--------+
  *
  *   ways: is the number of blocks per set
+ *
+ *   write_allocate: (=true) if a write miss occurs the data is loaded into the matching
+ *   cache blocks. (=false) data is only forwarded to the next level data storage
+ *
+ *   write_through: (=true) if it is written to the cache all blocks which have been
+ *   written to are also written to the next level data storage.
+ *
  */
 namespace kachesim {
 class SetAssociativeCache : public CacheInterface {

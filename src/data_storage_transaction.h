@@ -20,6 +20,12 @@ public:
     DataStorageTransactionType type;
     address_t address;
     latency_t latency;
+
+    /**
+     * a hit_level = 0 means the hit appeared at the requested level
+     * a hit_level > 0 means the hit appeared at a higher level, this means there was a
+     * miss at the requested
+     */
     uint32_t hit_level;
     Data data = Data(0);
 };

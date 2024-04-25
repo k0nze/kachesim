@@ -392,6 +392,8 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
     address_t tag = get_address_tag(address);
     address_t index = get_address_index(address);
 
+    uint32_t hit_level = 0;
+
     Data read_data = Data(num_bytes);
 
     // check if target cache set already contains tag
@@ -400,6 +402,8 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
     // TODO: may be move to CacheSet in the future
     if (block_index != -1) {
         // block with tag found -> hit -> read block
+        hit_level = 0;
+
         Data block_data = cache_sets_[index]->get_block_data(block_index);
         cache_sets_[index]->update_replacement_policy(block_index);
 
@@ -420,7 +424,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         } else {
             // full read
             DEBUG_PRINT(
-                "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - full read of chached "
+                "> %s r @ 0x%016llx : d=%s / i=%02lld / b=%04d - full read of cached "
                 "block\n",
                 name_.c_str(), address, read_data.to_string().c_str(), index,
                 block_index);
@@ -436,9 +440,10 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
 
         if (block_index != -1) {
             // free block found -> miss -> write to block
-            Data next_level_storage_data =
-                next_level_data_storage_->read(next_level_address, cache_block_size_)
-                    .data;
+            auto next_level_storage_dst =
+                next_level_data_storage_->read(next_level_address, cache_block_size_);
+            Data next_level_storage_data = next_level_storage_dst.data;
+            hit_level = next_level_storage_dst.hit_level + 1;
 
             for (int i = 0; i < num_bytes; i++) {
                 read_data[i] = next_level_storage_data[i + offset];
@@ -482,9 +487,10 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
                 next_level_data_storage_->write(write_back_address, write_back_data);
             }
 
-            Data next_level_storage_data =
-                next_level_data_storage_->read(next_level_address, cache_block_size_)
-                    .data;
+            auto next_level_storage_dst =
+                next_level_data_storage_->read(next_level_address, cache_block_size_);
+            Data next_level_storage_data = next_level_storage_dst.data;
+            hit_level = next_level_storage_dst.hit_level + 1;
 
             for (int i = 0; i < num_bytes; i++) {
                 read_data[i] = next_level_storage_data[i + offset];
@@ -514,7 +520,6 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         }
     }
 
-    uint32_t hit_level = 0;
     latency_t latency = 0;
 
     DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
@@ -535,6 +540,7 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
         align_read_transaction(address, num_bytes);
 
     int data_index = 0;
+    uint32_t hit_level = 0;
 
     for (auto& [addr, size] : address_size_map) {
         auto dst = aligned_read(addr, size);
@@ -542,9 +548,13 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
         for (int i = 0; i < size; i++) {
             read_data[data_index++] = dst.data[i];
         }
+
+        // return the highest hit level from all reads
+        if (dst.hit_level > hit_level) {
+            hit_level = dst.hit_level;
+        }
     }
 
-    uint32_t hit_level = 0;
     latency_t latency = 0;
     DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
     return dst;

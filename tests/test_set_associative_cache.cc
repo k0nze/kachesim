@@ -567,7 +567,38 @@ int main() {
 
     sac->reset();
 
-    sac->read(0x0000, 8);
+    // miss without eviction and without write
+    auto read_dst6 = sac->read(0x0000, 8);
+    assert(read_dst6.hit_level == 1);
+
+    auto read_dst7 = sac->read(0x0008, 8);
+    assert(read_dst7.hit_level == 1);
+
+    auto read_dst8 = sac->read(0x0010, 8);
+    assert(read_dst8.hit_level == 1);
+
+    auto read_dst9 = sac->read(0x0018, 8);
+    assert(read_dst9.hit_level == 1);
+
+    auto read_dst10 = sac->read(0x0020, 8);
+    assert(read_dst10.hit_level == 1);
+
+    auto read_dst11 = sac->read(0x0028, 8);
+    assert(read_dst11.hit_level == 1);
+
+    auto read_dst12 = sac->read(0x0030, 8);
+    assert(read_dst12.hit_level == 1);
+
+    auto read_dst13 = sac->read(0x0038, 8);
+    assert(read_dst13.hit_level == 1);
+
+    // miss with eviction and without write
+    auto read_dst14 = sac->read(0x0040, 8);
+    assert(read_dst14.hit_level == 1);
+
+    // hit
+    auto read_dst15 = sac->read(0x0010, 8);
+    assert(read_dst15.hit_level == 0);
 
     return 0;
 }

@@ -559,6 +559,7 @@ int main() {
     assert(read_dst5.data.get<uint64_t>() == 0xbbaa'9988'7766'5544);
     assert(read_dst5.data.get<uint64_t>(8) == 0x00'ffee'ddcc);
 
+    // test hit_level calculation
     // reset fake memory and fill
     fm->reset();
     for (int i = 0; i < fm->size(); i++) {
@@ -600,5 +601,19 @@ int main() {
     auto read_dst15 = sac->read(0x0010, 8);
     assert(read_dst15.hit_level == 0);
 
+    Data d_block2 = Data(8);
+    d_block2.set<uint64_t>(0xaaaa'aaaa'aaaa'aaaa);
+    auto write_dst0 = sac->write(0x0010, d_block2);
+    assert(write_dst0.hit_level == 0);
+
+    auto write_dst1 = sac->write(0x0110, d_block2);
+    assert(write_dst1.hit_level == -1);
+
+    Data d_block3 = Data(4);
+    auto write_dst2 = sac->write(0x0230, d_block3);
+    assert(write_dst2.hit_level == 1);
+
+    auto write_dst3 = sac->write(0x0234, d_block3);
+    assert(write_dst3.hit_level == 0);
     return 0;
 }

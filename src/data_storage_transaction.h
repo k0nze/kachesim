@@ -16,17 +16,18 @@ class DataStorageTransaction {
 public:
     DataStorageTransaction();
     DataStorageTransaction(DataStorageTransactionType type, address_t address,
-                           latency_t latency, uint32_t hit_level, Data data);
+                           latency_t latency, int32_t hit_level, Data data);
     DataStorageTransactionType type;
     address_t address;
     latency_t latency;
 
     /**
-     * a hit_level = 0 means the hit appeared at the requested level
-     * a hit_level > 0 means the hit appeared at a higher level, this means there was a
-     * miss at the requested
+     * a hit_level = -1 means the a miss and no hit on another level (e.g. full update
+     * of cache block without reading from next level data storage) a hit_level = 0
+     * means the hit appeared at the requested level a hit_level > 0 means the hit
+     * appeared at a higher level, this means there was a miss at the requested
      */
-    uint32_t hit_level;
+    int32_t hit_level;
     Data data = Data(0);
 };
 }  // namespace kachesim

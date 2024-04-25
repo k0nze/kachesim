@@ -474,15 +474,14 @@ int main() {
 
     // read full aligned block that is not cached, since the cache is full a block needs
     // to be evicted, the block to be evicted is in set 0, block index 1 is least
-    // recently used -> address 0x0200 is writte back
+    // recently used -> address 0x0200 is written back
 
     // 0x0020 = 0b0000001|00|000
     // 0x0200 = 0b0b10000|00|000
     Data write_back_data = sac->get_cache_block_data(0, 1);
 
-    auto dst = sac->read(0x0020, 8);
-    // assert(dst.data.get<uint64_t>() == 0x0404040404040404);
-    std::cout << std::hex << dst.data << std::endl;
+    auto read_dst0 = sac->read(0x0020, 8);
+    assert(read_dst0.data.get<uint64_t>() == 0x0404040404040404);
 
     assert(fm->get(0x0200) == 0x89);
     assert(fm->get(0x0201) == 0xed);
@@ -492,6 +491,83 @@ int main() {
     assert(fm->get(0x0205) == 0x03);
     assert(fm->get(0x0206) == 0x04);
     assert(fm->get(0x0207) == 0x05);
+
+    // unaligned read within single block that is not cached, since the cache is full a
+    // block needs to be evicted, the block to be evicted is in set 2, block index 0 is
+    // least recently used -> address 0x0210 is written back
+    fm->set(0x0310, 0xbb);
+    fm->set(0x0311, 0xcc);
+    auto read_dst1 = sac->read(0x0310, 2);
+    assert(read_dst1.data.get<uint64_t>() == 0xccbb);
+
+    assert(fm->get(0x0210) == 0x0e);
+    assert(fm->get(0x0211) == 0x0f);
+    assert(fm->get(0x0212) == 0x10);
+    assert(fm->get(0x0213) == 0x11);
+    assert(fm->get(0x0214) == 0x12);
+    assert(fm->get(0x0215) == 0x13);
+    assert(fm->get(0x0216) == 0x14);
+    assert(fm->get(0x0217) == 0x15);
+
+    // unaligned read spanning two blocks
+    fm->set(0x0308, 0xcc);
+    fm->set(0x0309, 0xdd);
+    fm->set(0x030a, 0xee);
+
+    auto read_dst2 = sac->read(0x030a, 9);
+    assert(read_dst2.data.get<uint64_t>() == 0xccbb'ffff'ffff'ffee);
+    assert(read_dst2.data.get<uint8_t>(8) == 0xff);
+
+    // unaligned read spanning three blocks
+    for (int i = 0; i < 24; i++) {
+        fm->set(0x100 + i, i);
+    }
+
+    auto read_dst3 = sac->read(0x0103, 19);
+    assert(read_dst3.data.size() == 19);
+    assert(read_dst3.data.get<uint64_t>() == 0x0a09'0807'0605'0403);
+    assert(read_dst3.data.get<uint64_t>(8) == 0x1211'100f'0e0d'0c0b);
+    assert(read_dst3.data.get<uint64_t>(16) == 0x151413);
+
+    // aligned read from first block and unaligned read from second block
+    auto read_dst4 = sac->read(0x0100, 13);
+    assert(read_dst4.data.size() == 13);
+    assert(read_dst4.data.get<uint64_t>() == 0x0706'0504'0302'0100);
+    assert(read_dst4.data.get<uint64_t>(8) == 0x0c'0b0a'0908);
+
+    // unaligned read of first block aligned read of second block
+    fm->set(0x0250, 0x11);
+    fm->set(0x0251, 0x22);
+    fm->set(0x0252, 0x33);
+    fm->set(0x0253, 0x44);
+    fm->set(0x0254, 0x55);
+    fm->set(0x0255, 0x66);
+    fm->set(0x0256, 0x77);
+    fm->set(0x0257, 0x88);
+
+    fm->set(0x0258, 0x99);
+    fm->set(0x0259, 0xaa);
+    fm->set(0x025a, 0xbb);
+    fm->set(0x025b, 0xcc);
+    fm->set(0x025c, 0xdd);
+    fm->set(0x025d, 0xee);
+    fm->set(0x025e, 0xff);
+    fm->set(0x025f, 0x00);
+
+    auto read_dst5 = sac->read(0x0253, 13);
+    assert(read_dst5.data.size() == 13);
+    assert(read_dst5.data.get<uint64_t>() == 0xbbaa'9988'7766'5544);
+    assert(read_dst5.data.get<uint64_t>(8) == 0x00'ffee'ddcc);
+
+    // reset fake memory and fill
+    fm->reset();
+    for (int i = 0; i < fm->size(); i++) {
+        fm->set(i, 0xff);
+    }
+
+    sac->reset();
+
+    sac->read(0x0000, 8);
 
     return 0;
 }

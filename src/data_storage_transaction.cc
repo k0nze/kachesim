@@ -3,6 +3,7 @@
 #include <iostream>
 
 namespace kachesim {
+DataStorageTransaction::DataStorageTransaction() {}
 DataStorageTransaction::DataStorageTransaction(DataStorageTransactionType type,
                                                address_t address, latency_t latency,
                                                uint32_t hit_level, Data data)

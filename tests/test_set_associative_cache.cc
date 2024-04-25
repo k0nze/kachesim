@@ -13,6 +13,9 @@ using namespace kachesim;
 int main() {
     std::srand(42);
 
+    auto addresses = DoublyLinkedList<uint64_t>();
+    std::map<address_t, uint8_t> address_data_map;
+
     auto fm = std::make_shared<FakeMemory>("mem0", 1024, 10, 5);
 
     // write 0xff to each byte in memory
@@ -578,7 +581,6 @@ int main() {
     sac0->reset();
 
     // generate ddl with all fake memory addresses
-    auto addresses = DoublyLinkedList<uint64_t>();
     for (int i = 0; i < fm->size(); i++) {
         addresses.insert_tail(i);
     }
@@ -597,8 +599,6 @@ int main() {
     }
 
     // test full write to fake memory through set associative cache
-    std::map<address_t, uint8_t> address_data_map;
-
     // generate data to write to fake memory
     for (int i = 0; i < fm->size(); i++) {
         uint8_t random_int = std::rand() % 256;
@@ -711,6 +711,69 @@ int main() {
     assert(fm->get(0x0005) == 0xff);
     assert(fm->get(0x0006) == 0x11);
     assert(fm->get(0x0007) == 0x22);
+
+    fm->set(0x0100, 0xef);
+    fm->set(0x0101, 0xbe);
+    fm->set(0x0102, 0xad);
+    fm->set(0x0103, 0xde);
+    fm->set(0x0104, 0x01);
+    fm->set(0x0105, 0x02);
+    fm->set(0x0106, 0x03);
+    fm->set(0x0107, 0x04);
+
+    auto read_dst16 = sac1->read(0x0100, 8);
+    assert(read_dst16.hit_level == 1);
+    assert(read_dst16.data.get<uint64_t>() == 0x04030201'deadbeef);
+
+    auto write_dst5 = sac1->write(0x0100, d_block4);
+    assert(write_dst5.hit_level == 0);
+
+    // no write back has taken place
+    assert(fm->get(0x0100) == 0xef);
+    assert(fm->get(0x0101) == 0xbe);
+    assert(fm->get(0x0102) == 0xad);
+    assert(fm->get(0x0103) == 0xde);
+    assert(fm->get(0x0104) == 0x01);
+    assert(fm->get(0x0105) == 0x02);
+    assert(fm->get(0x0106) == 0x03);
+    assert(fm->get(0x0107) == 0x04);
+
+    fm->reset();
+    sac1->reset();
+
+    // write to every fakje memory through set asosciative cache
+    // generate data to write to fake memory
+    for (int i = 0; i < fm->size(); i++) {
+        uint8_t random_int = std::rand() % 256;
+        address_data_map.insert({i, random_int});
+    }
+
+    // generate ddl with all fake memory addresses
+    addresses = DoublyLinkedList<uint64_t>();
+    for (int i = 0; i < fm->size(); i++) {
+        addresses.insert_tail(i);
+    }
+
+    while (!addresses.empty()) {
+        auto address_nodes = addresses.get_nodes();
+        size_t node_index = std::rand() % address_nodes.size();
+        auto node = address_nodes[node_index];
+        uint64_t address = node->value;
+        addresses.remove(node);
+        Data write_data = Data(1);
+        write_data.set<uint8_t>(address_data_map.at(address));
+        sac1->write(address, write_data);
+    }
+
+    // since there was no read no block was ever cached and no write allocation appeared
+    // therefore no cache flush needs to be issued
+
+    // check fake memory values
+    for (int i = 0; i < fm->size(); i++) {
+        assert(fm->get(i) == address_data_map.at(i));
+    }
+
+    // test write_through = true
 
     return 0;
 }

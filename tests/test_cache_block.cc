@@ -2,7 +2,7 @@
 #include <iostream>
 #include <memory>
 
-#include "cache_block.h"
+#include "kachesim.h"
 
 using namespace kachesim;
 

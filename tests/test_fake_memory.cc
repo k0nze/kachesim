@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "fake_memory.h"
+#include "kachesim.h"
 
 using namespace kachesim;
 

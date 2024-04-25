@@ -2,7 +2,7 @@
 #include <iostream>
 #include <memory>
 
-#include "doubly_linked_list/doubly_linked_list.h"
+#include "kachesim.h"
 
 using namespace kachesim;
 

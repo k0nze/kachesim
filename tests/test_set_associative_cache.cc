@@ -3,11 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "data.h"
-#include "data_storage.h"
-#include "fake_memory.h"
-#include "replacement_policy/replacement_policy.h"
-#include "set_associative_cache.h"
+#include "kachesim.h"
 
 using namespace kachesim;
 

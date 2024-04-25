@@ -3,7 +3,7 @@
 #include <limits>
 #include <memory>
 
-#include "data.h"
+#include "kachesim.h"
 
 using namespace kachesim;
 

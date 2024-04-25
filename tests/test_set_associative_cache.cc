@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -571,9 +572,11 @@ int main() {
         fm->set(i, random_int);
     }
 
+    sac->reset();
+
     // generate ddl with all fake memory addresses
     auto addresses = DoublyLinkedList<uint64_t>();
-    for (int i = 0; i < fm->size() - 1; i++) {
+    for (int i = 0; i < fm->size(); i++) {
         addresses.insert_tail(i);
     }
 
@@ -590,7 +593,38 @@ int main() {
         assert(read_dst.data.get<uint8_t>() == fm->get(address));
     }
 
-    sac->reset();
+    // test full write to fake memory through set associative cache
+    std::map<address_t, uint8_t> address_data_map;
+
+    // generate data to write to fake memory
+    for (int i = 0; i < fm->size(); i++) {
+        uint8_t random_int = std::rand() % 256;
+        address_data_map.insert({i, random_int});
+    }
+
+    // generate ddl with all fake memory addresses
+    addresses = DoublyLinkedList<uint64_t>();
+    for (int i = 0; i < fm->size(); i++) {
+        addresses.insert_tail(i);
+    }
+
+    while (!addresses.empty()) {
+        auto address_nodes = addresses.get_nodes();
+        size_t node_index = std::rand() % address_nodes.size();
+        auto node = address_nodes[node_index];
+        uint64_t address = node->value;
+        addresses.remove(node);
+        Data write_data = Data(1);
+        write_data.set<uint8_t>(address_data_map.at(address));
+        sac->write(address, write_data);
+    }
+
+    sac->flush();
+
+    // check fake memory values
+    for (int i = 0; i < fm->size(); i++) {
+        assert(fm->get(i) == address_data_map.at(i));
+    }
 
     // test hit_level calculation
     // reset fake memory and fill

@@ -692,6 +692,42 @@ bool SetAssociativeCache::is_cache_block_dirty(address_t cache_set_index,
 }
 
 /**
+ * @brief flush the whole cache, if blocks are dirty they are written back to the next
+ * level data storage
+ */
+
+DataStorageTransaction SetAssociativeCache::flush() {
+    // if nothing needs to be written back to the next leve data storage everything is
+    // considered a hit
+    int32_t hit_level = 0;
+
+    for (int i = 0; i < sets_; i++) {
+        for (int j = 0; j < ways_; j++) {
+            if (cache_sets_[i]->is_block_dirty(j) &&
+                cache_sets_[i]->is_block_valid(j)) {
+                auto tag = cache_sets_[i]->get_block_tag(j);
+                auto data = cache_sets_[i]->get_block_data(j);
+
+                address_t address = get_address_from_index_and_tag(i, tag);
+
+                auto next_level_dst = next_level_data_storage_->write(address, data);
+
+                if (next_level_dst.hit_level + 1 > hit_level) {
+                    hit_level = next_level_dst.hit_level + 1;
+                }
+            }
+        }
+    }
+    reset();
+
+    latency_t latency = 0;
+    Data data = Data(0);
+
+    DataStorageTransaction dst = {WRITE, 0, latency, hit_level, data};
+    return dst;
+}
+
+/**
  * @brief reset the whole cache
  */
 void SetAssociativeCache::reset() {

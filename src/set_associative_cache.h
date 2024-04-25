@@ -90,6 +90,7 @@ public:
     bool is_cache_block_valid(address_t cache_set_index, address_t block_index);
     bool is_cache_block_dirty(address_t cache_set_index, address_t block_index);
 
+    DataStorageTransaction flush();
     void reset();
 
 private:

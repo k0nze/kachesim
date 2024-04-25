@@ -187,7 +187,6 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     // check if target cache set already contains tag
     int32_t block_index = cache_sets_[index]->get_block_index_with_tag(tag);
 
-    // TODO add write_allocate
     // TODO add write_back
     // TODO: may be move to CacheSet in the future
     if (block_index != -1) {
@@ -337,6 +336,9 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                 "only no allocation\n",
                 name_.c_str(), address, data.to_string().c_str(), index);
         }
+    }
+
+    if (write_through_) {
     }
 
     latency_t latency = 0;

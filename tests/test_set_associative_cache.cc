@@ -774,6 +774,14 @@ int main() {
     }
 
     // test write_through = true
+    fm->reset();
+
+    write_allocate = false;
+    write_through = true;
+
+    auto sac2 = std::make_shared<SetAssociativeCache>(
+        "sac2", fm, write_allocate, write_through, miss_latency, hit_latency,
+        cache_block_size, sets, ways, ReplacementPolicyType::LRU);
 
     return 0;
 }

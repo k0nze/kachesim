@@ -1,13 +1,17 @@
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <vector>
 
+#include "doubly_linked_list/doubly_linked_list.h"
 #include "kachesim.h"
 
 using namespace kachesim;
 
 int main() {
+    std::srand(42);
+
     auto fm = std::make_shared<FakeMemory>("mem0", 1024, 10, 5);
 
     // write 0xff to each byte in memory
@@ -558,6 +562,35 @@ int main() {
     assert(read_dst5.data.size() == 13);
     assert(read_dst5.data.get<uint64_t>() == 0xbbaa'9988'7766'5544);
     assert(read_dst5.data.get<uint64_t>(8) == 0x00'ffee'ddcc);
+
+    // test full read of fake memory through set associative cache
+    // reset fake memroy and fill with random data
+    fm->reset();
+    for (int i = 0; i < fm->size(); i++) {
+        uint8_t random_int = std::rand() % 256;
+        fm->set(i, random_int);
+    }
+
+    // generate ddl with all fake memory addresses
+    auto addresses = DoublyLinkedList<uint64_t>();
+    for (int i = 0; i < fm->size() - 1; i++) {
+        addresses.insert_tail(i);
+    }
+
+    std::cout << addresses.size() << std::endl;
+
+    while (!addresses.empty()) {
+        auto address_nodes = addresses.get_nodes();
+        size_t node_index = std::rand() % address_nodes.size();
+        auto node = address_nodes[node_index];
+        uint64_t address = node->value;
+        addresses.remove(node);
+
+        auto read_dst = sac->read(address, 1);
+        assert(read_dst.data.get<uint8_t>() == fm->get(address));
+    }
+
+    sac->reset();
 
     // test hit_level calculation
     // reset fake memory and fill

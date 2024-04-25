@@ -129,6 +129,7 @@ public:
     }
 
     uint64_t size() const { return size_; };
+    bool empty() const { return size_ == 0; };
 
 private:
     std::shared_ptr<DoublyLinkedListNode<T>> head_ = nullptr;

@@ -17,6 +17,7 @@ add_library(
     memory_interface.cc
     fake_memory.cc
     cache_interface.cc
-    set_associative_cache.cc)
+    set_associative_cache.cc
+    memory_hierarchy.cc)
 
 target_compile_options(kachesim INTERFACE "-fsized-deallocation")

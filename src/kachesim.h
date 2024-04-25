@@ -11,6 +11,7 @@ namespace kachesim {}
 #include "data_storage_transaction.h"
 #include "doubly_linked_list/doubly_linked_list.h"
 #include "fake_memory.h"
+#include "memory_hierarchy.h"
 #include "memory_interface.h"
 #include "replacement_policy/least_recently_used.h"
 #include "replacement_policy/replacement_policy.h"

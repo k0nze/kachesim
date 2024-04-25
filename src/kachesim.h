@@ -1,6 +1,8 @@
 #ifndef KACHESIM_H
 #define KACHESIM_H
 
+namespace kachesim {}
+
 #include "cache_block.h"
 #include "cache_interface.h"
 #include "cache_set.h"

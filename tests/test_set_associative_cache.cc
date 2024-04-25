@@ -776,12 +776,16 @@ int main() {
     // test write_through = true
     fm->reset();
 
-    write_allocate = false;
+    write_allocate = true;
     write_through = true;
 
     auto sac2 = std::make_shared<SetAssociativeCache>(
         "sac2", fm, write_allocate, write_through, miss_latency, hit_latency,
         cache_block_size, sets, ways, ReplacementPolicyType::LRU);
+
+    auto d_block5 = Data(8);
+    d_block5.set<uint64_t>(0x1111'1111'1111'1111);
+    sac2->write(0x0000, d_block5);
 
     return 0;
 }

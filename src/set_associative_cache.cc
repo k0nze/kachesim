@@ -182,6 +182,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     address_t tag = get_address_tag(address);
     address_t index = get_address_index(address);
 
+    bool written_back = false;
+
     int32_t hit_level = -1;
 
     // check if target cache set already contains tag
@@ -330,6 +332,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             // write_allocate_ == false
             auto write_back_dst = next_level_data_storage_->write(address, data);
             hit_level = write_back_dst.hit_level + 1;
+            written_back = true;
 
             DEBUG_PRINT(
                 "> %s w @ 0x%016llx : d=%s / i=%02lld - block not cached, write back "
@@ -338,7 +341,13 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
         }
     }
 
-    if (write_through_) {
+    if (write_through_ && !written_back) {
+        auto write_back_dst = next_level_data_storage_->write(address, data);
+
+        DEBUG_PRINT(
+            "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - write through to next "
+            "level data storage\n",
+            name_.c_str(), address, data.to_string().c_str(), index, block_index);
     }
 
     latency_t latency = 0;

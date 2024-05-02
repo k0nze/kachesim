@@ -588,8 +588,6 @@ int main() {
         addresses.insert_tail(i);
     }
 
-    std::cout << addresses.size() << std::endl;
-
     while (!addresses.empty()) {
         auto address_nodes = addresses.get_nodes();
         size_t node_index = std::rand() % address_nodes.size();
@@ -890,6 +888,52 @@ int main() {
     assert(read_dst19.data.get<uint64_t>() == 0xbbaa'9988'7766'5544);
     assert(read_dst19.data.get<uint64_t>(8) == 0x0000);
     assert(read_dst19.type == DataStorageTransactionType::READ);
+
+    // reset fake memory
+    fm->reset();
+
+    // generate data to write to fake memory
+    for (int i = 0; i < fm->size(); i++) {
+        uint8_t random_int = std::rand() % 256;
+        address_data_map.insert({i, random_int});
+    }
+
+    // generate ddl with all fake memory addresses
+    for (int i = 0; i < fm->size(); i++) {
+        addresses.insert_tail(i);
+    }
+
+    while (!addresses.empty()) {
+        auto address_nodes = addresses.get_nodes();
+        size_t node_index = std::rand() % address_nodes.size();
+        auto node = address_nodes[node_index];
+        uint64_t address = node->value;
+        addresses.remove(node);
+        Data write_data = Data(1);
+        write_data.set<uint8_t>(address_data_map.at(address));
+
+        auto write_dst = sac2->write(address, write_data);
+
+        // hit level is either 0 or 1
+        assert(write_dst.address == address);
+        assert(write_dst.data == write_data);
+        assert(write_dst.type == DataStorageTransactionType::WRITE);
+
+        // check write through
+        assert(fm->get(address) == write_data.get<uint8_t>());
+
+        // check write allocate
+        auto read_dst = sac2->read(address, 1);
+
+        // hit level is always 1 because the address was just written and a write
+        // allocate occured
+        assert(read_dst.hit_level == 0);
+        assert(read_dst.address == address);
+        assert(read_dst.data == write_data);
+        assert(read_dst.type == DataStorageTransactionType::READ);
+
+        // TODO check latency
+    }
 
     // when a write miss occurs load cache block from next level data storage and do not
     // store it in a cache set

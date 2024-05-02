@@ -28,6 +28,9 @@ int main() {
     latency_t miss_latency = 10;
     latency_t hit_latency = 5;
 
+    // when a write miss occurs load cache block from next level data storage and store
+    // in a cache set
+    // write cache block back when it gets evicted
     bool write_allocate = true;
     bool write_through = false;
 
@@ -596,6 +599,10 @@ int main() {
 
         auto read_dst = sac0->read(address, 1);
         assert(read_dst.data.get<uint8_t>() == fm->get(address));
+        assert(read_dst.address == address);
+        assert(read_dst.type == DataStorageTransactionType::READ);
+
+        // TODO check latency
     }
 
     // test full write to fake memory through set associative cache
@@ -619,7 +626,12 @@ int main() {
         addresses.remove(node);
         Data write_data = Data(1);
         write_data.set<uint8_t>(address_data_map.at(address));
-        sac0->write(address, write_data);
+        auto write_dst = sac0->write(address, write_data);
+
+        // hit level is either 0 or 1
+        assert(write_dst.address == address);
+        assert(write_dst.type == DataStorageTransactionType::WRITE);
+        assert(write_dst.data.get<uint8_t>() == write_data.get<uint8_t>());
     }
 
     sac0->flush();
@@ -686,7 +698,9 @@ int main() {
     auto write_dst3 = sac0->write(0x0234, d_block3);
     assert(write_dst3.hit_level == 0);
 
-    // test write_allocate = false
+    // when a write miss occurs load cache block from next level data storage and do not
+    // store it in a cache set
+    // write cache block back when it gets evicted
     fm->reset();
 
     write_allocate = false;
@@ -741,7 +755,7 @@ int main() {
     fm->reset();
     sac1->reset();
 
-    // write to every fakje memory through set asosciative cache
+    // write to every fake memory through set asosciative cache
     // generate data to write to fake memory
     for (int i = 0; i < fm->size(); i++) {
         uint8_t random_int = std::rand() % 256;
@@ -762,7 +776,15 @@ int main() {
         addresses.remove(node);
         Data write_data = Data(1);
         write_data.set<uint8_t>(address_data_map.at(address));
-        sac1->write(address, write_data);
+        auto write_dst = sac1->write(address, write_data);
+
+        // hit level is always != 0 because no address is cached
+        assert(write_dst.hit_level == 1);
+        assert(write_dst.address == address);
+        assert(write_dst.type == DataStorageTransactionType::WRITE);
+        assert(write_dst.data.get<uint8_t>() == write_data.get<uint8_t>());
+
+        // TODO check latency
     }
 
     // since there was no read no block was ever cached and no write allocation appeared
@@ -773,7 +795,9 @@ int main() {
         assert(fm->get(i) == address_data_map.at(i));
     }
 
-    // test write_through = true
+    // when a write miss occurs load cache block from next level data storage and store
+    // in a cache set
+    // write cache block back when it gets updated
     fm->reset();
 
     write_allocate = true;
@@ -783,9 +807,95 @@ int main() {
         "sac2", fm, write_allocate, write_through, miss_latency, hit_latency,
         cache_block_size, sets, ways, ReplacementPolicyType::LRU);
 
+    // full aligned write to empty block
     auto d_block5 = Data(8);
     d_block5.set<uint64_t>(0x1111'1111'1111'1111);
-    sac2->write(0x0000, d_block5);
+    auto write_dst6 = sac2->write(0x0000, d_block5);
+
+    // hit level is -1 because no address is cached and no data was read from memory
+    assert(write_dst6.hit_level == -1);
+    assert(write_dst6.data.get<uint64_t>() == 0x1111'1111'1111'1111);
+    assert(write_dst6.type == DataStorageTransactionType::WRITE);
+
+    assert(fm->get(0x0000) == 0x11);
+    assert(fm->get(0x0001) == 0x11);
+    assert(fm->get(0x0002) == 0x11);
+    assert(fm->get(0x0003) == 0x11);
+    assert(fm->get(0x0004) == 0x11);
+    assert(fm->get(0x0005) == 0x11);
+    assert(fm->get(0x0006) == 0x11);
+    assert(fm->get(0x0007) == 0x11);
+
+    // read formerly written block
+    auto read_dst17 = sac2->read(0x0000, 8);
+
+    assert(read_dst17.address == 0x0000);
+    assert(read_dst17.hit_level == 0);
+    assert(read_dst17.data == d_block5);
+    assert(read_dst17.type == DataStorageTransactionType::READ);
+
+    // partial write to empty block
+    auto d_block6 = Data(5);
+    d_block6.set<uint64_t>(0x22'22'22'22'22);
+    auto write_dst7 = sac2->write(0x0008, d_block6);
+
+    // hit level is 1 becaue data was read from memory
+    assert(write_dst7.address == 0x0008);
+    assert(write_dst7.hit_level == 1);
+    assert(write_dst7.data.get<uint64_t>() == 0x0000'0022'2222'2222);
+    assert(write_dst7.type == DataStorageTransactionType::WRITE);
+
+    assert(fm->get(0x0008) == 0x22);
+    assert(fm->get(0x0009) == 0x22);
+    assert(fm->get(0x000a) == 0x22);
+    assert(fm->get(0x000b) == 0x22);
+    assert(fm->get(0x000c) == 0x22);
+
+    // read formerly written block
+    auto read_dst18 = sac2->read(0x0008, 8);
+
+    assert(read_dst18.address == 0x0008);
+    assert(read_dst18.hit_level == 0);
+    assert(read_dst18.data.get<uint64_t>() == 0x0000'0022'2222'2222);
+    assert(read_dst18.type == DataStorageTransactionType::READ);
+
+    // partial write to non empty and empty block
+    auto d_block7 = Data(9);
+    d_block7.set<uint64_t>(0xaa99'8877'6655'4433);
+    d_block7.set<uint8_t>(0xbb, 8, false);
+
+    auto write_dst8 = sac2->write(0x000a, d_block7);
+
+    // hit level is 1 because non cached block had to be read from next level
+    assert(write_dst8.address == 0x000a);
+    assert(write_dst8.hit_level == 1);
+    assert(write_dst8.data == d_block7);
+    assert(write_dst8.type == DataStorageTransactionType::WRITE);
+
+    assert(fm->get(0x000a) == 0x33);
+    assert(fm->get(0x000b) == 0x44);
+    assert(fm->get(0x000c) == 0x55);
+    assert(fm->get(0x000d) == 0x66);
+    assert(fm->get(0x000e) == 0x77);
+    assert(fm->get(0x000f) == 0x88);
+    assert(fm->get(0x0010) == 0x99);
+    assert(fm->get(0x0011) == 0xaa);
+    assert(fm->get(0x0012) == 0xbb);
+
+    // read formerly written blocks
+    auto read_dst19 = sac2->read(0x000b, 10);
+
+    assert(read_dst19.address == 0x000b);
+    assert(read_dst19.hit_level == 0);
+    assert(read_dst19.data.get<uint64_t>() == 0xbbaa'9988'7766'5544);
+    assert(read_dst19.data.get<uint64_t>(8) == 0x0000);
+    assert(read_dst19.type == DataStorageTransactionType::READ);
+
+    // when a write miss occurs load cache block from next level data storage and do not
+    // store it in a cache set
+    // write cache block back when it gets updated
+    write_allocate = false;
+    write_through = true;
 
     return 0;
 }

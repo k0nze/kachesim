@@ -69,6 +69,11 @@
  *   write_through: (=true) if it is written to the cache all blocks which have been
  *   written to are also written to the next level data storage.
  *
+ *   multi_block_access: if multiple blocks are accesses in on transaction are thoses
+ *   accesses processed in parallel or sequential
+ *   n = 1: sequential access: if multiple blocks are accessed the latency is summed up
+ *   n > 1: parallel access: if multiple blocks are accessed the latency of max of n
+ *   consecutive transactions is taken and than summed up
  */
 namespace kachesim {
 class SetAssociativeCache : public CacheInterface {
@@ -138,6 +143,8 @@ private:
     DataStorageTransaction fill_data_from_next_level_data_storage(Data& data,
                                                                   address_t address,
                                                                   size_t num_bytes);
+
+    latency_t calculate_multi_block_access_latency(std::vector<latency_t> latencies);
 };
 }  // namespace kachesim
 #endif

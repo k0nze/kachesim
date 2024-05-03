@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <vector>
 
 #include "doubly_linked_list/doubly_linked_list.h"
@@ -16,7 +17,11 @@ int main() {
     auto addresses = DoublyLinkedList<uint64_t>();
     std::map<address_t, uint8_t> address_data_map;
 
-    auto fm = std::make_shared<FakeMemory>("mem0", 1024, 10, 5);
+    latency_t fm_read_latency = 11;
+    latency_t fm_write_latency = 13;
+
+    auto fm =
+        std::make_shared<FakeMemory>("mem0", 1024, fm_read_latency, fm_write_latency);
 
     // write 0xff to each byte in memory
     for (int i = 0; i < 1024; i++) {
@@ -25,8 +30,8 @@ int main() {
         fm->write(i, d);
     }
 
-    latency_t miss_latency = 10;
-    latency_t hit_latency = 5;
+    latency_t sac_miss_latency = 7;
+    latency_t sac_hit_latency = 3;
 
     // when a write miss occurs load cache block from next level data storage and store
     // in a cache set
@@ -39,7 +44,7 @@ int main() {
     size_t ways = 2;
 
     auto sac0 = std::make_shared<SetAssociativeCache>(
-        "sac0", fm, write_allocate, write_through, miss_latency, hit_latency,
+        "sac0", fm, write_allocate, write_through, sac_miss_latency, sac_hit_latency,
         cache_block_size, sets, ways, ReplacementPolicyType::LRU);
 
     std::cout << "Cache size: " << sac0->size() << std::endl;
@@ -588,6 +593,7 @@ int main() {
         addresses.insert_tail(i);
     }
 
+    // read all addresses from fake memory through set associative cache
     while (!addresses.empty()) {
         auto address_nodes = addresses.get_nodes();
         size_t node_index = std::rand() % address_nodes.size();
@@ -595,13 +601,30 @@ int main() {
         uint64_t address = node->value;
         addresses.remove(node);
 
-        auto read_dst = sac0->read(address, 1);
-        assert(read_dst.data.get<uint8_t>() == fm->get(address));
-        assert(read_dst.address == address);
-        assert(read_dst.type == DataStorageTransactionType::READ);
+        // block addresses
+        uint64_t block_address = address & ~(cache_block_size - 1);
 
-        // TODO check latency
+        bool is_address_cached = sac0->is_address_cached(address);
+
+        auto read_dst = sac0->read(address, 1);
+
+        assert(read_dst.type == DataStorageTransactionType::READ);
+        assert(read_dst.address == address);
+
+        // hit level is either 0 or 1
+        // if address is cached it is a hit -> hit level is 0
+        if (is_address_cached) {
+            assert(read_dst.hit_level == 0);
+            assert(read_dst.latency == sac_hit_latency);
+        } else {
+            assert(read_dst.hit_level == 1);
+            assert(read_dst.latency == sac_miss_latency + fm_read_latency);
+        }
+
+        assert(read_dst.data.get<uint8_t>() == fm->get(address));
     }
+
+    return 0;
 
     // test full write to fake memory through set associative cache
     // generate data to write to fake memory
@@ -705,7 +728,7 @@ int main() {
     write_through = false;
 
     auto sac1 = std::make_shared<SetAssociativeCache>(
-        "sac1", fm, write_allocate, write_through, miss_latency, hit_latency,
+        "sac1", fm, write_allocate, write_through, sac_miss_latency, sac_hit_latency,
         cache_block_size, sets, ways, ReplacementPolicyType::LRU);
 
     // full aligned write to empty block
@@ -802,7 +825,7 @@ int main() {
     write_through = true;
 
     auto sac2 = std::make_shared<SetAssociativeCache>(
-        "sac2", fm, write_allocate, write_through, miss_latency, hit_latency,
+        "sac2", fm, write_allocate, write_through, sac_miss_latency, sac_hit_latency,
         cache_block_size, sets, ways, ReplacementPolicyType::LRU);
 
     // full aligned write to empty block
@@ -944,7 +967,7 @@ int main() {
     write_through = true;
 
     auto sac3 = std::make_shared<SetAssociativeCache>(
-        "sac3", fm, write_allocate, write_through, miss_latency, hit_latency,
+        "sac3", fm, write_allocate, write_through, sac_miss_latency, sac_hit_latency,
         cache_block_size, sets, ways, ReplacementPolicyType::LRU);
 
     // full aligned write to empty block

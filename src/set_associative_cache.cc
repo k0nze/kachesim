@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <utility>
 #include <vector>
 
@@ -75,6 +76,31 @@ inline address_t SetAssociativeCache::get_address_from_index_and_tag(address_t i
                                                                      address_t tag) {
     return (tag << (clog2(cache_block_size_) + clog2(sets_))) |
            (index << clog2(cache_block_size_));
+}
+
+/**
+ * @brief calculates the latency for a multi block access
+ * @param latencies the latencies of all aligned transactions
+ * @return the latency of the multi block access
+ */
+latency_t SetAssociativeCache::calculate_multi_block_access_latency(
+    std::vector<latency_t> latencies) {
+    std::vector<latency_t> sequential_access_latencies;
+
+    for (int i = 0; i < latencies.size(); i += multi_block_access_) {
+        std::vector<latency_t> parallel_access_latencies;
+        for (int j = i; j < i + multi_block_access_; j++) {
+            if (j < latencies.size()) {
+                parallel_access_latencies.push_back(latencies[j]);
+            }
+        }
+        sequential_access_latencies.push_back(*std::max_element(
+            parallel_access_latencies.begin(), parallel_access_latencies.end()));
+    }
+
+    // sum up sequential access latencies
+    return std::accumulate(sequential_access_latencies.begin(),
+                           sequential_access_latencies.end(), 0);
 }
 
 /**
@@ -161,11 +187,8 @@ DataStorageTransaction SetAssociativeCache::fill_data_from_next_level_data_stora
         fill_data[i] = next_level_data[i];
     }
 
-    // TODO correct values for latency
-    latency_t latency = 0;
-
-    DataStorageTransaction dst = {WRITE, address, latency, next_level_dst.hit_level,
-                                  fill_data};
+    DataStorageTransaction dst = {WRITE, address, next_level_dst.latency,
+                                  next_level_dst.hit_level, fill_data};
 
     return dst;
 }
@@ -185,6 +208,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     bool written_back = false;
 
     int32_t hit_level = -1;
+    latency_t latency = 0;
 
     // check if target cache set already contains tag
     int32_t block_index = cache_sets_[index]->get_block_index_with_tag(tag);
@@ -193,6 +217,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
     if (block_index != -1) {
         // block with tag found -> hit -> update block
         hit_level = 0;
+        latency = hit_latency_;
 
         // check if its a partial write
         if (data.size() != cache_block_size_) {
@@ -235,6 +260,8 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
         }
     } else {
         // block with tag not found -> miss
+        latency = miss_latency_;
+
         if (write_allocate_) {
             // check if there is a free block
             block_index = cache_sets_[index]->get_free_block_index();
@@ -246,7 +273,9 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                     // partial write
                     auto update_dst = fill_data_from_next_level_data_storage(
                         data, address, cache_block_size_);
+
                     hit_level = update_dst.hit_level + 1;
+                    latency += update_dst.latency;
 
                     Data update_data = update_dst.data;
 
@@ -289,8 +318,12 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                         cache_sets_[index]->get_block_tag(block_index);
                     address_t write_back_address =
                         get_address_from_index_and_tag(index, write_back_tag);
-                    next_level_data_storage_->write(write_back_address,
-                                                    write_back_data);
+                    auto write_back_dst = next_level_data_storage_->write(
+                        write_back_address, write_back_data);
+
+                    // if a write back occurs the latency from the write back
+                    // transaction needs to be added
+                    latency += write_back_dst.latency;
                 }
 
                 if (data.size() != cache_block_size_) {
@@ -300,6 +333,7 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
                     Data update_data = update_dst.data;
 
                     hit_level = update_dst.hit_level + 1;
+                    latency += update_dst.latency;
 
                     cache_sets_[index]->update_block(block_index, tag, update_data,
                                                      true, true);
@@ -331,6 +365,11 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
             // write_allocate_ == false
             auto write_back_dst = next_level_data_storage_->write(address, data);
             hit_level = write_back_dst.hit_level + 1;
+
+            // if a write back occurs the latency from the write back transaction needs
+            // to be added
+            latency += write_back_dst.latency;
+
             written_back = true;
 
             DEBUG_PRINT(
@@ -342,14 +381,15 @@ DataStorageTransaction SetAssociativeCache::aligned_write(address_t address,
 
     if (write_through_ && !written_back) {
         auto write_back_dst = next_level_data_storage_->write(address, data);
+        // if a write back occurs the latency from the write back transaction needs to
+        // be added
+        latency += write_back_dst.latency;
 
         DEBUG_PRINT(
             "> %s w @ 0x%016llx : d=%s / i=%02lld / b=%04d - write through to next "
             "level data storage\n",
             name_.c_str(), address, data.to_string().c_str(), index, block_index);
     }
-
-    latency_t latency = 0;
 
     DataStorageTransaction dst = {WRITE, address, latency, hit_level, data};
 
@@ -365,10 +405,13 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
     std::map<address_t, Data> address_data_map = align_write_transaction(address, data);
 
     int32_t hit_level = -1;
+    std::vector<latency_t> latencies;
 
     // itreate over address_data_map and execute and aligned_write
     for (auto& [addr, d] : address_data_map) {
         auto dst = aligned_write(addr, d);
+
+        latencies.push_back(dst.latency);
 
         // return the highest hit level from all reads
         if (dst.hit_level > hit_level) {
@@ -376,7 +419,7 @@ DataStorageTransaction SetAssociativeCache::write(address_t address, Data& data)
         }
     }
 
-    latency_t latency = 0;
+    latency_t latency = calculate_multi_block_access_latency(latencies);
 
     DataStorageTransaction dst = {WRITE, address, latency, hit_level, data};
 
@@ -437,6 +480,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
     address_t index = get_address_index(address);
 
     int32_t hit_level = -1;
+    latency_t latency = 0;
 
     Data read_data = Data(num_bytes);
 
@@ -447,6 +491,7 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
     if (block_index != -1) {
         // block with tag found -> hit -> read block
         hit_level = 0;
+        latency = hit_latency_;
 
         Data block_data = cache_sets_[index]->get_block_data(block_index);
         cache_sets_[index]->update_replacement_policy(block_index);
@@ -480,14 +525,18 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         // check if there is a free block
         block_index = cache_sets_[index]->get_free_block_index();
 
+        latency = miss_latency_;
+
         address_t next_level_address = address - offset;
 
         if (block_index != -1) {
             // free block found -> miss -> write to block
             auto next_level_storage_dst =
                 next_level_data_storage_->read(next_level_address, cache_block_size_);
+
             Data next_level_storage_data = next_level_storage_dst.data;
             hit_level = next_level_storage_dst.hit_level + 1;
+            latency += next_level_storage_dst.latency;
 
             for (int i = 0; i < num_bytes; i++) {
                 read_data[i] = next_level_storage_data[i + offset];
@@ -528,13 +577,18 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
                     cache_sets_[index]->get_block_tag(block_index);
                 address_t write_back_address =
                     get_address_from_index_and_tag(index, write_back_tag);
-                next_level_data_storage_->write(write_back_address, write_back_data);
+                auto next_level_storage_dst = next_level_data_storage_->write(
+                    write_back_address, write_back_data);
+
+                latency += next_level_storage_dst.latency;
             }
 
             auto next_level_storage_dst =
                 next_level_data_storage_->read(next_level_address, cache_block_size_);
+
             Data next_level_storage_data = next_level_storage_dst.data;
             hit_level = next_level_storage_dst.hit_level + 1;
+            latency += next_level_storage_dst.latency;
 
             for (int i = 0; i < num_bytes; i++) {
                 read_data[i] = next_level_storage_data[i + offset];
@@ -564,8 +618,6 @@ DataStorageTransaction SetAssociativeCache::aligned_read(address_t address,
         }
     }
 
-    latency_t latency = 0;
-
     DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
 
     return dst;
@@ -585,6 +637,7 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
 
     int data_index = 0;
     int32_t hit_level = -1;
+    std::vector<latency_t> latencies;
 
     for (auto& [addr, size] : address_size_map) {
         auto dst = aligned_read(addr, size);
@@ -593,13 +646,16 @@ DataStorageTransaction SetAssociativeCache::read(address_t address, size_t num_b
             read_data[data_index++] = dst.data[i];
         }
 
+        latencies.push_back(dst.latency);
+
         // return the highest hit level from all reads
         if (dst.hit_level > hit_level) {
             hit_level = dst.hit_level;
         }
     }
 
-    latency_t latency = 0;
+    latency_t latency = calculate_multi_block_access_latency(latencies);
+
     DataStorageTransaction dst = {READ, address, latency, hit_level, read_data};
     return dst;
 }

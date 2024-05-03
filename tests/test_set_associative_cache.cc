@@ -1029,15 +1029,14 @@ int main() {
         assert(fm->get(address) == write_data.get<uint8_t>());
 
         // check write allocate
-        auto read_dst = sac2->read(address, 1);
+        auto read_dst = sac3->read(address, 1);
 
         // hit level is 0 or 1
         assert(read_dst.address == address);
-        // assert(read_dst.data == write_data);
+        assert(read_dst.data == write_data);
         assert(read_dst.type == DataStorageTransactionType::READ);
 
         // TODO check latency
-        std::cout << write_data << " : " << read_dst.data << std::endl;
     }
     return 0;
 }

@@ -20,26 +20,46 @@ int main() {
         Data d = Data(1);
         d.set<uint8_t>(i);
         auto dst = fm->write(i, d);
+
+        assert(dst.type == DataStorageTransactionType::WRITE);
+        assert(dst.address == i);
         assert(dst.latency == write_latency);
+        assert(dst.hit_level == 0);
+        assert(dst.data == d);
     }
 
     // read bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i++) {
         auto dst = fm->read(i, 1);
-        assert(dst.data.get<uint8_t>() == (i % (UCHAR_MAX + 1)));
+
+        assert(dst.type == DataStorageTransactionType::READ);
+        assert(dst.address == i);
         assert(dst.latency == read_latency);
+        assert(dst.hit_level == 0);
+        assert(dst.data.get<uint8_t>() == (i % (UCHAR_MAX + 1)));
     }
 
-    // write 2 bytes to each 2ne memory address
+    // write 2 bytes to each 2nd memory address
     for (uint64_t i = 0; i < fm->size(); i += 2) {
         Data d = Data(2);
         d.set<uint16_t>(i);
-        fm->write(i, d);
+        auto dst = fm->write(i, d);
+
+        assert(dst.type == DataStorageTransactionType::WRITE);
+        assert(dst.address == i);
+        assert(dst.latency == write_latency);
+        assert(dst.hit_level == 0);
+        assert(dst.data.get<uint16_t>() == (i % (USHRT_MAX + 1)));
     }
 
     // read 2 bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i += 2) {
         auto dst = fm->read(i, 2);
+
+        assert(dst.type == DataStorageTransactionType::READ);
+        assert(dst.address == i);
+        assert(dst.latency == read_latency);
+        assert(dst.hit_level == 0);
         assert(dst.data.get<uint16_t>() == (i % (USHRT_MAX + 1)));
     }
 
@@ -47,12 +67,23 @@ int main() {
     for (uint64_t i = 0; i < fm->size(); i += 4) {
         Data d = Data(4);
         d.set<uint32_t>(i);
-        fm->write(i, d);
+        auto dst = fm->write(i, d);
+
+        assert(dst.type == DataStorageTransactionType::WRITE);
+        assert(dst.address == i);
+        assert(dst.latency == write_latency);
+        assert(dst.hit_level == 0);
+        assert(dst.data.get<uint32_t>() == (i % 4294967295));
     }
 
     // read 4 bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i += 4) {
         auto dst = fm->read(i, 4);
+
+        assert(dst.type == DataStorageTransactionType::READ);
+        assert(dst.address == i);
+        assert(dst.latency == read_latency);
+        assert(dst.hit_level == 0);
         assert(dst.data.get<uint32_t>() == (i % 4294967295));
     }
 
@@ -60,12 +91,23 @@ int main() {
     for (uint64_t i = 0; i < fm->size(); i += 8) {
         Data d = Data(8);
         d.set<uint64_t>(i);
-        fm->write(i, d);
+        auto dst = fm->write(i, d);
+
+        assert(dst.type == DataStorageTransactionType::WRITE);
+        assert(dst.address == i);
+        assert(dst.latency == write_latency);
+        assert(dst.hit_level == 0);
+        assert(dst.data.get<uint64_t>() == (i % ULLONG_MAX));
     }
 
     // read 8 bytes from memory and check if they are correct
     for (uint64_t i = 0; i < fm->size(); i += 8) {
         auto dst = fm->read(i, 8);
+
+        assert(dst.type == DataStorageTransactionType::READ);
+        assert(dst.address == i);
+        assert(dst.latency == read_latency);
+        assert(dst.hit_level == 0);
         assert(dst.data.get<uint64_t>() == (i % 18446744073709551615ul));
     }
 
@@ -75,6 +117,11 @@ int main() {
     // check if all bytes in memory are 0
     for (int i = 0; i < fm->size(); i++) {
         auto dst = fm->read(i, 1);
+
+        assert(dst.type == DataStorageTransactionType::READ);
+        assert(dst.address == i);
+        assert(dst.latency == read_latency);
+        assert(dst.hit_level == 0);
         assert(dst.data.get<uint8_t>() == 0);
     }
 

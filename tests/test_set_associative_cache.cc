@@ -967,5 +967,77 @@ int main() {
     assert(fm->get(0x0016) == 0x11);
     assert(fm->get(0x0017) == 0x11);
 
+    fm->set(0x0018, 0xaa);
+    fm->set(0x0019, 0xbb);
+    fm->set(0x001a, 0xcc);
+    fm->set(0x001b, 0xdd);
+
+    auto read_dst20 = sac3->read(0x0012, 10);
+
+    assert(read_dst20.address == 0x0012);
+    assert(read_dst20.hit_level == 1);
+    assert(read_dst20.data.get<uint64_t>() == 0xbbaa'1111'1111'1111);
+    assert(read_dst20.data.get<uint16_t>(8) == 0xddcc);
+    assert(read_dst20.type == DataStorageTransactionType::READ);
+
+    auto read_dst21 = sac3->read(0x0010, 8);
+
+    assert(read_dst21.address == 0x0010);
+    assert(read_dst21.hit_level == 0);
+    assert(read_dst21.data.get<uint64_t>() == 0x1111'1111'1111'1111);
+    assert(read_dst21.type == DataStorageTransactionType::READ);
+
+    auto read_dst22 = sac3->read(0x0018, 8);
+
+    assert(read_dst22.address == 0x0018);
+    assert(read_dst22.hit_level == 0);
+    assert(read_dst22.data.get<uint64_t>() == 0x0000'0000'ddcc'bbaa);
+    assert(read_dst22.type == DataStorageTransactionType::READ);
+
+    // reset fake memory and cache
+    fm->reset();
+    sac3->reset();
+
+    // generate data to write to fake memory
+    for (int i = 0; i < fm->size(); i++) {
+        uint8_t random_int = std::rand() % 256;
+        address_data_map.insert({i, random_int});
+    }
+
+    // generate ddl with all fake memory addresses
+    for (int i = 0; i < fm->size(); i++) {
+        addresses.insert_tail(i);
+    }
+
+    while (!addresses.empty()) {
+        auto address_nodes = addresses.get_nodes();
+        size_t node_index = std::rand() % address_nodes.size();
+        auto node = address_nodes[node_index];
+        uint64_t address = node->value;
+        addresses.remove(node);
+        Data write_data = Data(1);
+        write_data.set<uint8_t>(address_data_map.at(address));
+
+        auto write_dst = sac3->write(address, write_data);
+
+        // hit level is either 0 or 1
+        assert(write_dst.address == address);
+        assert(write_dst.data == write_data);
+        assert(write_dst.type == DataStorageTransactionType::WRITE);
+
+        // check write through
+        assert(fm->get(address) == write_data.get<uint8_t>());
+
+        // check write allocate
+        auto read_dst = sac2->read(address, 1);
+
+        // hit level is 0 or 1
+        assert(read_dst.address == address);
+        // assert(read_dst.data == write_data);
+        assert(read_dst.type == DataStorageTransactionType::READ);
+
+        // TODO check latency
+        std::cout << write_data << " : " << read_dst.data << std::endl;
+    }
     return 0;
 }

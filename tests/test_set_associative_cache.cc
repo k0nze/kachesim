@@ -938,8 +938,34 @@ int main() {
     // when a write miss occurs load cache block from next level data storage and do not
     // store it in a cache set
     // write cache block back when it gets updated
+    fm->reset();
+
     write_allocate = false;
     write_through = true;
+
+    auto sac3 = std::make_shared<SetAssociativeCache>(
+        "sac3", fm, write_allocate, write_through, miss_latency, hit_latency,
+        cache_block_size, sets, ways, ReplacementPolicyType::LRU);
+
+    // full aligned write to empty block
+    auto d_block8 = Data(8);
+    d_block8.set<uint64_t>(0x1111'1111'1111'1111);
+    auto write_dst9 = sac3->write(0x0010, d_block8);
+
+    // hit level is 1 because non cached block had to be read from next level
+    assert(write_dst9.address == 0x0010);
+    assert(write_dst9.hit_level == 1);
+    assert(write_dst9.data == d_block8);
+    assert(write_dst9.type == DataStorageTransactionType::WRITE);
+
+    assert(fm->get(0x0010) == 0x11);
+    assert(fm->get(0x0011) == 0x11);
+    assert(fm->get(0x0012) == 0x11);
+    assert(fm->get(0x0013) == 0x11);
+    assert(fm->get(0x0014) == 0x11);
+    assert(fm->get(0x0015) == 0x11);
+    assert(fm->get(0x0016) == 0x11);
+    assert(fm->get(0x0017) == 0x11);
 
     return 0;
 }

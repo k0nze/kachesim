@@ -2,8 +2,10 @@
 #define MEMORY_HIERARCHY_H
 
 #include <map>
+#include <memory>
 #include <string>
 
+#include "data_storage.h"
 #include "data_storage_transaction.h"
 
 namespace kachesim {
@@ -18,6 +20,7 @@ private:
     std::vector<std::string> data_storage_names_;
     std::map<std::string, std::string> data_storage_type_map_;
     std::map<std::string, std::string> data_storage_dependency_map_;
+    std::map<std::string, std::shared_ptr<DataStorage>> data_storage_map_;
 };
 }  // namespace kachesim
 

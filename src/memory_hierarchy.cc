@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <iostream>
 
+#include "fake_memory.h"
+#include "set_associative_cache.h"
+
 namespace kachesim {
 
 MemoryHierarchy::MemoryHierarchy() = default;
@@ -71,6 +74,68 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
                 throw std::runtime_error("No data_storage with name " +
                                          next_level_data_storage_name +
                                          " in yaml config");
+            }
+        }
+
+        // order data storages by their dependencies
+        std::vector<std::string> data_storage_order;
+
+        // first add FakeMemories because they don't have a dependcy
+        for (const auto& data_storage_name : data_storage_names_) {
+            if (data_storage_type_map_[data_storage_name].compare("FakeMemory") == 0) {
+                data_storage_order.push_back(data_storage_name);
+            }
+        }
+
+        // CAUTION: This is a naive implementation of topological sort and probably only
+        // works for linear memory hierarchies
+        while (data_storage_order.size() < data_storage_names_.size()) {
+            // add data storages which aren't already added and those next level data
+            // storages have already been added
+            for (const auto& data_storage_name : data_storage_names_) {
+                if (std::find(data_storage_order.begin(), data_storage_order.end(),
+                              data_storage_name) == data_storage_order.end()) {
+                    if (std::find(data_storage_order.begin(), data_storage_order.end(),
+                                  data_storage_dependency_map_[data_storage_name]) !=
+                        data_storage_order.end()) {
+                        data_storage_order.push_back(data_storage_name);
+                    }
+                }
+            }
+        }
+
+        // instantiate data storages
+        for (const auto& data_storage_name : data_storage_order) {
+            if (data_storage_type_map_[data_storage_name].compare("FakeMemory") == 0) {
+                int size = 0;
+                int read_latency = 0;
+                int write_latency = 0;
+
+                auto fake_memory = std::make_shared<FakeMemory>(
+                    data_storage_name, size, read_latency, write_latency);
+                data_storage_map_.insert({data_storage_name, fake_memory});
+            }
+
+            else if (data_storage_type_map_[data_storage_name].compare(
+                         "SetAssociativeCache") == 0) {
+                auto next_level_data_storage =
+                    data_storage_map_[data_storage_dependency_map_[data_storage_name]];
+                bool write_allocate = true;
+                bool write_through = false;
+                latency_t miss_latency = 0;
+                latency_t hit_latency = 0;
+                size_t cache_block_size = 16;
+                size_t sets = 4;
+                size_t ways = 2;
+                ReplacementPolicyType replacement_policy_type =
+                    ReplacementPolicyType::LRU;
+                size_t multi_block_access = 1;
+
+                auto set_associative_cache = std::make_shared<SetAssociativeCache>(
+                    data_storage_name, next_level_data_storage, write_allocate,
+                    write_through, miss_latency, hit_latency, cache_block_size, sets,
+                    ways, ReplacementPolicyType::LRU, multi_block_access);
+                data_storage_map_.insert({data_storage_name, set_associative_cache});
             }
         }
 

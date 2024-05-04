@@ -9,7 +9,7 @@ namespace kachesim {
 class MemoryHierarchy {
 public:
     MemoryHierarchy();
-    MemoryHierarchy(std::string yaml_config_string);
+    MemoryHierarchy(const std::string& yaml_config_string);
     DataStorageTransaction write(address_t address, Data& data);
     DataStorageTransaction read(address_t address, size_t num_bytes);
 };

@@ -2,14 +2,22 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <iostream>
+
 namespace kachesim {
 
 MemoryHierarchy::MemoryHierarchy() = default;
 
-MemoryHierarchy::MemoryHierarchy(std::string yaml_config_string) {
-    std::string s = "name: YAML from libcurl";
-    std::stringstream ss(s);
-    YAML::Parser parser(ss);
+MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
+    // std::stringstream ss(yaml_config_string);
+    // YAML::Parser parser(ss);
+
+    YAML::Node config = YAML::Load(yaml_config_string);
+
+    for (const auto& pair : config) {
+        std::string key = pair.first.as<std::string>();
+        std::cout << key << std::endl;
+    }
 }
 
 DataStorageTransaction MemoryHierarchy::write(address_t address, Data& data) {

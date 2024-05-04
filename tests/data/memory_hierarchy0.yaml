@@ -1,0 +1,9 @@
+nodes:
+  - name: fm0
+    type: FakeMemory
+  - name: l1_dcache
+    type: SetAssociativeCAche
+  - name: l2_dcache
+    type: SetAssociativeCAche
+  - name: l3_dcache
+    type: SetAssociativeCAche

@@ -807,13 +807,14 @@ int main() {
         write_data.set<uint8_t>(address_data_map.at(address));
         auto write_dst = sac1->write(address, write_data);
 
-        // hit level is always != 0 because no address is cached
-        assert(write_dst.hit_level == 1);
-        assert(write_dst.address == address);
+        // hit level is always 1 because no address is cached and everything is in the
+        // next level data since there is no write allocation everything is written back
+        // to the next level data storage
         assert(write_dst.type == DataStorageTransactionType::WRITE);
+        assert(write_dst.address == address);
+        assert(write_dst.hit_level == 1);
+        assert(write_dst.latency == sac_miss_latency + fm_write_latency);
         assert(write_dst.data.get<uint8_t>() == write_data.get<uint8_t>());
-
-        // TODO check latency
     }
 
     // since there was no read no block was ever cached and no write allocation appeared
@@ -940,15 +941,28 @@ int main() {
         auto node = address_nodes[node_index];
         uint64_t address = node->value;
         addresses.remove(node);
+
+        bool is_address_cached = sac2->is_address_cached(address);
+
         Data write_data = Data(1);
         write_data.set<uint8_t>(address_data_map.at(address));
 
         auto write_dst = sac2->write(address, write_data);
 
         // hit level is either 0 or 1
-        assert(write_dst.address == address);
-        assert(write_dst.data == write_data);
         assert(write_dst.type == DataStorageTransactionType::WRITE);
+        assert(write_dst.address == address);
+
+        // each write is getting written through
+        if (is_address_cached) {
+            assert(write_dst.hit_level == 0);
+            assert(write_dst.latency == sac_hit_latency + fm_write_latency);
+        } else {
+            assert(write_dst.hit_level == 1);
+            // latency depends on the eviction of blocks with write back
+        }
+
+        assert(write_dst.data == write_data);
 
         // check write through
         assert(fm->get(address) == write_data.get<uint8_t>());
@@ -962,8 +976,6 @@ int main() {
         assert(read_dst.address == address);
         assert(read_dst.data == write_data);
         assert(read_dst.type == DataStorageTransactionType::READ);
-
-        // TODO check latency
     }
 
     // when a write miss occurs load cache block from next level data storage and do not
@@ -1046,15 +1058,26 @@ int main() {
         auto node = address_nodes[node_index];
         uint64_t address = node->value;
         addresses.remove(node);
+
+        bool is_address_cached = sac3->is_address_cached(address);
+
         Data write_data = Data(1);
         write_data.set<uint8_t>(address_data_map.at(address));
 
         auto write_dst = sac3->write(address, write_data);
 
-        // hit level is either 0 or 1
-        assert(write_dst.address == address);
-        assert(write_dst.data == write_data);
         assert(write_dst.type == DataStorageTransactionType::WRITE);
+        assert(write_dst.address == address);
+
+        if (is_address_cached) {
+            assert(write_dst.hit_level == 0);
+            assert(write_dst.latency == sac_hit_latency + fm_write_latency);
+        } else {
+            assert(write_dst.hit_level == 1);
+            assert(write_dst.latency == sac_miss_latency + fm_write_latency);
+        }
+
+        assert(write_dst.data == write_data);
 
         // check write through
         assert(fm->get(address) == write_data.get<uint8_t>());
@@ -1062,12 +1085,18 @@ int main() {
         // check write allocate
         auto read_dst = sac3->read(address, 1);
 
-        // hit level is 0 or 1
-        assert(read_dst.address == address);
-        assert(read_dst.data == write_data);
         assert(read_dst.type == DataStorageTransactionType::READ);
+        assert(read_dst.address == address);
 
-        // TODO check latency
+        if (is_address_cached) {
+            assert(read_dst.hit_level == 0);
+            assert(read_dst.latency == sac_hit_latency);
+        } else {
+            assert(read_dst.hit_level == 1);
+            // latency depends on the eviction of blocks with write back
+        }
+
+        assert(read_dst.data == write_data);
     }
     return 0;
 }

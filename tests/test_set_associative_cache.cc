@@ -601,9 +601,6 @@ int main() {
         uint64_t address = node->value;
         addresses.remove(node);
 
-        // block addresses
-        uint64_t block_address = address & ~(cache_block_size - 1);
-
         bool is_address_cached = sac0->is_address_cached(address);
 
         auto read_dst = sac0->read(address, 1);
@@ -624,8 +621,6 @@ int main() {
         assert(read_dst.data.get<uint8_t>() == fm->get(address));
     }
 
-    return 0;
-
     // test full write to fake memory through set associative cache
     // generate data to write to fake memory
     for (int i = 0; i < fm->size(); i++) {
@@ -645,13 +640,26 @@ int main() {
         auto node = address_nodes[node_index];
         uint64_t address = node->value;
         addresses.remove(node);
+
+        bool is_address_cached = sac0->is_address_cached(address);
+
         Data write_data = Data(1);
         write_data.set<uint8_t>(address_data_map.at(address));
         auto write_dst = sac0->write(address, write_data);
 
-        // hit level is either 0 or 1
-        assert(write_dst.address == address);
         assert(write_dst.type == DataStorageTransactionType::WRITE);
+        assert(write_dst.address == address);
+
+        // hit level is either 0 or 1
+        // if address is cached it is a hit -> hit level is 0
+        if (is_address_cached) {
+            assert(write_dst.hit_level == 0);
+            assert(write_dst.latency == sac_hit_latency);
+        } else {
+            assert(write_dst.hit_level == 1);
+            // latency depends on the eviction of blocks with write back
+        }
+
         assert(write_dst.data.get<uint8_t>() == write_data.get<uint8_t>());
     }
 

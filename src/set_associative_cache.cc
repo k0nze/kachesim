@@ -782,6 +782,7 @@ DataStorageTransaction SetAssociativeCache::flush() {
     // if nothing needs to be written back to the next leve data storage everything is
     // considered a hit
     int32_t hit_level = 0;
+    latency_t latency = 0;
 
     for (int i = 0; i < sets_; i++) {
         for (int j = 0; j < ways_; j++) {
@@ -797,12 +798,12 @@ DataStorageTransaction SetAssociativeCache::flush() {
                 if (next_level_dst.hit_level + 1 > hit_level) {
                     hit_level = next_level_dst.hit_level + 1;
                 }
+                latency += next_level_dst.latency;
             }
         }
     }
     reset();
 
-    latency_t latency = 0;
     Data data = Data(0);
 
     DataStorageTransaction dst = {WRITE, 0, latency, hit_level, data};

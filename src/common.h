@@ -7,6 +7,11 @@
 #include <sstream>
 #include <string>
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
+namespace kachesim {
 /**
  * @author Siu Ching Pong -Asuka Kenji- https://stackoverflow.com/a/28703383
  */
@@ -28,6 +33,11 @@ std::string int_to_hex(T i) {
 
 uint32_t clog2(uint64_t x);
 
+#define DEBUG_PRINT(fmt, ...)                         \
+    do {                                              \
+        if (DEBUG) fprintf(stderr, fmt, __VA_ARGS__); \
+    } while (0)
+
 #define THROW_OUT_OF_RANGE(msg)                                                   \
     throw std::out_of_range((std::string(msg)) + " at " + std::string(__FILE__) + \
                             ":" + std::to_string(__LINE__));
@@ -36,4 +46,8 @@ uint32_t clog2(uint64_t x);
     throw std::invalid_argument((std::string(msg)) + " at " + std::string(__FILE__) + \
                                 ":" + std::to_string(__LINE__));
 
+#define THROW_RUNTIME_ERROR(msg)                                                   \
+    throw std::runtime_error((std::string(msg)) + " at " + std::string(__FILE__) + \
+                             ":" + std::to_string(__LINE__));
+}  // namespace kachesim
 #endif

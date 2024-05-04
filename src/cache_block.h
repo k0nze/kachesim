@@ -1,29 +1,30 @@
-#ifndef CACHE_LINE_H
-#define CACHE_LINE_H
+#ifndef CACHE_BLOCK_H
+#define CACHE_BLOCK_H
 
 #include <cstdint>
 #include <vector>
 
 #include "data.h"
 
+namespace kachesim {
 /**
- * represents a cache line (also called block) containing N bytes with a tag and a
+ * represents a cache block (also called line) containing N bytes with a tag and a
  * dirty bit
  */
-class CacheLine {
+class CacheBlock {
 public:
-    CacheLine(uint64_t size);
-    ~CacheLine();
+    CacheBlock(uint64_t size);
+    ~CacheBlock();
 
     std::size_t size() const { return size_; }
 
     void set_valid();
     void set_unvalid();
-    bool valid();
+    bool is_valid();
 
     void set_dirty();
     void set_not_dirty();
-    uint64_t dirty();
+    bool is_dirty();
 
     void update(uint64_t tag, Data& data, bool valid = true, bool dirty = true);
     uint64_t get_tag();
@@ -42,5 +43,6 @@ private:
     bool dirty_ = false;
     bool valid_ = false;
 };
+}  // namespace kachesim
 
 #endif

@@ -6,6 +6,7 @@
 
 typedef enum ReplacementPolicyType { LRU } ReplacementPolicyType;
 
+namespace kachesim {
 class ReplacementPolicy {
 public:
     virtual ~ReplacementPolicy() = 0;
@@ -14,5 +15,6 @@ public:
 
     virtual std::string to_string() = 0;
 };
+}  // namespace kachesim
 
 #endif

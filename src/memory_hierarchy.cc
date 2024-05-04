@@ -1,7 +1,16 @@
 #include "memory_hierarchy.h"
 
-#include "yaml-cpp/yaml.h"
+namespace kachesim {
 
-MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
-    YAML::Node config = YAML::Load(yaml_config_string);
+MemoryHierarchy::MemoryHierarchy() = default;
+
+DataStorageTransaction MemoryHierarchy::write(address_t address, Data& data) {
+    DataStorageTransaction dst;
+    return dst;
 }
+
+DataStorageTransaction MemoryHierarchy::read(address_t address, size_t num_bytes) {
+    DataStorageTransaction dst;
+    return dst;
+}
+}  // namespace kachesim

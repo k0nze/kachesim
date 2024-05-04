@@ -11,12 +11,26 @@ typedef uint64_t address_t;
 typedef enum DataStorageTransactionType { READ, WRITE } DataStorageTransactionType;
 typedef enum HitMiss { HIT, MISS } HitMiss;
 
-struct DataStorageTransaction {
+namespace kachesim {
+class DataStorageTransaction {
+public:
+    DataStorageTransaction();
+    DataStorageTransaction(DataStorageTransactionType type, address_t address,
+                           latency_t latency, int32_t hit_level, Data data);
     DataStorageTransactionType type;
     address_t address;
     latency_t latency;
-    uint32_t hit_level;
-    std::unique_ptr<Data> data;
+
+    /**
+     * a hit_level = -1 means a miss and no hit on another level (e.g. full write
+     * of cache block without reading from next level data storage)
+     * a hit_level = 0 means the hit appeared at the requested level a hit_level > 0
+     * means the hit appeared at a higher level, this means there was a miss at the
+     * requested
+     */
+    int32_t hit_level;
+    Data data = Data(0);
 };
+}  // namespace kachesim
 
 #endif

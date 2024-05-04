@@ -2,13 +2,15 @@
 #include <iostream>
 #include <memory>
 
-#include "cache_line.h"
+#include "kachesim.h"
+
+using namespace kachesim;
 
 int main() {
-    auto cl = std::make_unique<CacheLine>(8);
+    auto cl = std::make_unique<CacheBlock>(8);
 
-    // check that cache line is not valid by default
-    assert(!cl->valid());
+    // check that cache block is not valid by default
+    assert(!cl->is_valid());
 
     /*
     assert(cl->size() == 8);

@@ -2,7 +2,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "replacement_policy/least_recently_used.h"
+#include "kachesim.h"
+
+using namespace kachesim;
 
 int main() {
     auto lru = std::make_unique<LeastRecentlyUsed>();

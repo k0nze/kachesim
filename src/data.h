@@ -5,7 +5,10 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
 
+namespace kachesim {
 class Data {
 public:
     Data(uint32_t size);
@@ -14,11 +17,20 @@ public:
     Data(const Data& data);
     ~Data();
 
-    size_t size();
+    size_t size() const;
 
     uint8_t operator[](uint64_t index) const;
     uint8_t& operator[](uint64_t index);
+
     bool operator==(Data& d) const;
+    bool operator==(uint64_t i);
+
+    std::string to_string();
+
+    friend std::ostream& operator<<(std::ostream& os, Data d) {
+        os << d.to_string();
+        return os;
+    }
 
     /**
      * @brief set value to bytes starting from offset
@@ -53,5 +65,6 @@ private:
     size_t size_;
     uint8_t* data_;
 };
+}  // namespace kachesim
 
 #endif

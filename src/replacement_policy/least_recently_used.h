@@ -7,6 +7,7 @@
 #include "../doubly_linked_list/doubly_linked_list.h"
 #include "replacement_policy.h"
 
+namespace kachesim {
 class LeastRecentlyUsed : public ReplacementPolicy {
 public:
     LeastRecentlyUsed();
@@ -24,5 +25,6 @@ private:
 
     uint64_t size_;
 };
+}  // namespace kachesim
 
 #endif

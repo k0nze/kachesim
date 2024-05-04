@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+namespace kachesim {
 template <typename T>
 struct DoublyLinkedListNode {
     T value;
@@ -117,9 +118,10 @@ public:
         auto current_node = head_;
 
         if (current_node != nullptr) {
+            nodes.push_back(current_node);
             while (current_node->next != nullptr) {
-                nodes.push_back(current_node);
                 current_node = current_node->next;
+                nodes.push_back(current_node);
             }
         }
 
@@ -127,11 +129,13 @@ public:
     }
 
     uint64_t size() const { return size_; };
+    bool empty() const { return size_ == 0; };
 
 private:
     std::shared_ptr<DoublyLinkedListNode<T>> head_ = nullptr;
     std::shared_ptr<DoublyLinkedListNode<T>> tail_ = nullptr;
     uint64_t size_ = 0;
 };
+}  // namespace kachesim
 
 #endif

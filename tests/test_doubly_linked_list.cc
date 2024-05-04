@@ -2,7 +2,9 @@
 #include <iostream>
 #include <memory>
 
-#include "doubly_linked_list/doubly_linked_list.h"
+#include "kachesim.h"
+
+using namespace kachesim;
 
 int main() {
     auto dll = std::make_unique<DoublyLinkedList<uint64_t>>();
@@ -11,6 +13,9 @@ int main() {
     auto node_2 = dll->insert_head(2);
     auto node_3 = dll->insert_head(3);
     auto node_4 = dll->insert_head(4);
+
+    auto nodes = dll->get_nodes();
+    assert(nodes.size() == 4);
 
     assert(dll->size() == 4);
     assert(dll->get_head() == 4);

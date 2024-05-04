@@ -2,8 +2,8 @@ data_storages:
   - name: fm0
     type: FakeMemory
     size: 1024
-    read_latency: 7
-    write_latency: 11
+    read_latency: 23
+    write_latency: 29
 
   - name: l1_dcache
     type: SetAssociativeCache
@@ -21,7 +21,25 @@ data_storages:
   - name: l2_dcache
     type: SetAssociativeCache
     next_level_data_storage: l3_dcache
+    write_allocate: true
+    write_through: false
+    miss_latency: 11
+    hit_latency: 7
+    cache_block_size: 32
+    sets: 4
+    ways: 8
+    replacement_policy: LRU
+    multi_block_access: 1
 
   - name: l3_dcache
     type: SetAssociativeCache
     next_level_data_storage: fm0
+    write_allocate: true
+    write_through: false
+    miss_latency: 17
+    hit_latency: 13
+    cache_block_size: 32
+    sets: 2
+    ways: 16
+    replacement_policy: LRU
+    multi_block_access: 1

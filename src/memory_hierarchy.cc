@@ -1,12 +1,7 @@
 #include "memory_hierarchy.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <algorithm>
 #include <iostream>
-
-#include "fake_memory.h"
-#include "set_associative_cache.h"
 
 namespace kachesim {
 
@@ -17,8 +12,6 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
 
     // access data_storages
     if (config["data_storages"]) {
-        std::map<std::string, YAML::Node> data_storage_name_to_yaml_node_map;
-
         auto data_storages = config["data_storages"];
 
         // check if nodes is a sequence
@@ -40,24 +33,6 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
                 throw std::runtime_error(
                     "No data_storage does not contain 'name' in yaml config");
             }
-
-            // it works here!
-            auto node = data_storage;
-
-            if (node.IsMap()) {
-                for (const auto& it : node) {
-                    std::cout << "Key: " << it.first.as<std::string>() << ", ";
-                    std::cout << "Value: " << it.second.as<std::string>() << std::endl;
-                }
-            } else if (node.IsSequence()) {
-                for (const auto& it : node) {
-                    std::cout << "Element: " << it.as<std::string>() << std::endl;
-                }
-            }
-            // end
-
-            data_storage_name_to_yaml_node_map.insert(
-                {data_storage_type_str, data_storage});
 
             // access data storage type
             if (data_storage["type"]) {
@@ -126,23 +101,28 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
         // instantiate data storages
         for (const auto& data_storage_name : data_storage_order) {
             if (data_storage_type_map_[data_storage_name].compare("FakeMemory") == 0) {
-                YAML::Node node = data_storage_name_to_yaml_node_map[data_storage_name];
+                std::shared_ptr<FakeMemory> fake_memory;
 
-                uint64_t size = 0;
-                latency_t read_latency = 0;
-                latency_t write_latency = 0;
+                // TODO: fix this in the future
+                // since YAML:Nodes seems to be problematic when copying them from the
+                // loop where they are accessed iterate a second time over data storages
+                // to get node for current data storage
+                for (const auto& data_storage : data_storages) {
+                    if (data_storage["name"].as<std::string>().compare(
+                            data_storage_name) == 0) {
+                        fake_memory_from_yaml_node_(data_storage);
+                        break;
+                    }
+                }
 
-                /*
-                auto fake_memory = std::make_shared<FakeMemory>(
-                    data_storage_name, size, read_latency, write_latency);
                 data_storage_map_.insert({data_storage_name, fake_memory});
-                */
             }
 
             else if (data_storage_type_map_[data_storage_name].compare(
                          "SetAssociativeCache") == 0) {
                 auto next_level_data_storage =
                     data_storage_map_[data_storage_dependency_map_[data_storage_name]];
+
                 bool write_allocate = true;
                 bool write_through = false;
                 latency_t miss_latency = 0;
@@ -153,6 +133,18 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
                 ReplacementPolicyType replacement_policy_type =
                     ReplacementPolicyType::LRU;
                 size_t multi_block_access = 1;
+
+                // TODO: fix this in the future
+                // since YAML:Nodes seems to be problematic when copying them from the
+                // loop where they are accessed iterate a second time over data storages
+                // to get node for current data storage
+                for (const auto& data_storage : data_storages) {
+                    if (data_storage["name"].as<std::string>().compare(
+                            data_storage_name) == 0) {
+                        write_allocate = data_storage["write_allocate"].as<bool>();
+                        break;
+                    }
+                }
 
                 auto set_associative_cache = std::make_shared<SetAssociativeCache>(
                     data_storage_name, next_level_data_storage, write_allocate,
@@ -165,6 +157,24 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
     } else {
         throw std::runtime_error("No 'nodes' in yaml config");
     }
+}
+
+std::shared_ptr<FakeMemory> MemoryHierarchy::fake_memory_from_yaml_node_(
+    const YAML::Node& yaml_node) {
+    std::string data_storage_name = yaml_node["name"].as<std::string>();
+    uint64_t size = yaml_node["size"].as<uint64_t>();
+    latency_t read_latency = yaml_node["read_latency"].as<latency_t>();
+    latency_t write_latency = yaml_node["write_latency"].as<latency_t>();
+
+    auto fake_memory = std::make_shared<FakeMemory>(data_storage_name, size,
+                                                    read_latency, write_latency);
+    return fake_memory;
+}
+
+std::shared_ptr<SetAssociativeCache>
+MemoryHierarchy::set_associative_cache_from_yaml_node_(
+    const YAML::Node& yaml_node, std::shared_ptr<DataStorage> next_level_data_storage) {
+    return nullptr;
 }
 
 DataStorageTransaction MemoryHierarchy::write(address_t address, Data& data) {

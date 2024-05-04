@@ -20,6 +20,8 @@ public:
     DataStorageTransaction write(address_t address, Data& data);
     DataStorageTransaction read(address_t address, size_t num_bytes);
 
+    std::shared_ptr<MemoryInterface> top_level_memory;
+
 private:
     std::vector<std::string> data_storage_names_;
     std::map<std::string, std::string> data_storage_type_map_;
@@ -31,6 +33,8 @@ private:
     std::shared_ptr<SetAssociativeCache> set_associative_cache_from_yaml_node_(
         const YAML::Node& yaml_node,
         std::shared_ptr<DataStorage> next_level_data_storage);
+
+    std::shared_ptr<CacheInterface> first_level_cache_;
 };
 }  // namespace kachesim
 

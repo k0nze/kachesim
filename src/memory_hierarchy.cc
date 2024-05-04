@@ -144,6 +144,11 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
             }
         }
 
+        top_level_memory = std::dynamic_pointer_cast<MemoryInterface>(
+            data_storage_map_[data_storage_order[0]]);
+        first_level_cache_ = std::dynamic_pointer_cast<CacheInterface>(
+            data_storage_map_[data_storage_order[data_storage_order.size() - 1]]);
+
     } else {
         throw std::runtime_error("No 'nodes' in yaml config");
     }
@@ -196,12 +201,12 @@ MemoryHierarchy::set_associative_cache_from_yaml_node_(
 }
 
 DataStorageTransaction MemoryHierarchy::write(address_t address, Data& data) {
-    DataStorageTransaction dst;
-    return dst;
+    auto read_dst = first_level_cache_->write(address, data);
+    return read_dst;
 }
 
 DataStorageTransaction MemoryHierarchy::read(address_t address, size_t num_bytes) {
-    DataStorageTransaction dst;
-    return dst;
+    auto write_dst = first_level_cache_->read(address, num_bytes);
+    return write_dst;
 }
 }  // namespace kachesim

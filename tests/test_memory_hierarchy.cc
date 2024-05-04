@@ -1,3 +1,4 @@
+#include <cassert>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -25,6 +26,11 @@ int main() {
     yaml_config_string = read_file_into_string("../data/memory_hierarchy0.yaml");
 
     auto mh0 = std::make_unique<MemoryHierarchy>(yaml_config_string);
+
+    mh0->top_level_memory->set(0x0100, 0x2a);
+    auto read_dst0 = mh0->read(0x0100, 1);
+
+    assert(read_dst0.data.get<uint8_t>() == 0x2a);
 
     return 0;
 }

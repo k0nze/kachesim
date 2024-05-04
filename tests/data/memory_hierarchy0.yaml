@@ -1,9 +1,12 @@
-nodes:
+data_storages:
   - name: fm0
     type: FakeMemory
   - name: l1_dcache
     type: SetAssociativeCache
+    next_level_data_storage: l2_dcache
   - name: l2_dcache
     type: SetAssociativeCache
+    next_level_data_storage: l3_dcache
   - name: l3_dcache
     type: SetAssociativeCache
+    next_level_data_storage: fm0

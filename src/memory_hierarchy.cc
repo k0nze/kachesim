@@ -17,6 +17,8 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
 
     // access data_storages
     if (config["data_storages"]) {
+        std::map<std::string, YAML::Node> data_storage_name_to_yaml_node_map;
+
         auto data_storages = config["data_storages"];
 
         // check if nodes is a sequence
@@ -29,16 +31,33 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
         for (const auto& data_storage : data_storages) {
             std::string data_storage_name_str;
             std::string data_storage_type_str;
-
             // access node name
             if (data_storage["name"]) {
-                auto data_storage_name = data_storage["name"];
+                auto data_storage_name = Clone(data_storage["name"]);
                 data_storage_name_str = data_storage_name.as<std::string>();
                 data_storage_names_.push_back(data_storage_name_str);
             } else {
                 throw std::runtime_error(
                     "No data_storage does not contain 'name' in yaml config");
             }
+
+            // it works here!
+            auto node = data_storage;
+
+            if (node.IsMap()) {
+                for (const auto& it : node) {
+                    std::cout << "Key: " << it.first.as<std::string>() << ", ";
+                    std::cout << "Value: " << it.second.as<std::string>() << std::endl;
+                }
+            } else if (node.IsSequence()) {
+                for (const auto& it : node) {
+                    std::cout << "Element: " << it.as<std::string>() << std::endl;
+                }
+            }
+            // end
+
+            data_storage_name_to_yaml_node_map.insert(
+                {data_storage_type_str, data_storage});
 
             // access data storage type
             if (data_storage["type"]) {
@@ -107,13 +126,17 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
         // instantiate data storages
         for (const auto& data_storage_name : data_storage_order) {
             if (data_storage_type_map_[data_storage_name].compare("FakeMemory") == 0) {
-                int size = 0;
-                int read_latency = 0;
-                int write_latency = 0;
+                YAML::Node node = data_storage_name_to_yaml_node_map[data_storage_name];
 
+                uint64_t size = 0;
+                latency_t read_latency = 0;
+                latency_t write_latency = 0;
+
+                /*
                 auto fake_memory = std::make_shared<FakeMemory>(
                     data_storage_name, size, read_latency, write_latency);
                 data_storage_map_.insert({data_storage_name, fake_memory});
+                */
             }
 
             else if (data_storage_type_map_[data_storage_name].compare(

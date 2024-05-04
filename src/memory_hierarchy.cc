@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "common.h"
+
 namespace kachesim {
 
 MemoryHierarchy::MemoryHierarchy() = default;
@@ -110,7 +112,7 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
                 for (const auto& data_storage : data_storages) {
                     if (data_storage["name"].as<std::string>().compare(
                             data_storage_name) == 0) {
-                        fake_memory_from_yaml_node_(data_storage);
+                        fake_memory = fake_memory_from_yaml_node_(data_storage);
                         break;
                     }
                 }
@@ -120,19 +122,10 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
 
             else if (data_storage_type_map_[data_storage_name].compare(
                          "SetAssociativeCache") == 0) {
+                std::shared_ptr<SetAssociativeCache> set_associative_cache;
+
                 auto next_level_data_storage =
                     data_storage_map_[data_storage_dependency_map_[data_storage_name]];
-
-                bool write_allocate = true;
-                bool write_through = false;
-                latency_t miss_latency = 0;
-                latency_t hit_latency = 0;
-                size_t cache_block_size = 16;
-                size_t sets = 4;
-                size_t ways = 2;
-                ReplacementPolicyType replacement_policy_type =
-                    ReplacementPolicyType::LRU;
-                size_t multi_block_access = 1;
 
                 // TODO: fix this in the future
                 // since YAML:Nodes seems to be problematic when copying them from the
@@ -141,15 +134,12 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
                 for (const auto& data_storage : data_storages) {
                     if (data_storage["name"].as<std::string>().compare(
                             data_storage_name) == 0) {
-                        write_allocate = data_storage["write_allocate"].as<bool>();
+                        set_associative_cache = set_associative_cache_from_yaml_node_(
+                            data_storage, next_level_data_storage);
                         break;
                     }
                 }
 
-                auto set_associative_cache = std::make_shared<SetAssociativeCache>(
-                    data_storage_name, next_level_data_storage, write_allocate,
-                    write_through, miss_latency, hit_latency, cache_block_size, sets,
-                    ways, ReplacementPolicyType::LRU, multi_block_access);
                 data_storage_map_.insert({data_storage_name, set_associative_cache});
             }
         }
@@ -161,20 +151,48 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
 
 std::shared_ptr<FakeMemory> MemoryHierarchy::fake_memory_from_yaml_node_(
     const YAML::Node& yaml_node) {
-    std::string data_storage_name = yaml_node["name"].as<std::string>();
+    std::string name = yaml_node["name"].as<std::string>();
     uint64_t size = yaml_node["size"].as<uint64_t>();
     latency_t read_latency = yaml_node["read_latency"].as<latency_t>();
     latency_t write_latency = yaml_node["write_latency"].as<latency_t>();
 
-    auto fake_memory = std::make_shared<FakeMemory>(data_storage_name, size,
-                                                    read_latency, write_latency);
+    auto fake_memory =
+        std::make_shared<FakeMemory>(name, size, read_latency, write_latency);
     return fake_memory;
 }
 
 std::shared_ptr<SetAssociativeCache>
 MemoryHierarchy::set_associative_cache_from_yaml_node_(
     const YAML::Node& yaml_node, std::shared_ptr<DataStorage> next_level_data_storage) {
-    return nullptr;
+    std::string name = yaml_node["name"].as<std::string>();
+    bool write_allocate = yaml_node["write_allocate"].as<bool>();
+    bool write_through = yaml_node["write_through"].as<bool>();
+    latency_t miss_latency = yaml_node["miss_latency"].as<latency_t>();
+    latency_t hit_latency = yaml_node["hit_latency"].as<latency_t>();
+    size_t cache_block_size = yaml_node["cache_block_size"].as<size_t>();
+    size_t sets = yaml_node["sets"].as<size_t>();
+    size_t ways = yaml_node["ways"].as<size_t>();
+    std::string replacement_policy_str =
+        yaml_node["replacement_policy"].as<std::string>();
+
+    ReplacementPolicyType replacement_policy_type;
+
+    if (replacement_policy_str.compare("LRU") == 0) {
+        replacement_policy_type = ReplacementPolicyType::LRU;
+    } else {
+        std::string msg = "replacement_policy '" + replacement_policy_str + "' for '" +
+                          name + "' unknown in yaml config";
+        THROW_INVALID_ARGUMENT(msg);
+    }
+
+    size_t multi_block_access = yaml_node["multi_block_access"].as<size_t>();
+
+    auto set_associative_cache = std::make_shared<SetAssociativeCache>(
+        name, next_level_data_storage, write_allocate, write_through, miss_latency,
+        hit_latency, cache_block_size, sets, ways, replacement_policy_type,
+        multi_block_access);
+
+    return set_associative_cache;
 }
 
 DataStorageTransaction MemoryHierarchy::write(address_t address, Data& data) {

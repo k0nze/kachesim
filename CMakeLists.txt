@@ -29,6 +29,7 @@ add_library(
     src/data_storage.cc
     src/data_storage_transaction.cc
     src/memory_interface.cc
+    src/memory_hierarchy.cc
     src/fake_memory.cc
     src/cache_interface.cc
     src/set_associative_cache.cc

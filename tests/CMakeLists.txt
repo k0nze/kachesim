@@ -205,3 +205,29 @@ set_tests_properties(test_fake_memory_build PROPERTIES FIXTURES_SETUP
 add_test(NAME test_fake_memory COMMAND ./test_fake_memory test_fixture)
 
 set_tests_properties(test_fake_memory PROPERTIES FIXTURES_SETUP test_fixture)
+
+# test_memory_hierarchy
+add_executable(test_memory_hierarchy test_memory_hierarchy.cc)
+
+target_include_directories(test_memory_hierarchy
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(test_memory_hierarchy PRIVATE kachesim)
+
+add_test(
+    test_memory_hierarchy_build
+    "${CMAKE_COMMAND}"
+    --build
+    "${CMAKE_BINARY_DIR}"
+    --config
+    "$<CONFIG>"
+    --target
+    test_memory_hierarchy)
+
+set_tests_properties(test_memory_hierarchy_build PROPERTIES FIXTURES_SETUP
+                                                            test_fixture)
+
+add_test(NAME test_memory_hierarchy COMMAND ./test_memory_hierarchy
+                                            test_fixture)
+
+set_tests_properties(test_memory_hierarchy PROPERTIES FIXTURES_SETUP
+                                                      test_fixture)

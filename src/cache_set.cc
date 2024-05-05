@@ -1,9 +1,9 @@
-#include "cache_set.h"
+#include "kachesim/cache_set.h"
 
 #include <iostream>
 #include <memory>
 
-#include "common.h"
+#include "kachesim/common.h"
 #include "replacement_policy/least_recently_used.h"
 
 namespace kachesim {

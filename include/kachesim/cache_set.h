@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "cache_block.h"
+#include "kachesim/cache_block.h"
 #include "replacement_policy/replacement_policy.h"
 
 namespace kachesim {

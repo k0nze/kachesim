@@ -18,8 +18,9 @@ if(NOT yaml-cpp_POPULATED)
     add_subdirectory(${yaml-cpp_SOURCE_DIR} ${yaml-cpp_BINARY_DIR})
 endif()
 
-add_library(kachesim SHARED src/common.cc src/data.cc
-                            src/data_storage_transaction.cc src/cache_block.cc)
+add_library(
+    kachesim SHARED src/common.cc src/data.cc src/data_storage_transaction.cc
+                    src/cache_block.cc src/cache_block.cc)
 
 target_include_directories(kachesim PUBLIC include)
 
@@ -29,9 +30,9 @@ target_include_directories(kachesim PUBLIC include)
 # src/data_storage_transaction.cc src/memory_interface.cc
 # src/memory_hierarchy.cc src/fake_memory.cc src/cache_interface.cc
 # src/set_associative_cache.cc src/memory_hierarchy.cc)
-#
-# target_link_libraries(kachesim PUBLIC yaml-cpp::yaml-cpp)
-# target_compile_options(kachesim INTERFACE "-fsized-deallocation")
+
+target_link_libraries(kachesim PUBLIC yaml-cpp::yaml-cpp)
+target_compile_options(kachesim INTERFACE "-fsized-deallocation")
 
 # set(package_files src/ CMakeLists.txt LICENSE) add_custom_command(OUTPUT
 # ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip COMMAND ${CMAKE_COMMAND}

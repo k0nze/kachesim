@@ -30,7 +30,9 @@ add_library(
     src/data_storage_transaction.cc
     src/memory_interface.cc
     src/cache_interface.cc
-    src/set_associative_cache.cc)
+    src/fake_memory.cc
+    src/set_associative_cache.cc
+    src/memory_hierarchy.cc)
 
 target_include_directories(kachesim PUBLIC include)
 target_link_libraries(kachesim PUBLIC yaml-cpp::yaml-cpp)

@@ -1,9 +1,9 @@
-#include "memory_hierarchy.h"
+#include "kachesim/memory_hierarchy.h"
 
 #include <algorithm>
 #include <iostream>
 
-#include "common.h"
+#include "kachesim/common.h"
 
 namespace kachesim {
 

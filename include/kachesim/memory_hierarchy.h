@@ -7,10 +7,10 @@
 #include <memory>
 #include <string>
 
-#include "data_storage.h"
-#include "data_storage_transaction.h"
-#include "fake_memory.h"
-#include "set_associative_cache.h"
+#include "kachesim/data_storage.h"
+#include "kachesim/data_storage_transaction.h"
+#include "kachesim/fake_memory.h"
+#include "kachesim/set_associative_cache.h"
 
 namespace kachesim {
 class MemoryHierarchy {

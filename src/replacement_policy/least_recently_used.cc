@@ -1,4 +1,4 @@
-#include "least_recently_used.h"
+#include "kachesim/replacement_policy/least_recently_used.h"
 
 #include <iostream>
 #include <sstream>

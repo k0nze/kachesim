@@ -4,9 +4,9 @@
 #include <map>
 #include <memory>
 
-#include "cache_interface.h"
-#include "cache_set.h"
-#include "data_storage.h"
+#include "kachesim/cache_interface.h"
+#include "kachesim/cache_set.h"
+#include "kachesim/data_storage.h"
 
 /**
  * represents a set-associative cache

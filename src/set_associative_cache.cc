@@ -1,4 +1,4 @@
-#include "set_associative_cache.h"
+#include "kachesim/set_associative_cache.h"
 
 #include <cmath>
 #include <iomanip>
@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include "common.h"
+#include "kachesim/common.h"
 
 namespace kachesim {
 SetAssociativeCache::SetAssociativeCache(

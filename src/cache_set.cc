@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "kachesim/common.h"
-#include "replacement_policy/least_recently_used.h"
+#include "kachesim/replacement_policy/least_recently_used.h"
 
 namespace kachesim {
 CacheSet::CacheSet(uint64_t cache_block_size, uint32_t ways,

@@ -22,21 +22,17 @@ add_library(
     kachesim SHARED
     src/common.cc
     src/data.cc
-    src/data_storage_transaction.cc
     src/cache_block.cc
-    src/cache_block.cc
+    src/cache_set.cc
+    src/replacement_policy/replacement_policy.cc
+    src/replacement_policy/least_recently_used.cc
     src/data_storage.cc
-    src/cache_interface.cc)
+    src/data_storage_transaction.cc
+    src/memory_interface.cc
+    src/cache_interface.cc
+    src/set_associative_cache.cc)
 
 target_include_directories(kachesim PUBLIC include)
-
-# add_library( kachesim SHARED src/common.cc src/data.cc src/cache_block.cc
-# src/cache_set.cc src/replacement_policy/replacement_policy.cc
-# src/replacement_policy/least_recently_used.cc src/data_storage.cc
-# src/data_storage_transaction.cc src/memory_interface.cc
-# src/memory_hierarchy.cc src/fake_memory.cc src/cache_interface.cc
-# src/set_associative_cache.cc src/memory_hierarchy.cc)
-
 target_link_libraries(kachesim PUBLIC yaml-cpp::yaml-cpp)
 target_compile_options(kachesim INTERFACE "-fsized-deallocation")
 

@@ -1,4 +1,4 @@
-#include "fake_memory.h"
+#include "kachesim/fake_memory.h"
 
 #include <filesystem>
 #include <fstream>
@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "common.h"
+#include "kachesim/common.h"
 
 namespace kachesim {
 FakeMemory::FakeMemory(const std::string& name, uint64_t size, latency_t read_latency,

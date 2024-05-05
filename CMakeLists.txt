@@ -38,9 +38,14 @@ target_include_directories(kachesim PUBLIC include)
 target_link_libraries(kachesim PUBLIC yaml-cpp::yaml-cpp)
 target_compile_options(kachesim INTERFACE "-fsized-deallocation")
 
-# set(package_files src/ CMakeLists.txt LICENSE) add_custom_command(OUTPUT
-# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip COMMAND ${CMAKE_COMMAND}
-# -E tar c ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip --format=zip --
-# ${package_files} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DEPENDS
-# ${package_files}) add_custom_target(${PROJECT_NAME}_package DEPENDS
-# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip)
+set(package_files include/ src/ CMakeLists.txt LICENSE)
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip
+    COMMAND
+        ${CMAKE_COMMAND} -E tar c
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip --format=zip --
+        ${package_files}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS ${package_files})
+add_custom_target(${PROJECT_NAME}_package
+                  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip)

@@ -1,7 +1,7 @@
 #ifndef DATA_STORAGE_H
 #define DATA_STORAGE_H
 
-#include "data_storage_transaction.h"
+#include "kachesim/data_storage_transaction.h"
 
 namespace kachesim {
 class DataStorage {

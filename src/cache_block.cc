@@ -1,9 +1,9 @@
-#include "cache_block.h"
+#include "kachesim/cache_block.h"
 
 #include <iostream>
 #include <string>
 
-#include "common.h"
+#include "kachesim/common.h"
 
 namespace kachesim {
 CacheBlock::CacheBlock(uint64_t size) : size_(size) { reset(); }

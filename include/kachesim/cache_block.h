@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "data.h"
+#include "kachesim/data.h"
 
 namespace kachesim {
 /**

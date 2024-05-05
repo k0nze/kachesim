@@ -1,4 +1,4 @@
-#include "cache_interface.h"
+#include "kachesim/cache_interface.h"
 
 namespace kachesim {
 CacheInterface::CacheInterface() = default;

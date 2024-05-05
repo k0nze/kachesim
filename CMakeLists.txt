@@ -19,8 +19,14 @@ if(NOT yaml-cpp_POPULATED)
 endif()
 
 add_library(
-    kachesim SHARED src/common.cc src/data.cc src/data_storage_transaction.cc
-                    src/cache_block.cc src/cache_block.cc src/data_storage.cc)
+    kachesim SHARED
+    src/common.cc
+    src/data.cc
+    src/data_storage_transaction.cc
+    src/cache_block.cc
+    src/cache_block.cc
+    src/data_storage.cc
+    src/cache_interface.cc)
 
 target_include_directories(kachesim PUBLIC include)
 

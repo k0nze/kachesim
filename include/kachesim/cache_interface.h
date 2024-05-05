@@ -1,7 +1,7 @@
 #ifndef CACHE_INTERFACE_H
 #define CACHE_INTERFACE_H
 
-#include "data_storage.h"
+#include "kachesim/data_storage.h"
 
 namespace kachesim {
 class CacheInterface : public DataStorage {

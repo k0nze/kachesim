@@ -5,8 +5,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "doubly_linked_list/doubly_linked_list.h"
-#include "kachesim.h"
+#include "kachesim/doubly_linked_list/doubly_linked_list.h"
+#include "kachesim/kachesim.h"
 
 using namespace kachesim;
 

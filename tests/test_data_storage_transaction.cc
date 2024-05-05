@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "kachesim.h"
+#include "kachesim/kachesim.h"
 
 using namespace kachesim;
 

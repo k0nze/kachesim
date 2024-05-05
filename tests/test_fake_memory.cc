@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "kachesim.h"
+#include "kachesim/kachesim.h"
 
 using namespace kachesim;
 

@@ -2,7 +2,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "kachesim.h"
+#include "kachesim/kachesim.h"
 
 using namespace kachesim;
 

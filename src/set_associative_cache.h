@@ -90,6 +90,7 @@ public:
 
     DataStorageTransaction write(address_t address, Data& data);
     DataStorageTransaction read(address_t address, size_t num_bytes);
+    DataStorageTransaction flush();
 
     bool is_address_cached(address_t address);
     bool is_address_valid(address_t address);
@@ -102,7 +103,6 @@ public:
     bool is_cache_block_valid(address_t cache_set_index, address_t block_index);
     bool is_cache_block_dirty(address_t cache_set_index, address_t block_index);
 
-    DataStorageTransaction flush();
     void reset();
 
 private:

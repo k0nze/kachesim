@@ -148,6 +148,12 @@ MemoryHierarchy::MemoryHierarchy(const std::string& yaml_config_string) {
             data_storage_map_[data_storage_order[0]]);
         first_level_cache_ = std::dynamic_pointer_cast<CacheInterface>(
             data_storage_map_[data_storage_order[data_storage_order.size() - 1]]);
+        // set data_storage_names_ to data_storage_order in reverse
+        data_storage_names_.clear();
+        for (auto it = data_storage_order.rbegin(); it != data_storage_order.rend();
+             ++it) {
+            data_storage_names_.push_back(*it);
+        }
 
     } else {
         throw std::runtime_error("No 'nodes' in yaml config");
@@ -209,4 +215,25 @@ DataStorageTransaction MemoryHierarchy::read(address_t address, size_t num_bytes
     auto write_dst = first_level_cache_->read(address, num_bytes);
     return write_dst;
 }
+
+DataStorageTransaction MemoryHierarchy::flush_all_caches() {
+    // strating from the first level cache iterate over all cache levels to flush
+    // them. Since the last level is a memory it can't be flushed
+    int32_t hit_level = 0;
+    latency_t latency = 0;
+
+    for (int i = 0; i < data_storage_names_.size() - 1; i++) {
+        auto cache = std::dynamic_pointer_cast<CacheInterface>(
+            data_storage_map_[data_storage_names_[i]]);
+        auto flush_dst = cache->flush();
+        latency += flush_dst.latency;
+    }
+    Data data = Data(0);
+    DataStorageTransaction dst = {WRITE, 0, latency, hit_level, data};
+
+    return dst;
+}
+
+void MemoryHierarchy::reset() {}
+
 }  // namespace kachesim

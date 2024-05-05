@@ -18,7 +18,7 @@ if(NOT yaml-cpp_POPULATED)
     add_subdirectory(${yaml-cpp_SOURCE_DIR} ${yaml-cpp_BINARY_DIR})
 endif()
 
-add_library(kachesim SHARED src/common.cc)
+add_library(kachesim SHARED src/common.cc src/data.cc)
 
 target_include_directories(kachesim PUBLIC include)
 

@@ -1,4 +1,4 @@
-#include "memory_interface.h"
+#include "kachesim/memory_interface.h"
 
 namespace kachesim {
 MemoryInterface::MemoryInterface() = default;

@@ -1,7 +1,7 @@
 #ifndef MEMORY_INTERFACE_H
 #define MEMORY_INTERFACE_H
 
-#include "data_storage.h"
+#include "kachesim/data_storage.h"
 
 namespace kachesim {
 class MemoryInterface : public DataStorage {

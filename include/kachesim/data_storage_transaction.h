@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "data.h"
+#include "kachesim/data.h"
 
 typedef uint32_t latency_t;
 typedef uint64_t address_t;

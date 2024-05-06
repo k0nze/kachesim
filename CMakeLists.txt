@@ -19,7 +19,7 @@ if(NOT yaml-cpp_POPULATED)
 endif()
 
 add_library(
-    kachesim SHARED
+    kachesim STATIC
     src/common.cc
     src/data.cc
     src/cache_block.cc
